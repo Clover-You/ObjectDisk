@@ -1,0 +1,47 @@
+{
+    "name": "object_cloud",
+    "version": "1.0.0",
+    "main": "app.ts",
+    "author": "Clover You <2621869236@qq.com>",
+    "license": "MIT",
+    "scripts": {
+        "dev": "nodemon -i *.d.ts --exec \"ts-node\" src/app.ts"
+    },
+    "dependencies": {
+        "@types/fs-extra": "^9.0.6",
+        "@types/koa": "^2.13.4",
+        "@types/koa-bodyparser": "^4.3.0",
+        "@types/koa-json": "^2.0.18",
+        "@types/koa-logger": "^3.1.1",
+        "@types/koa2-cors": "^2.0.1",
+        "@types/mysql": "^2.15.17",
+        "@types/node": "^14.14.20",
+        "@types/node-rsa": "^1.0.0",
+        "crypto": "^1.0.1",
+        "date-fns": "^2.16.1",
+        "ffmpeg": "0.0.4",
+        "fs": "0.0.1-security",
+        "fs-extra": "^9.0.1",
+        "koa": "^2.13.1",
+        "koa-body": "^4.2.0",
+        "koa-bodyparser": "^4.3.0",
+        "koa-json": "^2.0.2",
+        "koa-logger": "^3.2.1",
+        "koa-onerror": "^4.1.0",
+        "koa-router": "^10.0.0",
+        "koa2-cors": "^2.0.6",
+        "kos": "^2.6.18",
+        "mysql": "^2.18.1",
+        "node-rsa": "^1.1.1"
+    },
+    "devDependencies": {
+        "@types/ffmpeg": "^1.0.4",
+        "@types/fluent-ffmpeg": "^2.1.16",
+        "@types/koa-router": "^7.4.1",
+        "@types/multiparty": "0.0.32",
+        "express": "^4.17.1",
+        "express-ws": "^4.0.0",
+        "fluent-ffmpeg": "^2.1.2",
+        "websocket-stream": "^5.5.2"
+    }
+}
