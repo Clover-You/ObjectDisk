@@ -32,4 +32,11 @@ export class AjaxResult<T = any> {
   static success<T>(data: T, message: string, code: number): AjaxResult<T> {
     return new AjaxResult<T>(code ?? 200, data, true, message ?? '操作成功');
   }
+
+  static fail<T>(message?: string, code?: number, data?: T): AjaxResult<T>;
+  static fail<T>(message: string, code?: number, data?: T): AjaxResult<T>;
+  static fail<T>(message: string, code: number, data?: T): AjaxResult<T>;
+  static fail<T>(message: string, code: number, data?: T): AjaxResult<T> {
+    return new AjaxResult<T>(code ?? 500, data, false, message ?? '操作失败');
+  }
 }
