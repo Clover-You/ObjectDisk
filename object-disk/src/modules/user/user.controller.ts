@@ -36,6 +36,9 @@ export class UserController {
    * @param account 账号
    * @param password 密码
    * @param registeredCode 内部注册码
+   * @author LRolinx
+   * @author Clover·You
+   * @date 2021/11/09 11:29
    */
   @Post('/objectCloudDiskRegistered')
   async userRegistered(
@@ -50,13 +53,14 @@ export class UserController {
         //用户不存在可注册
         const date = format(new Date(), DateUtils.DATETIME_DEFAULT_FORMAT);
 
-        const user = new UserEntity();
-        user.nickName = nickName;
-        user.photo =
-          'https://cn.bing.com/th?id=OHR.SnowCraterLake_ZH-CN9218350129_1920x1080.jpg&rf=LaDigue_1920x1080.jpg&pid=hp';
-        user.createTime = date;
-        user.password = MathTools.encryptForKey(password);
-        user.account = account;
+        const user = UserEntity.instance({
+          nickName,
+          photo:
+            'https://cn.bing.com/th?id=OHR.SnowCraterLake_ZH-CN9218350129_1920x1080.jpg&rf=LaDigue_1920x1080.jpg&pid=hp',
+          createTime: date,
+          password: MathTools.encryptForKey(password),
+          account,
+        });
 
         const insertResult = await this.userService.addUser(user);
 

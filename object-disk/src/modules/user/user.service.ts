@@ -31,6 +31,7 @@ export class UserService {
   /**
    * 根据账号查询用户
    * @param account 账号
+   * @author LRolinx
    * @author Clover You
    * @date 2021/11/09 10:38
    * @return Promise<UserEntity>
@@ -42,6 +43,7 @@ export class UserService {
   /**
    * 添加用户信息
    * @param user 用户信息
+   * @author LRolinx
    * @author Clover You
    * @date 2021/11/09 10:44
    * @return Promise<InsertResult>
