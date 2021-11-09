@@ -1,5 +1,4 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, response } from 'express';
+import { ArgumentsHost, ExceptionFilter, HttpException } from '@nestjs/common';
 
 /**
  * █████▒█      ██  ▄████▄   ██ ▄█▀     ██████╗ ██╗   ██╗ ██████╗
@@ -13,17 +12,13 @@ import { Request, response } from 'express';
  * ░     ░ ░      ░  ░
  * Copyright 2021 Clover.
  * <p>
- *  自定义日志中间件
+ *  异常过滤器
  * </p>
  * @author Clover
- * @create 2021-11-08 15:30
+ * @create 2021-11-08 15:56
  */
-@Injectable()
-export class LoggerMiddleware implements NestMiddleware {
-  use(req: Request, res: Response, next: () => void) {
-    const { method, path } = req;
-    console.log(`DEBUG: =============>>> ${method}
-      ====>>> PATH: ${path}`);
-    next();
+export class HttpExceptionFilter implements ExceptionFilter<HttpException> {
+  catch(exception: HttpException, host: ArgumentsHost) {
+    throw new Error('Method not implemented.');
   }
 }
