@@ -1,4 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserEntity } from '../../entity/user.entity';
 import { UserController } from './user.controller';
 
 /**
@@ -23,6 +25,7 @@ describe('UserController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [TypeOrmModule.forFeature([UserEntity])],
       controllers: [UserController],
     }).compile();
 

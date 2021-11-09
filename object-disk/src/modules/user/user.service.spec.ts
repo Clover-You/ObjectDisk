@@ -1,4 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserEntity } from '../../entity/user.entity';
+import { UserModule } from './user.module';
 import { UserService } from './user.service';
 
 /**
@@ -23,13 +26,18 @@ describe('UserService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [TypeOrmModule.forFeature([UserEntity])],
       providers: [UserService],
     }).compile();
-
     service = module.get<UserService>(UserService);
   });
 
   it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
+
+  it('测试findAll', () => {
+    console.log('Hello World!');
     expect(service).toBeDefined();
   });
 });
