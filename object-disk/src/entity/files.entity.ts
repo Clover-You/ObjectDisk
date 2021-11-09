@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 /**
  * █████▒█      ██  ▄████▄   ██ ▄█▀     ██████╗ ██╗   ██╗ ██████╗
@@ -12,66 +12,40 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
  * ░     ░ ░      ░  ░
  * Copyright 2021 Clover.
  * <p>
- *  用户实体
+ *  文件表
  * </p>
  * @author Clover
- * @create 2021-11-09 08:59
+ * @create 2021-11-09 09:20
  */
-@Entity('t_user')
-export class User {
+@Entity('t_files')
+export class Files {
   /**
-   * 用户id
+   * 文件id
    */
-  @PrimaryGeneratedColumn({
-    type: 'int',
-  })
-  id: number;
+  @PrimaryColumn({ type: 'varchar', length: 512, comment: '文件id' })
+  sha256: string;
 
   /**
-   * 用户昵称
+   * 文件路径
    */
-  @Column({ type: 'varchar', length: 32 })
-  nickname: string;
+  @Column({ type: 'varchar', length: 255, comment: '文件路径' })
+  url: string;
 
   /**
-   * 头像
+   * 文件状态id
    */
-  @Column({ type: 'varchar', length: 255 })
-  photo: string;
+  @Column({ type: 'int', comment: '文件状态id' })
+  statusId: number;
 
   /**
-   * 密码
+   * 文件类型id
    */
-  @Column({ type: 'varchar', length: 256 })
-  password: string;
+  @Column({ type: 'int', comment: '文件类型id' })
+  fileTypeId: number;
 
   /**
-   * 账号
+   * 是否已检查违规情况
    */
-  @Column({ type: 'varchar', length: '20' })
-  account: string;
-
-  /**
-   * 是否停用
-   */
-  @Column({ type: 'bit', default: false })
-  isDisable: boolean;
-
-  /**
-   * 创建时间
-   */
-  @Column({ type: 'char', length: 19 })
-  createtime: string;
-
-  /**
-   * 是否删除
-   */
-  @Column({ type: 'bit' })
-  del: boolean;
-
-  /**
-   * 删除时间
-   */
-  @Column({ type: 'char', length: 19 })
-  deltime: string;
+  @Column({ type: 'bit', comment: '是否已检查违规情况' })
+  checked: boolean;
 }

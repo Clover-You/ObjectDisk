@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from './user.entity';
 
 /**
  * █████▒█      ██  ▄████▄   ██ ▄█▀     ██████╗ ██╗   ██╗ ██████╗
@@ -12,56 +13,49 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
  * ░     ░ ░      ░  ░
  * Copyright 2021 Clover.
  * <p>
- *  用户实体
+ *  用户文件夹实体
  * </p>
  * @author Clover
  * @create 2021-11-09 08:59
  */
-@Entity('t_user')
-export class User {
+@Entity('t_folder')
+export class Folder {
   /**
-   * 用户id
+   * 文件夹id
    */
-  @PrimaryGeneratedColumn({
-    type: 'int',
-  })
+  @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
   /**
-   * 用户昵称
+   * 文件夹名称
    */
-  @Column({ type: 'varchar', length: 32 })
-  nickname: string;
+  @Column({ type: 'varchar', length: 64 })
+  name: string;
 
   /**
-   * 头像
+   * 用户id
    */
-  @Column({ type: 'varchar', length: 255 })
-  photo: string;
+  @Column({ type: 'int' })
+  userId: number;
 
   /**
-   * 密码
+   * 父文件夹id
    */
-  @Column({ type: 'varchar', length: 256 })
-  password: string;
+  @Column({ type: 'int' })
+  @ManyToOne(() => User, (user) => user.id)
+  folderId: number;
 
   /**
-   * 账号
+   * 文件夹大小
    */
-  @Column({ type: 'varchar', length: '20' })
-  account: string;
-
-  /**
-   * 是否停用
-   */
-  @Column({ type: 'bit', default: false })
-  isDisable: boolean;
+  @Column({ type: 'double' })
+  size: number;
 
   /**
    * 创建时间
    */
   @Column({ type: 'char', length: 19 })
-  createtime: string;
+  createTime: string;
 
   /**
    * 是否删除
@@ -73,5 +67,5 @@ export class User {
    * 删除时间
    */
   @Column({ type: 'char', length: 19 })
-  deltime: string;
+  delTime: string;
 }
