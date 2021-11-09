@@ -1,8 +1,10 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './modules/user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { LoggerMiddleware } from './common/logger/logger.middleware';
+import { DataBaseConfig } from './config/orm.config';
 
 /**
  * █████▒█      ██  ▄████▄   ██ ▄█▀     ██████╗ ██╗   ██╗ ██████╗
@@ -22,9 +24,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
  * @create 2021-11-08 15:23
  */
 @Module({
-  //, TypeOrmModule.forRoot()
-  imports: [UserModule],
+  imports: [UserModule, TypeOrmModule.forRoot(DataBaseConfig)],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    // 使用日志中间件
+    consumer.apply(LoggerMiddleware).forRoutes('/');
+  }
+}
