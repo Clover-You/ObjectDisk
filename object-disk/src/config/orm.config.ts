@@ -23,7 +23,7 @@ const DataBaseConfig: TypeOrmModuleOptions = {
   port: 3306,
   username: 'root',
   password: '123',
-  database: 'zhsm',
+  database: 'objcloud',
   // 不要打开这个设置
   synchronize: false,
   entities: ['dist/entity/*.entity{.ts,.js}'],
