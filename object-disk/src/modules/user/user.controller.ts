@@ -1,4 +1,4 @@
-import { Controller, Inject } from '@nestjs/common';
+import { Controller, Inject, Post } from '@nestjs/common';
 import { UserEntity } from 'src/entity/user.entity';
 import { AjaxResult } from 'src/utils/ajax-result.classes';
 import DateUtils from 'src/utils/DateUtils';
@@ -23,7 +23,7 @@ import MathTools from 'src/utils/MathTools';
  * @author Clover
  * @create 2021-11-08 15:24
  */
-@Controller('user')
+@Controller('/users')
 export class UserController {
   constructor(
     @Inject(UserService)
@@ -37,6 +37,7 @@ export class UserController {
    * @param password 密码
    * @param registeredCode 内部注册码
    */
+  @Post('/objectCloudDiskRegistered')
   async userRegistered(
     nickName: string,
     account: string,
