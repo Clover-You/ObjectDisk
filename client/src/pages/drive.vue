@@ -233,7 +233,10 @@ export default {
       //拖拽放入
       this.isShowUpdateModel = false;
 
-      let items = e.dataTransfer.items;
+      // let items = e.dataTransfer.items;
+      // 修复获取不了文件的情况
+      let items = [];
+      [].forEach.call(e.dataTransfer.items, function(file) {items.push(file);},false);
       // console.log(items);
       items.forEach(item => {
         if (item.kind === "file") {
