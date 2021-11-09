@@ -18,7 +18,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
  * @create 2021-11-09 09:11
  */
 @Entity('t_user_files')
-export class UserFiles {
+export class UserFilesEntity {
   /**
    * 用户文件id
    */

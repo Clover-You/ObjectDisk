@@ -1,5 +1,4 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { User } from './user.entity';
 
 /**
  * █████▒█      ██  ▄████▄   ██ ▄█▀     ██████╗ ██╗   ██╗ ██████╗
@@ -19,7 +18,7 @@ import { User } from './user.entity';
  * @create 2021-11-09 08:59
  */
 @Entity('t_folder')
-export class Folder {
+export class FolderEntity {
   /**
    * 文件夹id
    */
@@ -42,7 +41,6 @@ export class Folder {
    * 父文件夹id
    */
   @Column({ type: 'int' })
-  @ManyToOne(() => User, (user) => user.id)
   folderId: number;
 
   /**
