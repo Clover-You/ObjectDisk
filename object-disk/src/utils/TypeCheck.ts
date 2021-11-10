@@ -7,8 +7,8 @@
  * Author: Clover You
  * Create Time: 2021/1/12 00:39
  ***************************************************************************/
-export default class TypeCheck{
-    public static getType(o: any): string {
-        return Object.prototype.toString.call(o);
-    }
+export default class TypeCheck {
+  public static getType(o: any): string {
+    return Object.prototype.toString.call(o);
+  }
 }
