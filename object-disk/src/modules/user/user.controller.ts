@@ -1,10 +1,9 @@
-import { Controller, Inject, Post } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
 import { UserEntity } from 'src/entity/user.entity';
 import { AjaxResult } from 'src/utils/ajax-result.classes';
-import DateUtils from 'src/utils/DateUtils';
 import { UserService } from './user.service';
-import { format } from 'date-fns';
-import MathTools from 'src/utils/MathTools';
+import { HttpParameterException } from 'src/exceptions/http-parameter.exception';
+import { StringUtils } from 'src/utils/StringUtils';
 
 /**
  * █████▒█      ██  ▄████▄   ██ ▄█▀     ██████╗ ██╗   ██╗ ██████╗
@@ -48,32 +47,36 @@ export class UserController {
     registeredCode: string,
   ): Promise<AjaxResult<UserEntity>> {
     if (registeredCode.toUpperCase() == 'OBJECT') {
-      const user = await this.userService.queryUserByAccount(account);
-      if (user === null) {
-        //用户不存在可注册
-        const date = format(new Date(), DateUtils.DATETIME_DEFAULT_FORMAT);
-
-        const user = UserEntity.instance({
+      this.userService.userRegistered(
+        UserEntity.instance({
           nickName,
-          photo:
-            'https://cn.bing.com/th?id=OHR.SnowCraterLake_ZH-CN9218350129_1920x1080.jpg&rf=LaDigue_1920x1080.jpg&pid=hp',
-          createTime: date,
-          password: MathTools.encryptForKey(password),
           account,
-        });
-
-        const insertResult = await this.userService.addUser(user);
-
-        if (insertResult != void 0) {
-          return AjaxResult.success(null, '注册成功');
-        } else {
-          return AjaxResult.fail('注册失败');
-        }
-      } else {
-        return AjaxResult.fail('用户已被注册');
-      }
+          password,
+        }),
+      );
+      return AjaxResult.success(null, '注册成功');
     } else {
       return AjaxResult.fail('内部注册码错误');
     }
+  }
+
+  /**
+   * 用户登录请求接口
+   * @param account 账号
+   * @param password 密码
+   * @return Promise<AjaxResult>
+   * @author Clover You
+   * @date 2021/11/9 14:37
+   */
+  @Post('/objectCloudDiskLogin')
+  async userLogin(@Body() { account, password }: UserEntity) {
+    if (!StringUtils.hasText(account)) {
+      throw new HttpParameterException('账号不能为空', 406);
+    }
+    if (!StringUtils.hasText(password)) {
+      throw new HttpParameterException('密码不能为空', 406);
+    }
+    this.userService.userLogin(account, password);
+    return AjaxResult.success('登录成功!');
   }
 }

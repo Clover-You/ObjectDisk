@@ -5,6 +5,7 @@ import * as path from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { HttpParameterExceptionFilter } from './common/filters/http-parameter-exception.filter';
 /**
  * █████▒█      ██  ▄████▄   ██ ▄█▀     ██████╗ ██╗   ██╗ ██████╗
  * ▓██   ▒ ██  ▓██▒▒██▀ ▀█   ██▄█▒      ██╔══██╗██║   ██║██╔════╝
@@ -27,9 +28,8 @@ async function bootstrap() {
   app.useStaticAssets(path.join(__dirname, '..', 'resources'), {
     prefix: '/static/',
   });
-
-  app.useGlobalFilters(new HttpExceptionFilter());
-
+  app.useGlobalFilters(new HttpParameterExceptionFilter());
+  app.enableCors();
   // 开启API文档
   const swaggerOptions = new DocumentBuilder()
     .setTitle('对象网盘API文档')
