@@ -1,8 +1,9 @@
-.DS_Store
+*/.DS_Store
 */node_modules
 */dist
 */yarn.lock
 */yarn-error.log
+*/package-lock.json
 
 
 # local env files
@@ -16,7 +17,7 @@ yarn-error.log*
 pnpm-debug.log*
 
 # Editor directories and files
-.idea
+*/.idea
 .vscode
 *.suo
 *.ntvs*
