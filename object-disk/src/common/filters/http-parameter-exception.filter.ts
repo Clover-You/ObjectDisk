@@ -1,5 +1,13 @@
-import { ArgumentsHost, ExceptionFilter, HttpException } from '@nestjs/common';
-
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
+import { Response } from 'express';
+import { HttpParameterException } from 'src/exceptions/http-parameter.exception';
+import { AjaxResult } from 'src/utils/ajax-result.classes';
 /**
  * █████▒█      ██  ▄████▄   ██ ▄█▀     ██████╗ ██╗   ██╗ ██████╗
  * ▓██   ▒ ██  ▓██▒▒██▀ ▀█   ██▄█▒      ██╔══██╗██║   ██║██╔════╝
@@ -12,13 +20,21 @@ import { ArgumentsHost, ExceptionFilter, HttpException } from '@nestjs/common';
  * ░     ░ ░      ░  ░
  * Copyright 2021 Clover.
  * <p>
- *  异常过滤器
+ *  参数错误异常处理器
  * </p>
  * @author Clover
- * @create 2021-11-08 15:56
+ * @create 2021-11-09 15:20
  */
-export class HttpExceptionFilter implements ExceptionFilter<HttpException> {
+@Catch(HttpParameterException)
+export class HttpParameterExceptionFilter
+  implements ExceptionFilter<HttpException>
+{
   catch(exception: HttpException, host: ArgumentsHost) {
-    throw new Error('Method not implemented.');
+    const ctx = host.switchToHttp();
+    const resp = ctx.getResponse<Response>();
+
+    resp
+      .status(HttpStatus.NOT_ACCEPTABLE)
+      .json(AjaxResult.fail(exception.message, 406));
   }
 }
