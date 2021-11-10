@@ -6,7 +6,7 @@
  * 
  */
 const state = {
-    serveUrl: 'http://192.168.8.111:3000/',
+    serveUrl: 'http://127.0.0.1:3000/',
 };
 
 const mutations = {
