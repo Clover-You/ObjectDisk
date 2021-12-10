@@ -76,7 +76,7 @@ export class UserController {
     if (!StringUtils.hasText(password)) {
       throw new HttpParameterException('密码不能为空', 406);
     }
-    this.userService.userLogin(account, password);
-    return AjaxResult.success('登录成功!');
+    const userinfo = await this.userService.userLogin(account, password);
+    return AjaxResult.success(userinfo);
   }
 }

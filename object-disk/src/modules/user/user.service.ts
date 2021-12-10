@@ -46,7 +46,7 @@ export class UserService {
       const user = UserEntity.instance({
         nickName,
         photo:
-          'https://cn.bing.com/th?id=OHR.SnowCraterLake_ZH-CN9218350129_1920x1080.jpg&rf=LaDigue_1920x1080.jpg&pid=hp',
+          'https://storage.live.com/users/0xf2a82bac8d704404/myprofile/expressionprofile/profilephoto:UserTileStatic/p?ck=1&ex=720&sid=0CF8A907DF236BE1005BB80EDE136A1C&fofoff=1',
         createTime: date,
         password: MathTools.encryptForKey(password),
         account,
