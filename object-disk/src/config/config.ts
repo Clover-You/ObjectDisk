@@ -45,7 +45,7 @@ const USER_HOME = process.env.HOME || process.env.USERPROFILE;
 const conf: ConfType = {
   mysql: {
     user: 'root',
-    password: '123456',
+    password: '1433233Abc.',
     database: 'objcloud',
     host: '127.0.0.1',
     port: 3306,

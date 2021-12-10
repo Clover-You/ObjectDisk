@@ -6,9 +6,10 @@
  *
  */
 // import NodeRSA from 'node-rsa';
-import fs from 'fs';
-import conf from 'src/config/config';
 const NodeRSA = require('node-rsa');
+const fs = require('fs');
+// import * as fs from 'fs';
+import conf from 'src/config/config';
 
 export default class MathTools {
   // 生成一个1024长度的密钥对

@@ -4,7 +4,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { HttpParameterExceptionFilter } from './common/filters/http-parameter-exception.filter';
 /**
  * █████▒█      ██  ▄████▄   ██ ▄█▀     ██████╗ ██╗   ██╗ ██████╗
