@@ -188,12 +188,12 @@ export default {
               sessionStorage.setItem("isLogin", true);
               sessionStorage.setItem("id", res.data.data.id);
               sessionStorage.setItem("photo", res.data.data.photo);
-              sessionStorage.setItem("nickname", res.data.data.nickname);
+              sessionStorage.setItem("nickname", res.data.data.nickName);
 
               this.$store.state.isLogin = true;
               this.$store.state.id = res.data.data.id;
               this.$store.state.photo = res.data.data.photo;
-              this.$store.state.nickname = res.data.data.nickname;
+              this.$store.state.nickname = res.data.data.nickName;
               this.$router.push({ name: "drive" });
               break;
             case 500:
