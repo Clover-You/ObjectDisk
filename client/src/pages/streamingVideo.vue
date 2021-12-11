@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2021-01-09 13:37:25
- * @LastEditTime: 2021-03-09 11:40:18
+ * @LastEditTime 2021-12-11 19:55
  * @Description: 流视频DEMO
  * 
 -->
@@ -52,7 +52,8 @@ export default {
     //     src: URL.createObjectURL(res.data),
     //   })
     // }).catch(err => {
-    //   console.log(err);
+    //   this.showTipText = err.data.message;
+          // this.isShowTipMessge = true;
     // })
 
   },

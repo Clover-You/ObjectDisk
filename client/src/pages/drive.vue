@@ -1,18 +1,18 @@
 <!--
  * @Author: LRolinx
  * @Date: 2020-10-14 20:58:01
- * @LastEditTime 2021-12-11 18:30
+ * @LastEditTime 2021-12-11 19:54
  * @Description: 我的云盘
  * 
 -->
 <template>
-  <div class="driveBody" @mouseup="driveBodyMouseup"  @dragenter.prevent.stop="dragenter" @mouseup.stop="fileBoxMouseup($event,null)" @contextmenu.prevent="">
+  <div class="driveBody" @mouseup="driveBodyMouseup" @dragenter.prevent.stop="dragenter" @mouseup.stop="fileBoxMouseup($event,null)" @contextmenu.prevent="">
     <div class="draging" v-if="isShowUpdateModel" @dragover.prevent.stop="dragover" @dragleave.prevent.stop="dragleave" @drop.prevent.stop="drop">
-        <div class="tip" @dragleave.prevent.stop="">
-          <p>拖拽文件到此即可上传到XXX</p>
-        </div>
+      <div class="tip" @dragleave.prevent.stop="">
+        <p>拖拽文件到此即可上传到XXX</p>
       </div>
-    
+    </div>
+
     <div class="toolbar">
       <div class="toolbarLeft">
         <p class="toolbarTitle colorR">我的云盘</p>
@@ -43,10 +43,10 @@
               </div>
               <i class="iconfont iconPreview" :class="checkType(item).iconStr" v-if="item.type == 'file' && item.blob == null"></i>
             </div>
-              <div class="fileContentText">
-                <p class="fileContentName">{{item.name}}{{item.suffix==null?'':`.${item.suffix}`}}</p>
-                <p class="fileContentDate">{{item.updateTime.slice(0,item.updateTime.length-3)}}</p>
-              </div>
+            <div class="fileContentText">
+              <p class="fileContentName">{{item.name}}{{item.suffix==null?'':`.${item.suffix}`}}</p>
+              <p class="fileContentDate">{{item.updateTime.slice(0,item.updateTime.length-3)}}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -106,8 +106,8 @@
 import newFile from "@/components/newFile";
 import newFolder from "@/components/newFolder";
 import tipMessge from "@/components/tipMessge";
-import lVideo from "@/components/lVideo"
-import lPicture from "@/components/lPicture"
+import lVideo from "@/components/lVideo";
+import lPicture from "@/components/lPicture";
 export default {
   components: {
     newFile,
@@ -118,17 +118,17 @@ export default {
   },
   data() {
     return {
-      isShowlVideo: false,//是否显示视频模态窗
-      videoList: [],//视频模态窗数据
-      isShowTipMessge: false,//是否显示提示模态窗
-      showTipText: "",//显示提示内容
-      isShowRightMenu: false,//是否显示右键菜单选择
-      showRightMenuType: "default",//显示的右键菜单类型
-      isShowNewFileModel: false,//是否显示新建文件模态窗
-      isShowNewFolderModel: false,//是否显示新建文件夹模态窗
-      isShowUpdateModel: false,//是否显示上传模态窗
-      fileMenuPos: { x: 0, y: 0 },//菜单选择显示位置
-      fileData: [],//用户数据
+      isShowlVideo: false, //是否显示视频模态窗
+      videoList: [], //视频模态窗数据
+      isShowTipMessge: false, //是否显示提示模态窗
+      showTipText: "", //显示提示内容
+      isShowRightMenu: false, //是否显示右键菜单选择
+      showRightMenuType: "default", //显示的右键菜单类型
+      isShowNewFileModel: false, //是否显示新建文件模态窗
+      isShowNewFolderModel: false, //是否显示新建文件夹模态窗
+      isShowUpdateModel: false, //是否显示上传模态窗
+      fileMenuPos: { x: 0, y: 0 }, //菜单选择显示位置
+      fileData: [], //用户数据
     };
   },
   watch: {
@@ -136,74 +136,85 @@ export default {
       //监听路由变化
       // console.log(to,from);
       this.getUserFileAndFolder(this.getFolderId);
-    }
+    },
   },
   computed: {
     getFolderId() {
       //获取路由中的参数文件夹id
-      return this.$route.params.folderId == undefined ? '0' : this.$route.params.folderId;
+      return this.$route.params.folderId == undefined
+        ? "0"
+        : this.$route.params.folderId;
     },
   },
   created() {
     if (!this.$store.state.isLogin) {
-      this.$router.replace({ name: 'login' });//没登录直接回到登录页
+      this.$router.replace({ name: "login" }); //没登录直接回到登录页
     }
 
     this.getUserFileAndFolder(this.getFolderId);
   },
-  
+
   methods: {
     addUserFolder(value) {
       //添加用户文件夹
-      this.$http.post(`${this.$store.state.serve.serveUrl}drive/addUserFolder`, {
-        userid: this.$store.state.id,
-        folderid: this.getFolderId,
-        name: value,
-      }).then(res => {
-        if(res.data.code == 200) {
-          this.getUserFileAndFolder(this.getFolderId);
-        }else {
-          this.showTipText = res.data.message;
+      this.$http
+        .post(`${this.$store.state.serve.serveUrl}drive/addUserFolder`, {
+          userid: this.$store.state.id,
+          folderid: this.getFolderId,
+          name: value,
+        })
+        .then((res) => {
+          if (res.data.code == 200) {
+            this.getUserFileAndFolder(this.getFolderId);
+          } else {
+            this.showTipText = res.data.message;
             this.isShowTipMessge = true;
-        }
-      }).catch(err => {
-        console.log(err);
-      })
+          }
+        })
+        .catch((err) => {
+          this.showTipText = err.data.message;
+          this.isShowTipMessge = true;
+        });
     },
     getUserFileAndFolder(value) {
       // 获取用户的文件夹与文件
-      this.$http.post(`${this.$store.state.serve.serveUrl}drive/getUserFileAndFolder`, {
-        userid: this.$store.state.id,
-        folderid: value
-      }).then(res => {
-        switch (res.data.code) {
-          case 200:
+      this.$http
+        .post(`${this.$store.state.serve.serveUrl}drive/getUserFileAndFolder`, {
+          userid: this.$store.state.id,
+          folderid: value,
+        })
+        .then((res) => {
+          if (res.data.code == 200) {
             console.log(res.data.data);
-            for(let i=0;i<res.data.data.length;i++){
-                res.data.data[i].blob = null;
+            for (let i = 0; i < res.data.data.length; i++) {
+              res.data.data[i].blob = null;
             }
 
             this.fileData = res.data.data;
 
-            for(let i=0;i<res.data.data.length;i++){
-                if(res.data.data[i].type == 'file' && this.checkType(res.data.data[i]).type == 'image') {
-                  this.ImageToblobUrl(i);
-                }
-                if(res.data.data[i].type == 'file' && this.checkType(res.data.data[i]).type == 'video') {
-                  this.VideoImageToblobUrl(i);
-                }
+            for (let i = 0; i < res.data.data.length; i++) {
+              if (
+                res.data.data[i].type == "file" &&
+                this.checkType(res.data.data[i]).type == "image"
+              ) {
+                this.ImageToblobUrl(i);
+              }
+              if (
+                res.data.data[i].type == "file" &&
+                this.checkType(res.data.data[i]).type == "video"
+              ) {
+                this.VideoImageToblobUrl(i);
+              }
             }
-            
-            
-            break;
-          default:
+          } else {
             this.showTipText = res.data.message;
             this.isShowTipMessge = true;
-            break;
-        }
-      }).catch(err => {
-        console.log(err);
-      })
+          }
+        })
+        .catch((err) => {
+          this.showTipText = err.data.message;
+          this.isShowTipMessge = true;
+        });
     },
     dragenter(e) {
       //拖拽进入
@@ -212,14 +223,14 @@ export default {
         let item = items[i];
         if (item.kind === "file") {
           //是文件才触发显示效果
-          e.dataTransfer.dropEffect = 'copy';
+          e.dataTransfer.dropEffect = "copy";
           this.isShowUpdateModel = true;
         }
       }
     },
     dragover(e) {
       //拖拽持续移动
-      e.dataTransfer.dropEffect = 'copy';
+      e.dataTransfer.dropEffect = "copy";
       this.isShowUpdateModel = true;
     },
     dragleave() {
@@ -232,13 +243,13 @@ export default {
 
       let items = e.dataTransfer.items;
       // console.log(items);
-      items.forEach(item => {
+      items.forEach((item) => {
         if (item.kind === "file") {
           //是文件才触发
           let entry = item.webkitGetAsEntry();
           this.getFileFromEntryRecursively(entry);
         }
-      })
+      });
     },
     driveBodyMouseup() {
       //父级点击
@@ -250,17 +261,16 @@ export default {
       //点击文件与文件夹
       if (e.button == 2) {
         //右键
-        this.$set(this.fileMenuPos, 'x', e.x);
-        this.$set(this.fileMenuPos, 'y', e.y);
+        this.$set(this.fileMenuPos, "x", e.x);
+        this.$set(this.fileMenuPos, "y", e.y);
         this.isShowRightMenu = true;
       }
     },
     openFileOrFolder(item) {
       //打开文件或打开文件夹
       if (item.type == "folder") {
-        this.$router.push({ name: 'drive', params: { folderId: item.id } });
-      }
-      else {
+        this.$router.push({ name: "drive", params: { folderId: item.id } });
+      } else {
         //打开文件
         this.showTipText = "啊，文件预览还不能用";
         this.isShowTipMessge = true;
@@ -269,9 +279,9 @@ export default {
     getFileFromEntryRecursively(entry) {
       // 处理文件夹里的文件
       if (entry.isFile) {
-        entry.file(file => {
-          let fname = file.name.substring(0, file.name.lastIndexOf("."));//获取文件名
-          let fext = file.name.substring(file.name.lastIndexOf(".") + 1);//获取后缀名
+        entry.file((file) => {
+          let fname = file.name.substring(0, file.name.lastIndexOf(".")); //获取文件名
+          let fext = file.name.substring(file.name.lastIndexOf(".") + 1); //获取后缀名
           let path = entry.fullPath.substring(1);
 
           let fileInfoOBJ = {
@@ -285,20 +295,17 @@ export default {
             fext,
             filePath: path,
             fileSha256: "",
-            folderId: this.getFolderId
+            folderId: this.getFolderId,
             // currentChunkList: []
           };
-          this.$parent.uploadBufferPool.push(fileInfoOBJ)//将任务写入数据
-
+          this.$parent.uploadBufferPool.push(fileInfoOBJ); //将任务写入数据
         });
       } else {
         //检测到文件夹
         let reader = entry.createReader();
-        reader.readEntries(entries => {
-
+        reader.readEntries((entries) => {
           for (let i = 0, len = entries.length; i < len; i++) {
-            this.getFileFromEntryRecursively(entries[i])
-
+            this.getFileFromEntryRecursively(entries[i]);
           }
 
           // entries.forEach(entry => this.getFileFromEntryRecursively(entry));
@@ -316,300 +323,315 @@ export default {
     },
     ImageToblobUrl(i) {
       //获取图片数据并返回Blob地址
-      this.$http.post(`${this.$store.state.serve.serveUrl}drive/getImageData`, {
-        id:this.fileData[i].id
-      },{
-        responseType:'blob'
-      }).then(res => {
-        
-        let bloburl = window.URL.createObjectURL(res.data);
-        this.$set(this.fileData[i],"blob",bloburl);
-      }).catch(err => {
-        console.log(err);
-      })
+      this.$http
+        .post(
+          `${this.$store.state.serve.serveUrl}drive/getImageData`,
+          {
+            id: this.fileData[i].id,
+          },
+          {
+            responseType: "blob",
+          }
+        )
+        .then((res) => {
+          let bloburl = window.URL.createObjectURL(res.data);
+          this.$set(this.fileData[i], "blob", bloburl);
+        })
+        .catch((err) => {
+          this.showTipText = err.data.message;
+          this.isShowTipMessge = true;
+        });
     },
     VideoImageToblobUrl(i) {
       //获取视频预览图数据并返回Blob地址
-      this.$http.post(`${this.$store.state.serve.serveUrl}video/getVideoSceenshots`, {
-        id:this.fileData[i].id
-      },{
-        responseType:'blob'
-      }).then(res => {
-        
-        let bloburl = window.URL.createObjectURL(res.data);
-        this.$set(this.fileData[i],"blob",bloburl);
-      }).catch(err => {
-        console.log(err);
-      })
+      this.$http
+        .post(
+          `${this.$store.state.serve.serveUrl}video/getVideoSceenshots`,
+          {
+            id: this.fileData[i].id,
+          },
+          {
+            responseType: "blob",
+          }
+        )
+        .then((res) => {
+          let bloburl = window.URL.createObjectURL(res.data);
+          this.$set(this.fileData[i], "blob", bloburl);
+        })
+        .catch((err) => {
+          this.showTipText = err.data.message;
+          this.isShowTipMessge = true;
+        });
     },
     destroyBlobUrl(blob) {
       //销毁blob地址
       window.URL.revokeObjectURL(blob);
     },
     checkType(item) {
-    let typeStr = {
-      type:'',
-      iconStr:'icon-unknown'
-    };
-    if(item.fileType==null) {
-    //使用后缀判断
-    if(item.suffix != null) {
-    switch(item.suffix.toLowerCase()) {
-      // 图片
-    case "png": {
-      typeStr.type = "image";
-      typeStr.iconStr = "icon-pic";
-      break;
-    }
-    case "jpg": {
-      typeStr.type = "image";
-      typeStr.iconStr = "icon-pic";
-      break;
-    }
-    case "jpeg": {
-      typeStr.type = "image";
-      typeStr.iconStr = "icon-pic";
-      break;
-    }
-    case "gif": {
-      typeStr.type = "image";
-      typeStr.iconStr = "icon-pic";
-      break;
-    }
-    case "eps": {
-      typeStr.type = "image";
-      typeStr.iconStr = "icon-pic";
-      break;
-    }
-    case "exr": {
-      typeStr.type = "image";
-      typeStr.iconStr = "icon-pic";
-      break;
-    }
-    case "svg": {
-      typeStr.type = "image";
-      typeStr.iconStr = "icon-pic";
-      break;
-    }
-    case "tga": {
-      typeStr.type = "image";
-      typeStr.iconStr = "icon-pic";
-      break;
-    }
-    case "bmp": {
-      typeStr.type = "image";
-      typeStr.iconStr = "icon-pic";
-      break;
-    }
-    case "tiff": {
-      typeStr.type = "image";
-      typeStr.iconStr = "icon-pic";
-      break;
-    }
+      let typeStr = {
+        type: "",
+        iconStr: "icon-unknown",
+      };
+      if (item.fileType == null) {
+        //使用后缀判断
+        if (item.suffix != null) {
+          switch (item.suffix.toLowerCase()) {
+            // 图片
+            case "png": {
+              typeStr.type = "image";
+              typeStr.iconStr = "icon-pic";
+              break;
+            }
+            case "jpg": {
+              typeStr.type = "image";
+              typeStr.iconStr = "icon-pic";
+              break;
+            }
+            case "jpeg": {
+              typeStr.type = "image";
+              typeStr.iconStr = "icon-pic";
+              break;
+            }
+            case "gif": {
+              typeStr.type = "image";
+              typeStr.iconStr = "icon-pic";
+              break;
+            }
+            case "eps": {
+              typeStr.type = "image";
+              typeStr.iconStr = "icon-pic";
+              break;
+            }
+            case "exr": {
+              typeStr.type = "image";
+              typeStr.iconStr = "icon-pic";
+              break;
+            }
+            case "svg": {
+              typeStr.type = "image";
+              typeStr.iconStr = "icon-pic";
+              break;
+            }
+            case "tga": {
+              typeStr.type = "image";
+              typeStr.iconStr = "icon-pic";
+              break;
+            }
+            case "bmp": {
+              typeStr.type = "image";
+              typeStr.iconStr = "icon-pic";
+              break;
+            }
+            case "tiff": {
+              typeStr.type = "image";
+              typeStr.iconStr = "icon-pic";
+              break;
+            }
 
-    // 视频
-    case "mp4": {
-      typeStr.type = "video";
-      typeStr.iconStr = "icon-video";
-      break;
-    }
-    case "avi": {
-      typeStr.type = "video";
-      typeStr.iconStr = "icon-video";
-      break;
-    }
-    case "wmv": {
-      typeStr.type = "video";
-      typeStr.iconStr = "icon-video";
-      break;
-    }
-    case "m4v": {
-      typeStr.type = "video";
-      typeStr.iconStr = "icon-video";
-      break;
-    }
-    case "mov": {
-      typeStr.type = "video";
-      typeStr.iconStr = "icon-video";
-      break;
-    }
-    case "asf": {
-      typeStr.type = "video";
-      typeStr.iconStr = "icon-video";
-      break;
-    }
-    case "flv": {
-      typeStr.type = "video";
-      typeStr.iconStr = "icon-video";
-      break;
-    }
-    case "f4v": {
-      typeStr.type = "video";
-      typeStr.iconStr = "icon-video";
-      break;
-    }
-    case "rmvb": {
-      typeStr.type = "video";
-      typeStr.iconStr = "icon-video";
-      break;
-    }
-    case "rm": {
-      typeStr.type = "video";
-      typeStr.iconStr = "icon-video";
-      break;
-    }
-    case "3gp": {
-      typeStr.type = "video";
-      typeStr.iconStr = "icon-video";
-      break;
-    }
-    case "vob": {
-      typeStr.type = "video";
-      typeStr.iconStr = "icon-video";
-      break;
-    }
+            // 视频
+            case "mp4": {
+              typeStr.type = "video";
+              typeStr.iconStr = "icon-video";
+              break;
+            }
+            case "avi": {
+              typeStr.type = "video";
+              typeStr.iconStr = "icon-video";
+              break;
+            }
+            case "wmv": {
+              typeStr.type = "video";
+              typeStr.iconStr = "icon-video";
+              break;
+            }
+            case "m4v": {
+              typeStr.type = "video";
+              typeStr.iconStr = "icon-video";
+              break;
+            }
+            case "mov": {
+              typeStr.type = "video";
+              typeStr.iconStr = "icon-video";
+              break;
+            }
+            case "asf": {
+              typeStr.type = "video";
+              typeStr.iconStr = "icon-video";
+              break;
+            }
+            case "flv": {
+              typeStr.type = "video";
+              typeStr.iconStr = "icon-video";
+              break;
+            }
+            case "f4v": {
+              typeStr.type = "video";
+              typeStr.iconStr = "icon-video";
+              break;
+            }
+            case "rmvb": {
+              typeStr.type = "video";
+              typeStr.iconStr = "icon-video";
+              break;
+            }
+            case "rm": {
+              typeStr.type = "video";
+              typeStr.iconStr = "icon-video";
+              break;
+            }
+            case "3gp": {
+              typeStr.type = "video";
+              typeStr.iconStr = "icon-video";
+              break;
+            }
+            case "vob": {
+              typeStr.type = "video";
+              typeStr.iconStr = "icon-video";
+              break;
+            }
 
-    // 音频
-    case "mp3": {
-      typeStr.type = "audio";
-      typeStr.iconStr = "icon-music";
-      break;
-    }
-    case "aac": {
-      typeStr.type = "audio";
-      typeStr.iconStr = "icon-music";
-      break;
-    }
-    case "wav": {
-      typeStr.type = "audio";
-      typeStr.iconStr = "icon-music";
-      break;
-    }
-    case "ogg": {
-      typeStr.type = "audio";
-      typeStr.iconStr = "icon-music";
-      break;
-    }
-    case "alac": {
-      typeStr.type = "audio";
-      typeStr.iconStr = "icon-music";
-      break;
-    }
-    case "flac": {
-      typeStr.type = "audio";
-      typeStr.iconStr = "icon-music";
-      break;
-    }
-    case "ape": {
-      typeStr.type = "audio";
-      typeStr.iconStr = "icon-music";
-      break;
-    }
+            // 音频
+            case "mp3": {
+              typeStr.type = "audio";
+              typeStr.iconStr = "icon-music";
+              break;
+            }
+            case "aac": {
+              typeStr.type = "audio";
+              typeStr.iconStr = "icon-music";
+              break;
+            }
+            case "wav": {
+              typeStr.type = "audio";
+              typeStr.iconStr = "icon-music";
+              break;
+            }
+            case "ogg": {
+              typeStr.type = "audio";
+              typeStr.iconStr = "icon-music";
+              break;
+            }
+            case "alac": {
+              typeStr.type = "audio";
+              typeStr.iconStr = "icon-music";
+              break;
+            }
+            case "flac": {
+              typeStr.type = "audio";
+              typeStr.iconStr = "icon-music";
+              break;
+            }
+            case "ape": {
+              typeStr.type = "audio";
+              typeStr.iconStr = "icon-music";
+              break;
+            }
 
-    // 文本
-    case "txt": {
-      typeStr.type = "text";
-      typeStr.iconStr = "icon-txt";
-      break;
-    }
-    case "html": {
-      typeStr.type = "text";
-      typeStr.iconStr = "icon-html";
-      break;
-    }
-    case "js": {
-      typeStr.type = "text";
-      typeStr.iconStr = "icon-javascript";
-      break;
-    }
-    case "css": {
-      typeStr.type = "text";
-      typeStr.iconStr = "icon-css";
-      break;
-    }
-    case "xlsx": {
-      typeStr.type = "text";
-      typeStr.iconStr = "icon-excel";
-      break;
-    }
-    case "doc": {
-      typeStr.type = "text";
-      typeStr = "icon-word";
-      break;
-    }
-    case "docx": {
-      typeStr.type = "text";
-      typeStr.iconStr = "icon-word";
-      break;
-    }
-    case "pdf": {
-      typeStr.type = "text";
-      typeStr.iconStr = "icon-pdf";
-      break;
-    }
-    case "ppt": {
-      typeStr.type = "text";
-      typeStr.iconStr = "icon-ppt";
-      break;
-    }
+            // 文本
+            case "txt": {
+              typeStr.type = "text";
+              typeStr.iconStr = "icon-txt";
+              break;
+            }
+            case "html": {
+              typeStr.type = "text";
+              typeStr.iconStr = "icon-html";
+              break;
+            }
+            case "js": {
+              typeStr.type = "text";
+              typeStr.iconStr = "icon-javascript";
+              break;
+            }
+            case "css": {
+              typeStr.type = "text";
+              typeStr.iconStr = "icon-css";
+              break;
+            }
+            case "xlsx": {
+              typeStr.type = "text";
+              typeStr.iconStr = "icon-excel";
+              break;
+            }
+            case "doc": {
+              typeStr.type = "text";
+              typeStr = "icon-word";
+              break;
+            }
+            case "docx": {
+              typeStr.type = "text";
+              typeStr.iconStr = "icon-word";
+              break;
+            }
+            case "pdf": {
+              typeStr.type = "text";
+              typeStr.iconStr = "icon-pdf";
+              break;
+            }
+            case "ppt": {
+              typeStr.type = "text";
+              typeStr.iconStr = "icon-ppt";
+              break;
+            }
 
-    //其他文件
-    case "psd": {
-      typeStr.type = "*";
-      typeStr.iconStr = "icon-unknown";
-      break;
-    }
-    case "xmind": {
-      typeStr.type = "*";
-      typeStr.iconStr = "icon-xmind";
-      break;
-    }
+            //其他文件
+            case "psd": {
+              typeStr.type = "*";
+              typeStr.iconStr = "icon-unknown";
+              break;
+            }
+            case "xmind": {
+              typeStr.type = "*";
+              typeStr.iconStr = "icon-xmind";
+              break;
+            }
 
-    //种子
-    case "bt": {
-      typeStr.type = "*";
-      typeStr.iconStr = "icon-bt";
-      break;
-    }
+            //种子
+            case "bt": {
+              typeStr.type = "*";
+              typeStr.iconStr = "icon-bt";
+              break;
+            }
 
-    //压缩
-    case "zip": {
-      typeStr.type = "*";
-      typeStr.iconStr = "icon-zip";
-      break;
-    }
-    case "jar": {
-      typeStr.type = "*";
-      typeStr.iconStr = "icon-zip";
-      break;
-    }
-    case "7z": {
-      typeStr.type = "*";
-      typeStr.iconStr = "icon-zip";
-      break;
-    }
-    case "rar": {
-      typeStr.type = "*";
-      typeStr.iconStr = "icon-zip";
-      break;
-    }
+            //压缩
+            case "zip": {
+              typeStr.type = "*";
+              typeStr.iconStr = "icon-zip";
+              break;
+            }
+            case "jar": {
+              typeStr.type = "*";
+              typeStr.iconStr = "icon-zip";
+              break;
+            }
+            case "7z": {
+              typeStr.type = "*";
+              typeStr.iconStr = "icon-zip";
+              break;
+            }
+            case "rar": {
+              typeStr.type = "*";
+              typeStr.iconStr = "icon-zip";
+              break;
+            }
 
-    //window可运行文件
-    case "exe": {
-      typeStr.type = "*";
-      typeStr.iconStr = "icon-windows";
-      break;
-    }
-    case "msi": {
-      typeStr.type = "*";
-      typeStr.iconStr = "icon-windows";
-      break;
-    }
-  }
-}}
+            //window可运行文件
+            case "exe": {
+              typeStr.type = "*";
+              typeStr.iconStr = "icon-windows";
+              break;
+            }
+            case "msi": {
+              typeStr.type = "*";
+              typeStr.iconStr = "icon-windows";
+              break;
+            }
+          }
+        }
+      }
       return typeStr;
     },
-  }
+  },
 };
 </script>
 
@@ -624,7 +646,7 @@ export default {
 }
 
 .toolbar {
-  margin:0.3rem 0;
+  margin: 0.3rem 0;
   height: 0.4rem;
   display: flex;
   justify-content: space-between;
@@ -649,7 +671,7 @@ export default {
 
 .toolbarArrow {
   font-size: 0.16rem;
-  margin:0 0.05rem
+  margin: 0 0.05rem;
 }
 
 .toolbarOn {
@@ -666,14 +688,14 @@ export default {
   position: absolute;
   right: 0.5rem;
   flex-shrink: 0;
-  background:#fff;
+  background: #fff;
   padding: 0 0 0 0.2rem;
 }
 
 .dropZone {
   outline: none;
   cursor: default;
-  flex:1;
+  flex: 1;
   display: flex;
   padding: 0 0.5rem;
   overflow: auto;
@@ -729,7 +751,7 @@ export default {
 
 .file-container {
   position: relative;
-  flex:1;
+  flex: 1;
   z-index: 0;
   overflow: auto;
   display: flex;
@@ -742,7 +764,7 @@ export default {
   flex-grow: 0;
   border-radius: 0.2rem;
   display: inline-flex;
-  
+
   user-select: none;
   margin: 0.2rem;
   padding-top: 0.12rem;
@@ -753,7 +775,7 @@ export default {
 }
 
 .fileBox:hover {
-background-color: rgba(117, 139, 189,0.2);
+  background-color: rgba(117, 139, 189, 0.2);
 }
 
 .fileBoxOn {
@@ -762,7 +784,7 @@ background-color: rgba(117, 139, 189,0.2);
 
 .fileContentBox {
   display: flex;
-  flex:1;
+  flex: 1;
   flex-direction: column;
   align-items: center;
   /* justify-content: center; */
@@ -791,7 +813,7 @@ background-color: rgba(117, 139, 189,0.2);
   align-items: center;
   justify-content: center;
   position: absolute;
-  left:50%;
+  left: 50%;
   right: 50%;
   width: max-content;
   transform: translateX(-50%);
@@ -801,10 +823,11 @@ background-color: rgba(117, 139, 189,0.2);
   border-radius: 100rem;
   background: rgba(30, 30, 30, 0.3);
   padding: 0.08rem;
-  backdrop-filter:blur(10px);
+  backdrop-filter: blur(10px);
 }
 
-.imagePreview,.iconPreview {
+.imagePreview,
+.iconPreview {
   height: max-content;
   max-height: 1rem;
   max-width: 1rem;
@@ -823,7 +846,7 @@ background-color: rgba(117, 139, 189,0.2);
   margin-top: 0.12rem;
   padding-left: 0.2rem;
   padding-right: 0.2rem;
-  
+
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;

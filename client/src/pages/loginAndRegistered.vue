@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2021-10-23 10:40:52
- * @LastEditTime 2021-12-11 17:00
+ * @LastEditTime 2021-12-11 19:55
  * @Description: 登录与注册
  * 
 -->
@@ -165,7 +165,8 @@ export default {
           }
         })
         .catch((err) => {
-          console.log(err);
+          this.showTipText = err.data.message;
+          this.isShowTipMessge = true;
         });
     },
     registered() {
@@ -207,7 +208,7 @@ export default {
           }
         )
         .then((res) => {
-          console.log(res.data)
+          console.log(res.data);
           if (res.data.code == 200) {
             this.$router.push({ name: "login" });
             this.showTipText = res.data.message;
@@ -218,7 +219,8 @@ export default {
           }
         })
         .catch((err) => {
-          console.log(err);
+          this.showTipText = err.data.message;
+          this.isShowTipMessge = true;
         });
     },
     resetInput() {

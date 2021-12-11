@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2021-01-05 22:39:52
- * @LastEditTime 2021-12-11 16:42
+ * @LastEditTime 2021-12-11 19:55
  * @Description: 登录
  * 
 -->
@@ -123,7 +123,8 @@ export default {
           }
         })
         .catch((err) => {
-          console.log(err);
+          this.showTipText = err.data.message;
+          this.isShowTipMessge = true;
         });
     },
     encryption(str) {

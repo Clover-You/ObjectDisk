@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2021-01-17 20:28:02
- * @LastEditTime 2021-12-11 16:43
+ * @LastEditTime 2021-12-11 19:55
  * @Description: 注册
  * 
 -->
@@ -114,7 +114,8 @@ export default {
           }
         })
         .catch((err) => {
-          console.log(err);
+          this.showTipText = err.data.message;
+          this.isShowTipMessge = true;
         });
     },
   },
