@@ -8,7 +8,7 @@
 
 const state = {
     useLocalAreaNetwork: true, //是否启动局域网络
-    serveUrl: 'http://192.168.8.111:3000/',
+    serveUrl: 'http://localhost:3000/',
 };
 
 const mutations = {
