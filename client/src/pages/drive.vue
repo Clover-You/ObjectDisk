@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2020-10-14 20:58:01
- * @LastEditTime 2021-12-11 11:27
+ * @LastEditTime 2021-12-11 18:30
  * @Description: 我的云盘
  * 
 -->
@@ -43,7 +43,7 @@
               </div>
               <i class="iconfont iconPreview" :class="checkType(item).iconStr" v-if="item.type == 'file' && item.blob == null"></i>
             </div>
-              <div style="width:100%">
+              <div class="fileContentText">
                 <p class="fileContentName">{{item.name}}{{item.suffix==null?'':`.${item.suffix}`}}</p>
                 <p class="fileContentDate">{{item.updateTime.slice(0,item.updateTime.length-3)}}</p>
               </div>
@@ -141,7 +141,7 @@ export default {
   computed: {
     getFolderId() {
       //获取路由中的参数文件夹id
-      return this.$route.params.folderId == undefined ? 0 : this.$route.params.folderId;
+      return this.$route.params.folderId == undefined ? '0' : this.$route.params.folderId;
     },
   },
   created() {
@@ -160,14 +160,11 @@ export default {
         folderid: this.getFolderId,
         name: value,
       }).then(res => {
-        switch (res.data.code) {
-          case 200:
-            this.getUserFileAndFolder(this.getFolderId);
-            break;
-          case 500:
-            this.showTipText = res.data.message;
+        if(res.data.code == 200) {
+          this.getUserFileAndFolder(this.getFolderId);
+        }else {
+          this.showTipText = res.data.message;
             this.isShowTipMessge = true;
-            break;
         }
       }).catch(err => {
         console.log(err);
@@ -199,7 +196,7 @@ export default {
             
             
             break;
-          case 500:
+          default:
             this.showTipText = res.data.message;
             this.isShowTipMessge = true;
             break;
@@ -747,9 +744,8 @@ export default {
   display: inline-flex;
   
   user-select: none;
-  margin-bottom: 0.2rem;
-  margin-right: 0.2rem;
-  padding: 0.2rem;
+  margin: 0.2rem;
+  padding-top: 0.12rem;
   letter-spacing: 0.01px;
   transition: ease-in 0.2s;
   height: 1.8rem;
@@ -765,15 +761,20 @@ background-color: rgba(117, 139, 189,0.2);
 }
 
 .fileContentBox {
-  /* margin: 0.2rem; */
   display: flex;
   flex:1;
   flex-direction: column;
   align-items: center;
+  /* justify-content: center; */
 }
 
 .fileContentImg {
   display: flex;
+}
+
+.fileContentText {
+  display: flex;
+  flex-direction: column;
 }
 
 .imgBox {
@@ -820,10 +821,12 @@ background-color: rgba(117, 139, 189,0.2);
   width: 100%;
   text-align: center;
   margin-top: 0.12rem;
-
+  padding-left: 0.2rem;
+  padding-right: 0.2rem;
+  
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   text-overflow: ellipsis;
   overflow-wrap: break-word;
   overflow: hidden;

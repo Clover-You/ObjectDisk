@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2021-10-23 10:40:52
- * @LastEditTime: 2021-10-24 18:20:25
+ * @LastEditTime 2021-12-11 17:00
  * @Description: 登录与注册
  * 
 -->
@@ -15,11 +15,7 @@
 
         <div class="rememberMeBox">
           <label class="rememberMeBoxLabel">记住账号</label>
-          <div
-            class="switchBox"
-            :class="{ switchBoxOn: rememberMe }"
-            @click="switchRememberMe"
-          >
+          <div class="switchBox" :class="{ switchBoxOn: rememberMe }" @click="switchRememberMe">
             <div class="switch" :class="{ switchOn: rememberMe }"></div>
           </div>
         </div>
@@ -28,37 +24,12 @@
       </form>
       <form class="sign-up-form">
         <h6 class="form-title">注册</h6>
-        <input
-          v-model="nickName"
-          type="text"
-          placeholder="昵称"
-          maxlength="32"
-        />
-        <input
-          v-model="account"
-          type="text"
-          placeholder="用户名"
-          maxlength="32"
-        />
-        <input
-          v-model="password"
-          type="password"
-          placeholder="密码"
-          maxlength="32"
-        />
-        <input
-          v-model="confirmPassword"
-          type="password"
-          placeholder="重复密码"
-          maxlength="32"
-        />
+        <input v-model="nickName" type="text" placeholder="昵称" maxlength="32" />
+        <input v-model="account" type="text" placeholder="用户名" maxlength="32" />
+        <input v-model="password" type="password" placeholder="密码" maxlength="32" />
+        <input v-model="confirmPassword" type="password" placeholder="重复密码" maxlength="32" />
         <div class="verificationCodeInputBox">
-          <l-verification-code-input
-            class="verificationCodeInput"
-            :maxLength="6"
-            placeholder="注册码"
-            :value.sync="registeredCode"
-          ></l-verification-code-input>
+          <l-verification-code-input class="verificationCodeInput" :maxLength="6" placeholder="注册码" :value.sync="registeredCode"></l-verification-code-input>
         </div>
         <div class="submit-btn" @click="registered">立即注册</div>
       </form>
@@ -79,10 +50,7 @@
     </div>
 
     <!-- 提示模态窗 -->
-    <tipMessge
-      :showTipMessge.sync="isShowTipMessge"
-      :text="showTipText"
-    ></tipMessge>
+    <tipMessge :showTipMessge.sync="isShowTipMessge" :text="showTipText"></tipMessge>
   </div>
 </template>
 
@@ -172,34 +140,28 @@ export default {
           password: this.password,
         })
         .then((res) => {
-          switch (res.data.code) {
-            case 200:
-              if (this.rememberMe) {
-                localStorage.setItem("account", this.encryption(this.account));
-                localStorage.setItem(
-                  "password",
-                  this.encryption(this.password)
-                );
-              } else {
-                localStorage.removeItem("account");
-                localStorage.removeItem("password");
-              }
+          if (res.data.code == 200) {
+            if (this.rememberMe) {
+              localStorage.setItem("account", this.encryption(this.account));
+              localStorage.setItem("password", this.encryption(this.password));
+            } else {
+              localStorage.removeItem("account");
+              localStorage.removeItem("password");
+            }
 
-              sessionStorage.setItem("isLogin", true);
-              sessionStorage.setItem("id", res.data.data.id);
-              sessionStorage.setItem("photo", res.data.data.photo);
-              sessionStorage.setItem("nickname", res.data.data.nickName);
+            sessionStorage.setItem("isLogin", true);
+            sessionStorage.setItem("id", res.data.data.id);
+            sessionStorage.setItem("photo", res.data.data.photo);
+            sessionStorage.setItem("nickname", res.data.data.nickName);
 
-              this.$store.state.isLogin = true;
-              this.$store.state.id = res.data.data.id;
-              this.$store.state.photo = res.data.data.photo;
-              this.$store.state.nickname = res.data.data.nickName;
-              this.$router.push({ name: "drive" });
-              break;
-            case 500:
-              this.showTipText = res.data.message;
-              this.isShowTipMessge = true;
-              break;
+            this.$store.state.isLogin = true;
+            this.$store.state.id = res.data.data.id;
+            this.$store.state.photo = res.data.data.photo;
+            this.$store.state.nickname = res.data.data.nickName;
+            this.$router.push({ name: "drive" });
+          } else {
+            this.showTipText = res.data.message;
+            this.isShowTipMessge = true;
           }
         })
         .catch((err) => {
@@ -245,16 +207,14 @@ export default {
           }
         )
         .then((res) => {
-          switch (res.data.code) {
-            case 200:
-              this.$router.push({ name: "login" });
-              this.showTipText = res.data.message;
-              this.isShowTipMessge = true;
-              break;
-            case 500:
-              this.showTipText = res.data.message;
-              this.isShowTipMessge = true;
-              break;
+          console.log(res.data)
+          if (res.data.code == 200) {
+            this.$router.push({ name: "login" });
+            this.showTipText = res.data.message;
+            this.isShowTipMessge = true;
+          } else {
+            this.showTipText = res.data.message;
+            this.isShowTipMessge = true;
           }
         })
         .catch((err) => {
