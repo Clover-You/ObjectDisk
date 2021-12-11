@@ -5,6 +5,7 @@ import { UserModule } from './modules/user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { LoggerMiddleware } from './common/logger/logger.middleware';
 import { DataBaseConfig } from './config/orm.config';
+import { DriveModule } from './modules/drive/drive.module';
 
 /**
  * █████▒█      ██  ▄████▄   ██ ▄█▀     ██████╗ ██╗   ██╗ ██████╗
@@ -24,7 +25,7 @@ import { DataBaseConfig } from './config/orm.config';
  * @create 2021-11-08 15:23
  */
 @Module({
-  imports: [UserModule, TypeOrmModule.forRoot(DataBaseConfig)],
+  imports: [UserModule, DriveModule, TypeOrmModule.forRoot(DataBaseConfig)],
   controllers: [AppController],
   providers: [AppService],
 })
