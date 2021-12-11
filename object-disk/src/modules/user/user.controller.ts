@@ -1,8 +1,14 @@
-import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Inject,
+  Post,
+} from '@nestjs/common';
 import { UserEntity } from 'src/entity/user.entity';
 import { AjaxResult } from 'src/utils/ajax-result.classes';
 import { UserService } from './user.service';
-import { HttpParameterException } from 'src/exceptions/http-parameter.exception';
 import { StringUtils } from 'src/utils/StringUtils';
 import MathTools from 'src/utils/MathTools';
 import { UserDefaultEntity } from 'src/customizeEntity/user_default.entity';
@@ -43,13 +49,10 @@ export class UserController {
    */
   @Post('/objectCloudDiskRegistered')
   async userRegistered(
-    nickName: string,
-    account: string,
-    password: string,
-    registeredCode: string,
+    @Body() { nickName, account, password, registeredCode },
   ): Promise<AjaxResult<UserEntity>> {
     if (registeredCode.toUpperCase() == 'OBJECT') {
-      this.userService.userRegistered(
+      await this.userService.userRegistered(
         UserEntity.instance({
           nickName,
           account,
@@ -58,7 +61,10 @@ export class UserController {
       );
       return AjaxResult.success(null, '注册成功');
     } else {
-      return AjaxResult.fail('内部注册码错误');
+      return AjaxResult.fail(
+        '内部注册码错误',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -73,10 +79,10 @@ export class UserController {
   @Post('/objectCloudDiskLogin')
   async userLogin(@Body() { account, password }: UserEntity) {
     if (!StringUtils.hasText(account)) {
-      throw new HttpParameterException('账号不能为空', 406);
+      return AjaxResult.fail('账号不能为空', HttpStatus.INTERNAL_SERVER_ERROR);
     }
     if (!StringUtils.hasText(password)) {
-      throw new HttpParameterException('密码不能为空', 406);
+      return AjaxResult.fail('密码不能为空', HttpStatus.INTERNAL_SERVER_ERROR);
     }
     const userinfo = await this.userService.userLogin(account, password);
 

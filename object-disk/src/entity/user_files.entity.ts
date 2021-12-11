@@ -41,7 +41,7 @@ export class UserFilesEntity {
    * 文件夹id
    */
   @Column({ type: 'int' })
-  folderId?: string;
+  folderId?: number;
 
   /**
    * 用户id

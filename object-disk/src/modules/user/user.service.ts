@@ -39,7 +39,7 @@ export class UserService {
 
   async userRegistered({ account, nickName, password }: UserEntity) {
     const user = await this.queryUserByAccount(account);
-    if (user === null) {
+    if (user === undefined) {
       //用户不存在可注册
       const date = format(new Date(), DateUtils.DATETIME_DEFAULT_FORMAT);
 
@@ -58,7 +58,10 @@ export class UserService {
         throw new HttpException('注册失败', HttpStatus.INTERNAL_SERVER_ERROR);
       }
     } else {
-      throw new HttpParameterException('用户已被注册', 406);
+      throw new HttpParameterException(
+        '用户已被注册',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -97,10 +100,16 @@ export class UserService {
   async userLogin(account: string, password: string): Promise<UserEntity> {
     const user = await this.queryUserByAccount(account);
     if (user == null) {
-      throw new HttpParameterException('账号不存在', 406);
+      throw new HttpParameterException(
+        '账号不存在',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
     if (user.password !== MathTools.encryptForKey(password.trim())) {
-      throw new HttpParameterException('密码错误', 406);
+      throw new HttpParameterException(
+        '密码错误',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
     return user;
   }
