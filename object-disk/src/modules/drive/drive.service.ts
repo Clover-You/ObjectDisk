@@ -1,3 +1,5 @@
+import { format } from 'date-fns';
+import { AjaxResult } from 'src/utils/ajax-result.classes';
 /*
  * █████▒█      ██  ▄████▄   ██ ▄█▀     ██████╗ ██╗   ██╗ ██████╗
  * ▓██   ▒ ██  ▓██▒▒██▀ ▀█   ██▄█▒      ██╔══██╗██║   ██║██╔════╝
@@ -16,7 +18,7 @@
  * @create 2021-12-10 17:31
  */
 
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserFileAndFolder } from 'src/customizeEntity/user_file_and_folder.entity';
 import { FolderEntity } from 'src/entity/folder.entity';
@@ -39,54 +41,43 @@ export class DriveService {
    * @param name 文件夹名称
    * @param folderId 父级文件夹id
    */
-  async addFolder({ userId, name, folderId }: FolderEntity) {
+  async addFolder(
+    userId: number,
+    folderId: number,
+    name: string,
+  ): Promise<AjaxResult> {
     //检查指定的folder_id文件夹里是否已有对应的name文件夹
-    const folderin = FolderEntity.instance({
-      userId,
-      folderId,
-      name,
-    });
-    const folder = await this.folderEntity.findOne(folderin);
-    // const userFolder = await this.folderDb.queryFolderByUserIDAndFolderID(
-    //   userId,
-    //   folder_id,
-    // );
-    const isExist = false; //文件夹是否存在
-    // if (userFolder != null) {
-    //   for (const item of userFolder) {
-    //     if (item.getName() === name) {
-    //       //文件夹名称冲突
-    //       isExist = true;
-    //       break;
-    //     }
-    //   }
-    // }
-    // if (!isExist) {
-    //   //文件夹不存在
-    //   const date = format(new Date(), DateUtils.DATETIME_DEFAULT_FORMAT);
-    //   const folderDB = new FolderEntity();
-    //   folderDB.userId = userId;
-    //   folderDB.folderId = folder_id;
-    //   folderDB.name = name;
-    //   folderDB.createTime = date;
-    //   const count = this.folderEntity.insert(folderDB);
-    //   // const count =  await this.folderDb.add(folderDB);
-    //   if (count !== 1) {
-    //     throw new HttpParameterException(
-    //       '文件夹创建失败',
-    //       HttpStatus.INTERNAL_SERVER_ERROR,
-    //     );
-    //   }
-    // } else {
-    //   //文件夹存在
-    //   throw new HttpParameterException('文件夹已存在', 406);
-    // }
+    const folder = await this.folderEntity.findOne({ userId, name, folderId });
+    if (folder == undefined) {
+      //文件夹不存在
+      const date = format(new Date(), DateUtils.DATETIME_DEFAULT_FORMAT);
+      const folderDB = new FolderEntity();
+      folderDB.userId = userId;
+      folderDB.folderId = folderId;
+      folderDB.name = name;
+      folderDB.createTime = date;
+      const count = await this.folderEntity.insert(folderDB);
+      if (count == void 0) {
+        //新建文件夹失败
+        return AjaxResult.fail('新建文件夹失败');
+      }
+      //新建文件夹成功
+      return AjaxResult.success('新建文件夹成功');
+    } else {
+      //文件夹存在
+      return AjaxResult.fail('文件夹存在');
+    }
   }
 
+  /**
+   * 获取用户文件和文件夹
+   * @param userId
+   * @param folderId
+   */
   async getUserFileAndFolder(
     userId: number,
     folderId: number,
-  ): Promise<UserFileAndFolder[]> {
+  ): Promise<AjaxResult> {
     const folders = await this.folderEntity.find({ userId, folderId });
     const files = await this.userFilesEntity.find({ userId, folderId });
     const result: UserFileAndFolder[] = [];
@@ -115,6 +106,6 @@ export class DriveService {
       }
     }
 
-    return result;
+    return AjaxResult.success(result, '查询成功');
   }
 }

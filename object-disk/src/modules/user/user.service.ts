@@ -1,17 +1,12 @@
-import {
-  HttpCode,
-  HttpException,
-  HttpStatus,
-  Injectable,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from '../../entity/user.entity';
+import { UserEntity } from 'src/entity/user.entity';
 import { InsertResult, Repository } from 'typeorm';
 import { AjaxResult } from 'src/utils/ajax-result.classes';
-import { HttpParameterException } from 'src/exceptions/http-parameter.exception';
 import MathTools from 'src/utils/MathTools';
 import { format } from 'date-fns';
 import DateUtils from 'src/utils/DateUtils';
+import { UserDefaultEntity } from 'src/customizeEntity/user_default.entity';
 /**
  * █████▒█      ██  ▄████▄   ██ ▄█▀     ██████╗ ██╗   ██╗ ██████╗
  * ▓██   ▒ ██  ▓██▒▒██▀ ▀█   ██▄█▒      ██╔══██╗██║   ██║██╔════╝
@@ -37,7 +32,11 @@ export class UserService {
     private readonly userEntity: Repository<UserEntity>,
   ) {}
 
-  async userRegistered({ account, nickName, password }: UserEntity) {
+  async userRegistered({
+    account,
+    nickName,
+    password,
+  }: UserEntity): Promise<AjaxResult> {
     const user = await this.queryUserByAccount(account);
     if (user === undefined) {
       //用户不存在可注册
@@ -55,13 +54,11 @@ export class UserService {
       const insertResult = await this.addUser(user);
 
       if (insertResult == void 0) {
-        throw new HttpException('注册失败', HttpStatus.INTERNAL_SERVER_ERROR);
+        return AjaxResult.fail('注册失败');
       }
+      return AjaxResult.success('注册成功');
     } else {
-      throw new HttpParameterException(
-        '用户已被注册',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      return AjaxResult.fail('用户已被注册');
     }
   }
 
@@ -97,20 +94,20 @@ export class UserService {
    * @date 2021/11/09 15:55
    * @return Promise<UserEntity>
    */
-  async userLogin(account: string, password: string): Promise<UserEntity> {
+  async userLogin(account: string, password: string): Promise<AjaxResult> {
     const user = await this.queryUserByAccount(account);
     if (user == null) {
-      throw new HttpParameterException(
-        '账号不存在',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      return AjaxResult.fail('账号不存在');
     }
     if (user.password !== MathTools.encryptForKey(password.trim())) {
-      throw new HttpParameterException(
-        '密码错误',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      return AjaxResult.fail('密码错误');
     }
-    return user;
+
+    const userdef = new UserDefaultEntity();
+    userdef.id = MathTools.encryptForKey(user.id);
+    userdef.nickName = user.nickName;
+    userdef.photo = user.photo;
+
+    return AjaxResult.success(userdef, '登录成功');
   }
 }
