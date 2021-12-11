@@ -180,7 +180,7 @@ export default {
               if (!examineres.data.data.userFileExist) {
                 if (!examineres.data.data.fileExist) {
                   this.$set(item, 'uploadType', 2)
-                  // console.log(`${examineres.data.msg}>>${examineres.data.data}`)
+                  // console.log(`${examineres.data.message}>>${examineres.data.data}`)
                   //没文件开始上传
                   // console.log(item);
 
@@ -273,7 +273,7 @@ export default {
               }
               break;
             case 500:
-              console.log(examineres.data.msg);
+              console.log(examineres.data.message);
               break;
           }
 

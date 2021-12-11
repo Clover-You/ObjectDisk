@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2020-10-14 20:58:01
- * @LastEditTime: 2021-01-26 21:21:25
+ * @LastEditTime 2021-12-11 11:27
  * @Description: 我的云盘
  * 
 -->
@@ -165,7 +165,7 @@ export default {
             this.getUserFileAndFolder(this.getFolderId);
             break;
           case 500:
-            this.showTipText = res.data.msg;
+            this.showTipText = res.data.message;
             this.isShowTipMessge = true;
             break;
         }
@@ -200,7 +200,7 @@ export default {
             
             break;
           case 500:
-            this.showTipText = res.data.msg;
+            this.showTipText = res.data.message;
             this.isShowTipMessge = true;
             break;
         }

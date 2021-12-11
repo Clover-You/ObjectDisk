@@ -197,7 +197,7 @@ export default {
               this.$router.push({ name: "drive" });
               break;
             case 500:
-              this.showTipText = res.data.msg;
+              this.showTipText = res.data.message;
               this.isShowTipMessge = true;
               break;
           }
@@ -248,11 +248,11 @@ export default {
           switch (res.data.code) {
             case 200:
               this.$router.push({ name: "login" });
-              this.showTipText = res.data.msg;
+              this.showTipText = res.data.message;
               this.isShowTipMessge = true;
               break;
             case 500:
-              this.showTipText = res.data.msg;
+              this.showTipText = res.data.message;
               this.isShowTipMessge = true;
               break;
           }
