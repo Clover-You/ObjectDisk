@@ -4,6 +4,8 @@ import { AjaxResult } from 'src/utils/ajax-result.classes';
 import { UserService } from './user.service';
 import { HttpParameterException } from 'src/exceptions/http-parameter.exception';
 import { StringUtils } from 'src/utils/StringUtils';
+import MathTools from 'src/utils/MathTools';
+import { UserDefaultEntity } from 'src/customizeEntity/user_default.entity';
 
 /**
  * █████▒█      ██  ▄████▄   ██ ▄█▀     ██████╗ ██╗   ██╗ ██████╗
@@ -77,6 +79,12 @@ export class UserController {
       throw new HttpParameterException('密码不能为空', 406);
     }
     const userinfo = await this.userService.userLogin(account, password);
-    return AjaxResult.success(userinfo);
+
+    const userdef = new UserDefaultEntity();
+    userdef.id = MathTools.encryptForKey(userinfo.id);
+    userdef.nickName = userinfo.nickName;
+    userdef.photo = userinfo.photo;
+
+    return AjaxResult.success(userdef);
   }
 }
