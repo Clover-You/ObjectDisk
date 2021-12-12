@@ -1,5 +1,17 @@
 import { format } from 'date-fns';
 import { AjaxResult } from 'src/utils/ajax-result.classes';
+import { Injectable, StreamableFile } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserFileAndFolder } from 'src/customizeEntity/user_file_and_folder.entity';
+import { FolderEntity } from 'src/entity/folder.entity';
+import { UserFilesEntity } from 'src/entity/user_files.entity';
+import DateUtils from 'src/utils/DateUtils';
+import MathTools from 'src/utils/MathTools';
+import { Repository } from 'typeorm';
+import conf from 'src/config/config';
+import * as fs from 'fs';
+import { Stream } from 'stream';
+
 /*
  * █████▒█      ██  ▄████▄   ██ ▄█▀     ██████╗ ██╗   ██╗ ██████╗
  * ▓██   ▒ ██  ▓██▒▒██▀ ▀█   ██▄█▒      ██╔══██╗██║   ██║██╔════╝
@@ -17,15 +29,6 @@ import { AjaxResult } from 'src/utils/ajax-result.classes';
  * @author LRolinx
  * @create 2021-12-10 17:31
  */
-
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { UserFileAndFolder } from 'src/customizeEntity/user_file_and_folder.entity';
-import { FolderEntity } from 'src/entity/folder.entity';
-import { UserFilesEntity } from 'src/entity/user_files.entity';
-import DateUtils from 'src/utils/DateUtils';
-import MathTools from 'src/utils/MathTools';
-import { Repository } from 'typeorm';
 
 @Injectable()
 export class DriveService {
@@ -107,5 +110,20 @@ export class DriveService {
     }
 
     return AjaxResult.success(result, '查询成功');
+  }
+
+  /**
+   * 根据文件id获取文件
+   * @param id
+   */
+  async getUserFileForFileId(id: number): Promise<StreamableFile> {
+    const files = await this.userFilesEntity.findOne({ id });
+    const path = `${conf.upload.path}${files.fileId}`;
+    if (!fs.existsSync(path)) {
+      //文件不存在
+      return null;
+    }
+    const file = fs.createReadStream(path);
+    return new StreamableFile(file);
   }
 }
