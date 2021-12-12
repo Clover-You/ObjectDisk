@@ -1,3 +1,4 @@
+import MathTools from 'src/utils/MathTools';
 import { Request } from 'express';
 import { AjaxResult } from 'src/utils/ajax-result.classes';
 import {
@@ -103,10 +104,14 @@ export class UploadController {
       return AjaxResult.fail('参数错误');
     }
 
+    const decryptUserid = parseInt(MathTools.decryptForKey(userid));
+    const decryptFolderid =
+      folderid == '0' ? 0 : parseInt(MathTools.decryptForKey(folderid));
+
     return this.uploadService.uploadStreamFile(
       req,
-      userid,
-      folderid,
+      decryptUserid,
+      decryptFolderid,
       fileName,
       filePath,
       fileExt,

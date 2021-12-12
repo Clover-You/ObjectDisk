@@ -53,12 +53,13 @@ export class DriveService {
     if (folder == undefined) {
       //文件夹不存在
       const date = format(new Date(), DateUtils.DATETIME_DEFAULT_FORMAT);
-      const folderDB = new FolderEntity();
-      folderDB.userId = userId;
-      folderDB.folderId = folderId;
-      folderDB.name = name;
-      folderDB.size = 0;
-      folderDB.createTime = date;
+      const folderDB = FolderEntity.instance({
+        userId,
+        folderId,
+        name,
+        size: 0,
+        createTime: date,
+      });
       const count = await this.folderEntity.insert(folderDB);
       if (count == void 0) {
         //新建文件夹失败

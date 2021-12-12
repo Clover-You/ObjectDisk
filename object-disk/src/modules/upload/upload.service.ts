@@ -1,12 +1,15 @@
+import { Request } from 'express';
 import { AjaxResult } from 'src/utils/ajax-result.classes';
 import { Injectable } from '@nestjs/common';
 import conf from 'src/config/config';
 import * as fs from 'fs';
-import path from 'path/posix';
 import { UserFilesEntity } from 'src/entity/user_files.entity';
 import { FilesEntity } from 'src/entity/files.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import DateUtils from 'src/utils/DateUtils';
+import { format } from 'date-fns';
+import * as path from 'path';
 
 /*
  * █████▒█      ██  ▄████▄   ██ ▄█▀     ██████╗ ██╗   ██╗ ██████╗
@@ -35,15 +38,15 @@ export class UploadService {
   ) {}
 
   async uploadStreamFile(
-    req,
-    userid,
-    folderid,
-    fileName,
-    filePath,
-    fileExt,
-    fileSha256,
-    currentChunkMax,
-    currentChunkIndex,
+    req: Request,
+    userid: number,
+    folderid: number,
+    fileName: string,
+    filePath: string,
+    fileExt: string,
+    fileSha256: string,
+    currentChunkMax: number,
+    currentChunkIndex: number,
   ): Promise<AjaxResult> {
     const sha256Path = `${conf.upload.temp}${fileSha256}\\`;
     const uploadPath = `${conf.upload.path}${fileSha256}`;
@@ -59,7 +62,6 @@ export class UploadService {
 
     req
       .on('data', (trunk) => {
-        console.log(3);
         buffers.push(trunk);
       })
       .on('end', () => {
@@ -78,22 +80,28 @@ export class UploadService {
           const content = fs.readFileSync(path.join(sha256Path, i.toString()));
           fs.appendFileSync(uploadPath, content);
         }
+        const date = format(new Date(), DateUtils.DATETIME_DEFAULT_FORMAT);
+        const userfile = UserFilesEntity.instance({
+          userId: userid,
+          folderId: folderid,
+          fileId: fileSha256,
+          fileName: fileName,
+          createTime: date,
+          suffix: fileExt,
+        });
 
         //写入用户文件表里
-        // const userfileData = await UploadController.userFileService.addUserFile(
-        //   ctx.request.query.userid,
-        //   ctx.request.query.folderid,
-        //   ctx.request.query.fileSha256,
-        //   ctx.request.query.fileName,
-        //   ctx.request.query.fileExt,
-        // );
+        this.userFilesEntity.insert(userfile);
 
         //写入文件表里
-        // const sqlurl = uploadPath.replace(/\\/g, '\\\\');
-        // const data = await UploadController.userFileService.addFile(
-        //   ctx.request.query.fileSha256,
-        //   sqlurl,
-        // );
+        const sqlurl = uploadPath.replace(/\\/g, '\\\\');
+        const file = FilesEntity.instance({
+          sha256: fileSha256,
+          url: sqlurl,
+          statusId: 0,
+          fileTypeId: 0,
+        });
+        this.filesEntity.insert(file);
 
         return AjaxResult.success('传输完成');
       })
