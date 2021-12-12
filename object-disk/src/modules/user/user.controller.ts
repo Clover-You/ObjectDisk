@@ -3,6 +3,7 @@ import { UserEntity } from 'src/entity/user.entity';
 import { AjaxResult } from 'src/utils/ajax-result.classes';
 import { UserService } from './user.service';
 import { StringUtils } from 'src/utils/StringUtils';
+import { HttpParameterException } from "../../exceptions/http-parameter.exception";
 
 /**
  * █████▒█      ██  ▄████▄   ██ ▄█▀     ██████╗ ██╗   ██╗ ██████╗
@@ -71,11 +72,18 @@ export class UserController {
     @Body() { account, password }: UserEntity,
   ): Promise<AjaxResult> {
     if (!StringUtils.hasText(account)) {
-      return AjaxResult.fail('账号不能为空', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpParameterException(
+        '账号不能为空',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
     if (!StringUtils.hasText(password)) {
-      return AjaxResult.fail('密码不能为空', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpParameterException(
+        '密码不能为空',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
     return await this.userService.userLogin(account, password);
   }
 }
+
