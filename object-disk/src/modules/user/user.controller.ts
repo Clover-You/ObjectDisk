@@ -43,7 +43,7 @@ export class UserController {
     @Body() { nickName, account, password, registeredCode },
   ): Promise<AjaxResult> {
     if (registeredCode.toUpperCase() == 'OBJECT') {
-      return await this.userService.userRegistered(
+      return this.userService.userRegistered(
         UserEntity.instance({
           nickName,
           account,
@@ -76,6 +76,6 @@ export class UserController {
     if (!StringUtils.hasText(password)) {
       return AjaxResult.fail('密码不能为空', HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    return await this.userService.userLogin(account, password);
+    return this.userService.userLogin(account, password);
   }
 }
