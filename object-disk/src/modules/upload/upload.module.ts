@@ -1,14 +1,11 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { UserModule } from './modules/user/user.module';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { LoggerMiddleware } from './common/logger/logger.middleware';
-import { DataBaseConfig } from './config/orm.config';
-import { DriveModule } from './modules/drive/drive.module';
-import { UploadModule } from './modules/upload/upload.module';
+import { FilesEntity } from 'src/entity/files.entity';
+import { UserFilesEntity } from 'src/entity/user_files.entity';
+import { UploadController } from './upload.controller';
+import { UploadService } from './upload.service';
 
-/**
+/*
  * █████▒█      ██  ▄████▄   ██ ▄█▀     ██████╗ ██╗   ██╗ ██████╗
  * ▓██   ▒ ██  ▓██▒▒██▀ ▀█   ██▄█▒      ██╔══██╗██║   ██║██╔════╝
  * ▒████ ░▓██  ▒██░▒▓█    ▄ ▓███▄░      ██████╔╝██║   ██║██║  ███╗
@@ -18,26 +15,16 @@ import { UploadModule } from './modules/upload/upload.module';
  * ░     ░░▒░ ░ ░   ░  ▒   ░ ░▒ ▒░
  * ░ ░    ░░░ ░ ░ ░        ░ ░░ ░
  * ░     ░ ░      ░  ░
- * Copyright 2021 Clover.
+ * Copyright 2022 LRolinx.
  * <p>
- *  App模块「即主程序」
+ *  -上传模块
  * </p>
- * @author Clover
- * @create 2021-11-08 15:23
+ * @author LRolinx
+ * @create 2021-12-12 15:07
  */
 @Module({
-  imports: [
-    UserModule,
-    DriveModule,
-    UploadModule,
-    TypeOrmModule.forRoot(DataBaseConfig),
-  ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [UploadController],
+  imports: [TypeOrmModule.forFeature([FilesEntity, UserFilesEntity])],
+  providers: [UploadService],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    // 使用日志中间件
-    consumer.apply(LoggerMiddleware).forRoutes('/');
-  }
-}
+export class UploadModule {}

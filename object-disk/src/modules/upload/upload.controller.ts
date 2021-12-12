@@ -1,0 +1,118 @@
+import { Request } from 'express';
+import { AjaxResult } from 'src/utils/ajax-result.classes';
+import {
+  Body,
+  Controller,
+  Inject,
+  Post,
+  Put,
+  Query,
+  Req,
+} from '@nestjs/common';
+import { UploadService } from './upload.service';
+import { StringUtils } from 'src/utils/StringUtils';
+
+/*
+ * █████▒█      ██  ▄████▄   ██ ▄█▀     ██████╗ ██╗   ██╗ ██████╗
+ * ▓██   ▒ ██  ▓██▒▒██▀ ▀█   ██▄█▒      ██╔══██╗██║   ██║██╔════╝
+ * ▒████ ░▓██  ▒██░▒▓█    ▄ ▓███▄░      ██████╔╝██║   ██║██║  ███╗
+ * ░▓█▒  ░▓▓█  ░██░▒▓▓▄ ▄██▒▓██ █▄      ██╔══██╗██║   ██║██║   ██║
+ * ░▒█░   ▒▒█████▓ ▒ ▓███▀ ░▒██▒ █▄     ██████╔╝╚██████╔╝╚██████╔╝
+ * ▒ ░   ░▒▓▒ ▒ ▒ ░ ░▒ ▒  ░▒ ▒▒ ▓▒     ╚═════╝  ╚═════╝  ╚═════╝
+ * ░     ░░▒░ ░ ░   ░  ▒   ░ ░▒ ▒░
+ * ░ ░    ░░░ ░ ░ ░        ░ ░░ ░
+ * ░     ░ ░      ░  ░
+ * Copyright 2022 LRolinx.
+ * <p>
+ *  -上传控制器
+ * </p>
+ * @author LRolinx
+ * @create 2021-12-12 15:08
+ */
+@Controller('/upload')
+export class UploadController {
+  constructor(
+    @Inject(UploadService)
+    private readonly uploadService: UploadService,
+  ) {}
+
+  /**
+   * 上传前检查文件
+   * @param userid
+   * @param folderid
+   * @param sha256Id
+   * @param filename
+   * @param fileext
+   * @returns
+   */
+  @Post('/examineFile')
+  async examineFile(
+    @Body() { userid, folderid, sha256Id, filename, fileext },
+  ): Promise<AjaxResult> {
+    if (
+      !StringUtils.hasText(userid) ||
+      !StringUtils.hasText(folderid) ||
+      !StringUtils.hasText(sha256Id) ||
+      !StringUtils.hasText(filename) ||
+      !StringUtils.hasText(fileext)
+    ) {
+      return AjaxResult.fail('参数错误');
+    } else {
+      return AjaxResult.success({ userFileExist: false, fileExist: false });
+    }
+  }
+
+  /**
+   * 上传流文件
+   * @param req
+   * @param userid
+   * @param folderid
+   * @param fileName
+   * @param filePath
+   * @param fileExt
+   * @param fileSha256
+   * @param currentChunkMax
+   * @param currentChunkIndex
+   * @returns
+   */
+  @Put('/uploadStreamFile')
+  async uploadStreamFile(
+    @Req() req: Request,
+    @Query()
+    {
+      userid,
+      folderid,
+      fileName,
+      filePath,
+      fileExt,
+      fileSha256,
+      currentChunkMax,
+      currentChunkIndex,
+    },
+  ): Promise<AjaxResult> {
+    if (
+      !StringUtils.hasText(userid) ||
+      !StringUtils.hasText(folderid) ||
+      !StringUtils.hasText(fileName) ||
+      !StringUtils.hasText(filePath) ||
+      !StringUtils.hasText(fileExt) ||
+      !StringUtils.hasText(fileSha256) ||
+      !StringUtils.hasText(currentChunkMax) ||
+      !StringUtils.hasText(currentChunkIndex)
+    ) {
+      return AjaxResult.fail('参数错误');
+    }
+
+    return this.uploadService.uploadStreamFile(
+      req,
+      userid,
+      folderid,
+      fileName,
+      filePath,
+      fileExt,
+      fileSha256,
+      currentChunkMax,
+      currentChunkIndex,
+    );
+  }
+}
