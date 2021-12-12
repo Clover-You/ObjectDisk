@@ -3,7 +3,7 @@ import { UserEntity } from 'src/entity/user.entity';
 import { AjaxResult } from 'src/utils/ajax-result.classes';
 import { UserService } from './user.service';
 import { StringUtils } from 'src/utils/StringUtils';
-import { HttpParameterException } from "../../exceptions/http-parameter.exception";
+import { HttpParameterException } from '../../exceptions/http-parameter.exception';
 
 /**
  * █████▒█      ██  ▄████▄   ██ ▄█▀     ██████╗ ██╗   ██╗ ██████╗
@@ -44,7 +44,7 @@ export class UserController {
     @Body() { nickName, account, password, registeredCode },
   ): Promise<AjaxResult> {
     if (registeredCode.toUpperCase() == 'OBJECT') {
-      return await this.userService.userRegistered(
+      return this.userService.userRegistered(
         UserEntity.instance({
           nickName,
           account,
@@ -83,7 +83,6 @@ export class UserController {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-    return await this.userService.userLogin(account, password);
+    return this.userService.userLogin(account, password);
   }
 }
-
