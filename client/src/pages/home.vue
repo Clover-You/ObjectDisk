@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2020-10-14 20:58:01
- * @LastEditTime 2021-12-12 15:13
+ * @LastEditTime 2021-12-12 21:36
  * @Description: 我的云盘
  *
 -->
@@ -203,14 +203,8 @@ export default {
                         fileslice,
                         {
                           params: {
-                            userid: encodeURI(this.$store.state.id).replace(
-                              /\+/g,
-                              "%2B"
-                            ),
-                            folderid: encodeURI(item.folderId).replace(
-                              /\+/g,
-                              "%2B"
-                            ),
+                            userid: this.$store.state.id,
+                            folderid: item.folderId,
                             fileName: item.fname,
                             filePath: item.filePath,
                             fileExt: item.fext,
