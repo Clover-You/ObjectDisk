@@ -1,13 +1,6 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { UserModule } from './modules/user/user.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { LoggerMiddleware } from './common/logger/logger.middleware';
-import { DataBaseConfig } from './config/orm.config';
-import { DriveModule } from './modules/drive/drive.module';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-/**
+/*
  * █████▒█      ██  ▄████▄   ██ ▄█▀     ██████╗ ██╗   ██╗ ██████╗
  * ▓██   ▒ ██  ▓██▒▒██▀ ▀█   ██▄█▒      ██╔══██╗██║   ██║██╔════╝
  * ▒████ ░▓██  ▒██░▒▓█    ▄ ▓███▄░      ██████╔╝██║   ██║██║  ███╗
@@ -17,21 +10,41 @@ import { DriveModule } from './modules/drive/drive.module';
  * ░     ░░▒░ ░ ░   ░  ▒   ░ ░▒ ▒░
  * ░ ░    ░░░ ░ ░ ░        ░ ░░ ░
  * ░     ░ ░      ░  ░
- * Copyright 2021 Clover.
+ * Copyright 2022 LRolinx.
  * <p>
- *  App模块「即主程序」
+ *  -
  * </p>
- * @author Clover
- * @create 2021-11-08 15:23
+ * @author LRolinx
+ * @create 2021-12-11 17:24
  */
-@Module({
-  imports: [UserModule, DriveModule, TypeOrmModule.forRoot(DataBaseConfig)],
-  controllers: [AppController],
-  providers: [AppService],
-})
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    // 使用日志中间件
-    consumer.apply(LoggerMiddleware).forRoutes('/');
-  }
+@Entity('t_user_file_and_folder')
+export class UserFileAndFolder {
+  /**
+   * 加密用户ID
+   */
+  @PrimaryColumn({
+    type: 'varchar',
+  })
+  id?: string;
+
+  @Column({ type: 'varchar', length: 255 })
+  name?: string;
+
+  @Column({ type: 'varchar', length: 255 })
+  type?: string;
+
+  @Column({ type: 'double' })
+  size?: number;
+
+  @Column({ type: 'varchar', length: 255 })
+  path?: string;
+
+  @Column({ type: 'varchar', length: 255 })
+  updateTime?: string;
+
+  @Column({ type: 'varchar', length: 255 })
+  suffix?: string;
+
+  @Column({ type: 'varchar', length: 255 })
+  fileType?: string;
 }

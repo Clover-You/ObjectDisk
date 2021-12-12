@@ -4,8 +4,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { HttpParameterExceptionFilter } from './common/filters/http-parameter-exception.filter';
+import MathTools from './utils/MathTools';
 /**
  * █████▒█      ██  ▄████▄   ██ ▄█▀     ██████╗ ██╗   ██╗ ██████╗
  * ▓██   ▒ ██  ▓██▒▒██▀ ▀█   ██▄█▒      ██╔══██╗██║   ██║██╔════╝
@@ -24,6 +24,9 @@ import { HttpParameterExceptionFilter } from './common/filters/http-parameter-ex
  * @create 2021-11-08 15:27
  */
 async function bootstrap() {
+  //生成公私密匙
+  MathTools.generateKey();
+
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.useStaticAssets(path.join(__dirname, '..', 'resources'), {
     prefix: '/static/',

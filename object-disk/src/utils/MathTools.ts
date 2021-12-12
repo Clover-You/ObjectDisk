@@ -1,14 +1,13 @@
 /*
  * @Author: LRolinx
  * @Date: 2021-01-20 10:27:54
- * @LastEditTime: 2021-01-22 18:03:37
+ * @LastEditTime 2021-12-11 22:21
  * @Description:
  *
  */
-// import NodeRSA from 'node-rsa';
-import fs from 'fs';
+import * as NodeRSA from 'node-rsa';
+import * as fs from 'fs';
 import conf from 'src/config/config';
-const NodeRSA = require('node-rsa');
 
 export default class MathTools {
   // 生成一个1024长度的密钥对

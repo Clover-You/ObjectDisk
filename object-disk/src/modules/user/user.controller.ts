@@ -1,8 +1,7 @@
-import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
+import { Body, Controller, HttpStatus, Inject, Post } from '@nestjs/common';
 import { UserEntity } from 'src/entity/user.entity';
 import { AjaxResult } from 'src/utils/ajax-result.classes';
 import { UserService } from './user.service';
-import { HttpParameterException } from 'src/exceptions/http-parameter.exception';
 import { StringUtils } from 'src/utils/StringUtils';
 
 /**
@@ -41,22 +40,21 @@ export class UserController {
    */
   @Post('/objectCloudDiskRegistered')
   async userRegistered(
-    nickName: string,
-    account: string,
-    password: string,
-    registeredCode: string,
-  ): Promise<AjaxResult<UserEntity>> {
+    @Body() { nickName, account, password, registeredCode },
+  ): Promise<AjaxResult> {
     if (registeredCode.toUpperCase() == 'OBJECT') {
-      this.userService.userRegistered(
+      return await this.userService.userRegistered(
         UserEntity.instance({
           nickName,
           account,
           password,
         }),
       );
-      return AjaxResult.success(null, '注册成功');
     } else {
-      return AjaxResult.fail('内部注册码错误');
+      return AjaxResult.fail(
+        '内部注册码错误',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -69,14 +67,15 @@ export class UserController {
    * @date 2021/11/9 14:37
    */
   @Post('/objectCloudDiskLogin')
-  async userLogin(@Body() { account, password }: UserEntity) {
+  async userLogin(
+    @Body() { account, password }: UserEntity,
+  ): Promise<AjaxResult> {
     if (!StringUtils.hasText(account)) {
-      throw new HttpParameterException('账号不能为空', 406);
+      return AjaxResult.fail('账号不能为空', HttpStatus.INTERNAL_SERVER_ERROR);
     }
     if (!StringUtils.hasText(password)) {
-      throw new HttpParameterException('密码不能为空', 406);
+      return AjaxResult.fail('密码不能为空', HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    this.userService.userLogin(account, password);
-    return AjaxResult.success('登录成功!');
+    return await this.userService.userLogin(account, password);
   }
 }

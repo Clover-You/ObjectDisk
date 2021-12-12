@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2021-01-17 20:28:02
- * @LastEditTime: 2021-01-24 18:18:13
+ * @LastEditTime 2021-12-11 19:55
  * @Description: 注册
  * 
 -->
@@ -33,32 +33,32 @@
 </template>
 <script>
 import tipMessge from "@/components/tipMessge";
-import lVerificationCodeInput from '../components/lVerificationCodeInput'
+import lVerificationCodeInput from "../components/lVerificationCodeInput";
 export default {
   components: {
     tipMessge,
-    lVerificationCodeInput
+    lVerificationCodeInput,
   },
   data() {
     return {
-      isShowTipMessge: false,//是否显示提示模态窗
-      showTipText: "",//显示提示内容
-      nickName: '',
-      account: '',
-      password: '',
-      confirmPassword: '',
-      registeredCode: '',
-    }
+      isShowTipMessge: false, //是否显示提示模态窗
+      showTipText: "", //显示提示内容
+      nickName: "",
+      account: "",
+      password: "",
+      confirmPassword: "",
+      registeredCode: "",
+    };
   },
   created() {
     if (this.$store.state.isLogin) {
-      this.$router.replace({ name: 'drive' });//已登录直接进入云盘
+      this.$router.replace({ name: "drive" }); //已登录直接进入云盘
     }
   },
   methods: {
     gotoLogin() {
       //跳转到登录
-      this.$router.replace({ name: 'login' });
+      this.$router.replace({ name: "login" });
     },
     keydown(e) {
       if (e.keyCode == 13) {
@@ -67,55 +67,59 @@ export default {
     },
     registered() {
       //注册
-      if (this.nickName == '') {
+      if (this.nickName == "") {
         this.showTipText = "昵称不能为空";
         this.isShowTipMessge = true;
         return;
       }
-      if (this.account == '') {
+      if (this.account == "") {
         this.showTipText = "账号不能为空";
         this.isShowTipMessge = true;
         return;
       }
-      if (this.password == '') {
+      if (this.password == "") {
         this.showTipText = "密码不能为空";
         this.isShowTipMessge = true;
         return;
       }
-      if (this.confirmPassword == '') {
+      if (this.confirmPassword == "") {
         this.showTipText = "确认密码不能为空";
         this.isShowTipMessge = true;
         return;
       }
-      if (this.registeredCode == '') {
+      if (this.registeredCode == "") {
         this.showTipText = "内部注册码不能为空";
         this.isShowTipMessge = true;
         return;
       }
-      this.$http.post(`${this.$store.state.serve.serveUrl}users/objectCloudDiskRegistered`, {
-        nickName: this.nickName,
-        account: this.account,
-        password: this.password,
-        confirmPassword: this.confirmPassword,
-        registeredCode: this.registeredCode
-      }).then(res => {
-        switch (res.data.code) {
-          case 200:
-            this.$router.push({ name: 'login' });
-            this.showTipText = res.data.msg;
+      this.$http
+        .post(
+          `${this.$store.state.serve.serveUrl}users/objectCloudDiskRegistered`,
+          {
+            nickName: this.nickName,
+            account: this.account,
+            password: this.password,
+            confirmPassword: this.confirmPassword,
+            registeredCode: this.registeredCode,
+          }
+        )
+        .then((res) => {
+          if (res.data.code == 200) {
+            this.$router.push({ name: "login" });
+            this.showTipText = res.data.message;
             this.isShowTipMessge = true;
-            break;
-          case 500:
-            this.showTipText = res.data.msg;
+          } else {
+            this.showTipText = res.data.message;
             this.isShowTipMessge = true;
-            break;
-        }
-      }).catch(err => {
-        console.log(err);
-      })
-    }
-  }
-}
+          }
+        })
+        .catch((err) => {
+          this.showTipText = err.data.message;
+          this.isShowTipMessge = true;
+        });
+    },
+  },
+};
 </script>
 <style scoped>
 .body {
