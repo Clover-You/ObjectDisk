@@ -57,6 +57,7 @@ export class DriveService {
       folderDB.userId = userId;
       folderDB.folderId = folderId;
       folderDB.name = name;
+      folderDB.size = 0;
       folderDB.createTime = date;
       const count = await this.folderEntity.insert(folderDB);
       if (count == void 0) {
@@ -64,10 +65,17 @@ export class DriveService {
         return AjaxResult.fail('新建文件夹失败');
       }
       //新建文件夹成功
-      return AjaxResult.success('新建文件夹成功');
+      return AjaxResult.success(
+        MathTools.encryptForKey(count.raw['insertId']),
+        '新建文件夹成功',
+      );
     } else {
       //文件夹存在
-      return AjaxResult.fail('文件夹存在');
+      return AjaxResult.fail(
+        '文件夹存在',
+        500,
+        MathTools.encryptForKey(folder.id),
+      );
     }
   }
 

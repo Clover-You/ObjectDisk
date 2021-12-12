@@ -58,7 +58,7 @@ export class UserService {
       }
       return AjaxResult.success('注册成功');
     } else {
-      return AjaxResult.fail('用户已被注册');
+      return AjaxResult.fail('用户已存在');
     }
   }
 
