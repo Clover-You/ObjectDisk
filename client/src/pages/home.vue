@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2020-10-14 20:58:01
- * @LastEditTime 2021-12-11 16:40
+ * @LastEditTime 2021-12-12 15:13
  * @Description: 我的云盘
  *
 -->
@@ -17,38 +17,23 @@
         </div>
 
         <ul class="siderbarUl">
-          <li
-              :class="{ liOn: $store.state.siderbarStr == 'drive' }"
-              @click="openDrive"
-          >
+          <li :class="{ liOn: $store.state.siderbarStr == 'drive' }" @click="openDrive">
             <i class="iconfont icon-drive"></i>
             <p>我的云盘</p>
           </li>
-          <li
-              :class="{ liOn: $store.state.siderbarStr == 'driveResourcePool' }"
-              @click="openDriveResourcePool"
-          >
+          <li :class="{ liOn: $store.state.siderbarStr == 'driveResourcePool' }" @click="openDriveResourcePool">
             <i class="iconfont icon-cloud"></i>
             <p>资源池</p>
           </li>
-          <li
-              :class="{ liOn: $store.state.siderbarStr == 'iconList' }"
-              @click="openIconList"
-          >
+          <li :class="{ liOn: $store.state.siderbarStr == 'iconList' }" @click="openIconList">
             <i class="iconfont icon-play-drag"></i>
             <p>图标库</p>
           </li>
-          <li
-              :class="{ liOn: $store.state.siderbarStr == 'streamingVideo' }"
-              @click="openStreamingVideo"
-          >
+          <li :class="{ liOn: $store.state.siderbarStr == 'streamingVideo' }" @click="openStreamingVideo">
             <i class="iconfont icon-video-play"></i>
             <p>视频流DEMO</p>
           </li>
-          <li
-              :class="{ liOn: $store.state.siderbarStr == 'interactiveEffect' }"
-              @click="openInteractiveEffect"
-          >
+          <li :class="{ liOn: $store.state.siderbarStr == 'interactiveEffect' }" @click="openInteractiveEffect">
             <i class="iconfont icon-list"></i>
             <p>交互效果DEMO</p>
           </li>
@@ -56,22 +41,16 @@
 
         <div class="headBox">
           <div class="headChildBox">
-            <img :src="$store.state.photo"/>
+            <img :src="$store.state.photo" />
             <p>{{ $store.state.nickname }}</p>
           </div>
         </div>
       </div>
       <div class="content">
         <keep-alive>
-          <router-view
-              v-if="$route.meta.keepAlive"
-              ref="childRouter"
-          ></router-view>
+          <router-view v-if="$route.meta.keepAlive" ref="childRouter"></router-view>
         </keep-alive>
-        <router-view
-            v-if="!$route.meta.keepAlive"
-            ref="childRouter"
-        ></router-view>
+        <router-view v-if="!$route.meta.keepAlive" ref="childRouter"></router-view>
       </div>
     </div>
 
@@ -81,7 +60,7 @@
 
 <script>
 import uploadModal from "@/components/uploadModal.vue";
-import {sha256} from "js-sha256";
+import { sha256 } from "js-sha256";
 
 export default {
   components: {
@@ -122,36 +101,35 @@ export default {
       this.$store.state.siderbarStr = sessionStorage.getItem("siderbarStr");
     }
   },
-  mounted() {
-  },
+  mounted() {},
   methods: {
     judgmentIsLogin() {
       //检查登录
 
       if (!this.$store.state.isLogin) {
         sessionStorage.setItem("siderbarStr", "drive"); //重置最后路由
-        this.$router.replace({name: "login"}); //没登录直接回到登录页
+        this.$router.replace({ name: "login" }); //没登录直接回到登录页
       }
     },
     openDrive() {
       //打开我的云盘
-      this.$router.push({name: "drive"});
+      this.$router.push({ name: "drive" });
     },
     openDriveResourcePool() {
       // 打开资源池
-      this.$router.push({name: "driveResourcePool"});
+      this.$router.push({ name: "driveResourcePool" });
     },
     openIconList() {
       //打开图标库
-      this.$router.push({name: "iconList"});
+      this.$router.push({ name: "iconList" });
     },
     openStreamingVideo() {
       //打开视频流DEMO
-      this.$router.push({name: "streamingVideo"});
+      this.$router.push({ name: "streamingVideo" });
     },
     openInteractiveEffect() {
       //打开树形结构DEMO
-      this.$router.push({name: "interactiveEffect"});
+      this.$router.push({ name: "interactiveEffect" });
     },
     distributionTask() {
       //分配任务
@@ -178,106 +156,110 @@ export default {
         this.$set(item, "fileSha256", sha256Id);
         //检查文件
         this.$http
-            .post(`${this.$store.state.serve.serveUrl}upload/examineFile`, {
-              userid: this.$store.state.id,
-              folderid: item.folderId,
-              sha256Id: sha256Id,
-              filename: item.fname,
-              fileext: item.fext,
-            })
-            .then((examineres) => {
-              //检查是否有重复文件
-              // 根据浏览器获取文件分割方法
-              let blobSlice =
-                  File.prototype.mozSlice ||
-                  File.prototype.webkitSlice ||
-                  File.prototype.slice;
+          .post(`${this.$store.state.serve.serveUrl}upload/examineFile`, {
+            userid: this.$store.state.id,
+            folderid: item.folderId,
+            sha256Id: sha256Id,
+            filename: item.fname,
+            fileext: item.fext,
+          })
+          .then((examineres) => {
+            //检查是否有重复文件
+            // 根据浏览器获取文件分割方法
+            let blobSlice =
+              File.prototype.mozSlice ||
+              File.prototype.webkitSlice ||
+              File.prototype.slice;
 
-              // 指定文件分块大小 1024的2次方
-              let chunkSize = this.calculateSliceSize(item.file.size) * 1024 ** 2;
-              // 计算文件分块总数
-              let chunks = Math.ceil(item.file.size / chunkSize);
-              //设置总片段数量
-              this.$set(item, "currentChunkMax", chunks);
+            // 指定文件分块大小 1024的2次方
+            let chunkSize = this.calculateSliceSize(item.file.size) * 1024 ** 2;
+            // 计算文件分块总数
+            let chunks = Math.ceil(item.file.size / chunkSize);
+            //设置总片段数量
+            this.$set(item, "currentChunkMax", chunks);
 
-              if (examineres.data.code == 200) {
-                if (!examineres.data.data.userFileExist) {
-                  if (!examineres.data.data.fileExist) {
-                    this.$set(item, "uploadType", 2);
-                    // console.log(`${examineres.data.message}>>${examineres.data.data}`)
-                    //没文件开始上传
-                    // console.log(item);
+            if (examineres.data.code == 200) {
+              if (!examineres.data.data.userFileExist) {
+                if (!examineres.data.data.fileExist) {
+                  //设置该任务的状态
+                  this.$set(item, "uploadType", 2);
+                  for (let i = 0, len = chunks; i < len; i++) {
+                    // 计算开始读取的位置
+                    let start = i * chunkSize;
+                    // 计算结束读取的位置
+                    let end =
+                      start + chunkSize >= item.file.size
+                        ? item.file.size
+                        : start + chunkSize;
 
-                    for (let i = 0, len = chunks; i < len; i++) {
-                      // 计算开始读取的位置
-                      let start = i * chunkSize;
-                      // 计算结束读取的位置
-                      let end =
-                          start + chunkSize >= item.file.size
-                              ? item.file.size
-                              : start + chunkSize;
+                    // 简化流程
+                    let fileslice = blobSlice.call(item.file, start, end);
 
-                      // 简化流程
-                      let fileslice = blobSlice.call(item.file, start, end);
+                    //片段流上传
 
-                      //片段流上传
-
-                      this.$http
-                          .put(`${this.$store.state.serve.serveUrl}upload/uploadStreamFile`,
-                              fileslice,
-                              {
-                                params: {
-                                  userid: encodeURI(this.$store.state.id).replace(/\+/g, "%2B"),
-                                  folderid: encodeURI(item.folderId).replace(/\+/g, "%2B"),
-                                  fileName: item.fname,
-                                  filePath: item.filePath,
-                                  fileExt: item.fext,
-                                  fileSha256: item.fileSha256,
-                                  currentChunkMax: chunks,
-                                  currentChunkIndex: i
-                                },
-                                headers: {
-                                  "Content-Type": "image/png",
-                                },
-                              }
-                          )
-                          .then(() => {
-                            this.$set(
-                                item,
-                                "uploadCurrentChunkNum",
-                                item.uploadCurrentChunkNum + 1
-                            );
-                            if (
-                                item.uploadCurrentChunkNum >= item.currentChunkMax
-                            ) {
-                              console.log(this.$refs.childRouter);
-                              this.$refs.childRouter.getUserFileAndFolder(
-                                  this.$refs.childRouter.getFolderId
-                              );
-                              //设置上传完成
-                              this.$set(item, "uploadType", 4);
-                            }
-                          });
-                    }
-                  } else {
-                    //秒传文件
-                    //uploadType 0等待中 1准备中 2上传中 3上传暂停 4上传完成 5秒传 6文件太小 7文件太大 其他上传错误
-                    this.$set(this.uploadBufferPool, item.uploadType, 5);
-                    if (item.uploadCurrentChunkNum == item.currentChunkMax) {
-                      this.$set(item, "uploadType", 4);
-                    }
+                    this.$http
+                      .put(
+                        `${this.$store.state.serve.serveUrl}upload/uploadStreamFile`,
+                        fileslice,
+                        {
+                          params: {
+                            userid: encodeURI(this.$store.state.id).replace(
+                              /\+/g,
+                              "%2B"
+                            ),
+                            folderid: encodeURI(item.folderId).replace(
+                              /\+/g,
+                              "%2B"
+                            ),
+                            fileName: item.fname,
+                            filePath: item.filePath,
+                            fileExt: item.fext,
+                            fileSha256: item.fileSha256,
+                            currentChunkMax: chunks,
+                            currentChunkIndex: i,
+                          },
+                          headers: {
+                            "Content-Type": "image/png",
+                          },
+                        }
+                      )
+                      .then(() => {
+                        this.$set(
+                          item,
+                          "uploadCurrentChunkNum",
+                          item.uploadCurrentChunkNum + 1
+                        );
+                        if (
+                          item.uploadCurrentChunkNum >= item.currentChunkMax
+                        ) {
+                          console.log(this.$refs.childRouter);
+                          this.$refs.childRouter.getUserFileAndFolder(
+                            this.$refs.childRouter.getFolderId
+                          );
+                          //设置任务上传完成
+                          this.$set(item, "uploadType", 4);
+                        }
+                      });
                   }
                 } else {
-                  //文件已存在
-                  console.log("文件已存在");
+                  //秒传文件
+                  //uploadType 0等待中 1准备中 2上传中 3上传暂停 4上传完成 5秒传 6文件太小 7文件太大 其他上传错误
+                  this.$set(this.uploadBufferPool, item.uploadType, 5);
+                  if (item.uploadCurrentChunkNum == item.currentChunkMax) {
+                    this.$set(item, "uploadType", 4);
+                  }
                 }
               } else {
-                console.log(examineres.data.message);
+                //文件已存在
+                console.log("文件已存在");
               }
-            })
-            .catch((err) => {
-              console.log(err);
-            });
+            } else {
+              console.log(examineres.data.message);
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       };
     },
 

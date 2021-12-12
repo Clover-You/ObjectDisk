@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2020-10-14 20:58:01
- * @LastEditTime 2021-12-11 21:32
+ * @LastEditTime 2021-12-12 16:31
  * @Description: 我的云盘
  * 
 -->
@@ -242,12 +242,11 @@ export default {
       this.isShowUpdateModel = false;
 
       let items = e.dataTransfer.items;
-      // console.log(items);
       items.forEach((item) => {
         if (item.kind === "file") {
           //是文件才触发
           let entry = item.webkitGetAsEntry();
-          this.getFileFromEntryRecursively(entry);
+          this.getFileFromEntryRecursively("0", entry);
         }
       });
     },
@@ -276,7 +275,7 @@ export default {
         this.isShowTipMessge = true;
       }
     },
-    getFileFromEntryRecursively(entry) {
+    async getFileFromEntryRecursively(folderId, entry) {
       // 处理文件夹里的文件
       if (entry.isFile) {
         entry.file((file) => {
@@ -295,21 +294,35 @@ export default {
             fext,
             filePath: path,
             fileSha256: "",
-            folderId: this.getFolderId,
+            folderId: folderId == "0" ? this.getFolderId : folderId,
             // currentChunkList: []
           };
+          // console.log(fileInfoOBJ);
           this.$parent.uploadBufferPool.push(fileInfoOBJ); //将任务写入数据
         });
       } else {
         //检测到文件夹
+        let createfolderres = await this.$http.post(
+          `${this.$store.state.serve.serveUrl}drive/addUserFolder`,
+          {
+            userid: this.$store.state.id,
+            folderid: folderId == "0" ? this.getFolderId : folderId,
+            name: entry.name,
+          }
+        );
+
         let reader = entry.createReader();
         reader.readEntries((entries) => {
           for (let i = 0, len = entries.length; i < len; i++) {
-            this.getFileFromEntryRecursively(entries[i]);
+            this.getFileFromEntryRecursively(
+              createfolderres.data.data,
+              entries[i]
+            );
           }
 
           // entries.forEach(entry => this.getFileFromEntryRecursively(entry));
         });
+        this.getUserFileAndFolder(this.getFolderId);
       }
     },
     openNewFolderModel() {
