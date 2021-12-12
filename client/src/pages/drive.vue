@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2020-10-14 20:58:01
- * @LastEditTime 2021-12-11 19:59
+ * @LastEditTime 2021-12-11 21:32
  * @Description: 我的云盘
  * 
 -->
@@ -325,7 +325,7 @@ export default {
       //获取图片数据并返回Blob地址
       this.$http
         .post(
-          `${this.$store.state.serve.serveUrl}drive/getImageData`,
+          `${this.$store.state.serve.serveUrl}drive/getUserFileForFileId`,
           {
             id: this.fileData[i].id,
           },
