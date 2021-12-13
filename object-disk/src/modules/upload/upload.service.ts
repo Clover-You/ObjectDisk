@@ -37,6 +37,51 @@ export class UploadService {
     private readonly userFilesEntity: Repository<UserFilesEntity>,
   ) {}
 
+  async examineFile(
+    userid: number,
+    folderid: number,
+    sha256Id: string,
+    filename: string,
+    fileext: string,
+  ): Promise<AjaxResult> {
+    const enres = { userFileExist: false, fileExist: false };
+    const file = await this.filesEntity.findOne(
+      FilesEntity.instance({ sha256: sha256Id }),
+    );
+    const userfile = await this.userFilesEntity.findOne(
+      UserFilesEntity.instance({
+        userId: userid,
+        folderId: folderid,
+        fileName: filename,
+        suffix: fileext,
+      }),
+    );
+    console.log(file, userfile);
+
+    if (file != undefined) {
+      enres.fileExist = true;
+    }
+
+    if (userfile != undefined) {
+      enres.userFileExist = true;
+    }
+
+    return AjaxResult.success(enres);
+  }
+
+  /**
+   * 上传文件
+   * @param req
+   * @param userid
+   * @param folderid
+   * @param fileName
+   * @param filePath
+   * @param fileExt
+   * @param fileSha256
+   * @param currentChunkMax
+   * @param currentChunkIndex
+   * @returns
+   */
   async uploadStreamFile(
     req: Request,
     userid: number,

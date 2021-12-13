@@ -59,7 +59,16 @@ export class UploadController {
     ) {
       return AjaxResult.fail('参数错误');
     } else {
-      return AjaxResult.success({ userFileExist: false, fileExist: false });
+      const decryptUserid = parseInt(MathTools.decryptForKey(userid));
+      const decryptFolderid =
+        folderid == '0' ? 0 : parseInt(MathTools.decryptForKey(folderid));
+      return this.uploadService.examineFile(
+        decryptUserid,
+        decryptFolderid,
+        sha256Id,
+        filename,
+        fileext,
+      );
     }
   }
 
