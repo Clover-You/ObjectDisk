@@ -1,23 +1,23 @@
 <!--
  * @Author: LRolinx
  * @Date: 2021-01-09 21:55:39
- * @LastEditTime: 2021-01-14 15:41:26
+ * @LastEditTime 2021-12-13 11:07
  * @Description: 上传模态窗
  * 
 -->
 <template>
   <div class="body" v-if="uploadBufferPool.length!=0">
     <div class="upLoadListBox" ref="upLoadListBox">
-<div class="head">
-  <div class="head_left">
-    <i class="headLeftIcon iconfont icon-transfer"></i>
-    <p class="headLeftP">正在上传·剩余1项</p>
-  </div>
-  <div class="head_right">
-    <i class="headRightIcon iconfont icon-pause"></i>
-    <i class="headRightIcon iconfont icon-close-circle-sm"></i>
-  </div>
-</div>
+      <div class="head">
+        <div class="head_left">
+          <i class="headLeftIcon iconfont icon-transfer"></i>
+          <p class="headLeftP">正在上传·剩余{{uploadRemainingTask}}项</p>
+        </div>
+        <div class="head_right">
+          <i class="headRightIcon iconfont icon-pause"></i>
+          <i class="headRightIcon iconfont icon-close-circle-sm"></i>
+        </div>
+      </div>
 
       <ul class="upLoadListUlBox">
         <li class="upLoadListLiBox" v-for="(item,index) in uploadBufferPool" :key="index">
@@ -33,7 +33,7 @@
                 <p>{{upLoadType(item.uploadType)}}</p>
               </div>
             </div>
-            
+
           </div>
           <div class="upLoadListLiRightBox">
             <i class="iconfont icon-reload" v-if="item.uploadType==4"></i>
@@ -53,17 +53,20 @@ export default {
   props: {
     uploadBufferPool: {
       type: Array,
-      define: []
+      define: [],
+    },
+    uploadRemainingTask:{
+      type:Number,
+      default:0,
     }
   },
-  watch: {
-  },
+  watch: {},
   computed: {
     fileIcon: function () {
       return function (value) {
-        console.log(value)
+        console.log(value);
         if (value == "video/mp4") {
-          return "icon-video"
+          return "icon-video";
         }
         // if (value == "application/octet-stream") {
         //   return ""
@@ -72,54 +75,93 @@ export default {
         //   return ""
         // }
         if (value == "application/zip") {
-          return "icon-zip"
+          return "icon-zip";
         }
         if (value == "application/pdf") {
-          return "icon-pdf"
+          return "icon-pdf";
         }
         if (value == "text/html") {
-          return "icon-html"
+          return "icon-html";
         }
         if (value == "text/plain") {
-          return "icon-txt"
+          return "icon-txt";
         }
         if (value == "image/jpeg") {
-          return "icon-pic"
+          return "icon-pic";
         }
         if (value == "image/png") {
-          return "icon-pic"
+          return "icon-pic";
         }
         return "icon-unknown";
-
-      }
+      };
     },
     fileSize: function () {
       return function (value) {
-        if (null == value || value == '') {
+        if (null == value || value == "") {
           return "0yte";
         }
-        var unitArr = new Array("Byte", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB");
+        var unitArr = new Array(
+          "Byte",
+          "KB",
+          "MB",
+          "GB",
+          "TB",
+          "PB",
+          "EB",
+          "ZB",
+          "YB"
+        );
         var index = 0;
         var srcsize = parseFloat(value);
         index = Math.floor(Math.log(srcsize) / Math.log(1024));
         var size = srcsize / Math.pow(1024, index);
-        size = size.toFixed(2);//保留的小数位数
+        size = size.toFixed(2); //保留的小数位数
         return size + unitArr[index];
-      }
+      };
     },
     upLoadType: function () {
-      //uploadType 0等待中 1准备中 2上传中 3上传暂停 4上传完成 5上传错误 6秒传
+      //uploadType 0等待中 1准备中 2上传中 3上传暂停 4上传完成 5秒传 6文件太小 7文件太大 8文件已存在 404上传错误
       return function (value) {
-        return value == 0 ? '等待中' : value == 1 ? '准备中' : value == 2 ? '上传中' : value == 3 ? '上传暂停' : value == 4 ? '上传完成' : value == 5 ? '秒传' :value == 6 ? '文件太小' :value == 7 ? '文件太大' : '上传错误'
-      }
+        return value == 0
+          ? "等待中"
+          : value == 1
+          ? "准备中"
+          : value == 2
+          ? "上传中"
+          : value == 3
+          ? "上传暂停"
+          : value == 4
+          ? "上传完成"
+          : value == 5
+          ? "秒传"
+          : value == 6
+          ? "文件太小"
+          : value == 7
+          ? "文件太大"
+          : value == 8
+          ? "文件已存在"
+          : "上传错误";
+      };
     },
     upLoadTypeColor: function () {
       return function (value) {
-        return value == 0 ? '' : value == 1 ? '' : value == 2 ? '' : value == 3 ? 'upLoadStop' : value == 4 ? 'upLoadSuccess' : value == 5 ? 'upLoadError' : 'upLoadSuccess'
-      }
-    }
-  }
-}
+        return value == 0
+          ? ""
+          : value == 1
+          ? ""
+          : value == 2
+          ? ""
+          : value == 3
+          ? "upLoadStop"
+          : value == 4
+          ? "upLoadSuccess"
+          : value == 5
+          ? "upLoadError"
+          : "upLoadSuccess";
+      };
+    },
+  },
+};
 </script>
 <style scoped>
 .body {
@@ -139,7 +181,6 @@ export default {
   overflow: auto;
   display: flex;
   flex-direction: column;
-  
 }
 
 .head {
@@ -152,7 +193,7 @@ export default {
 .head_left {
   display: flex;
   align-items: center;
-font-size: 0.14rem;
+  font-size: 0.14rem;
 }
 
 .headLeftIcon {
@@ -164,13 +205,13 @@ font-size: 0.14rem;
 }
 
 .head_right {
-display: flex;
-align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .headRightIcon {
   font-size: 0.24rem;
-   margin-left: 0.2rem;
+  margin-left: 0.2rem;
 }
 
 .foot {
@@ -215,8 +256,8 @@ align-items: center;
 }
 
 .rightContentTitle {
-font-size: 0.14rem;
-overflow: hidden;
+  font-size: 0.14rem;
+  overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -232,7 +273,6 @@ overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
 
 .upLoadListLiRightBox {
   display: flex;

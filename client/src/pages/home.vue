@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2020-10-14 20:58:01
- * @LastEditTime 2021-12-12 21:36
+ * @LastEditTime 2021-12-13 11:42
  * @Description: 我的云盘
  *
 -->
@@ -54,7 +54,7 @@
       </div>
     </div>
 
-    <uploadModal :uploadBufferPool="uploadBufferPool"></uploadModal>
+    <uploadModal :uploadBufferPool="uploadBufferPool" :uploadRemainingTask="uploadRemainingTask"></uploadModal>
   </div>
 </template>
 
@@ -84,13 +84,7 @@ export default {
     },
     uploadBufferPool() {
       //监听任务列表更新
-      ++this.uploadRemainingTask;
-      if (this.uploadSetTimeOut != null) {
-        clearTimeout(this.uploadSetTimeOut);
-        this.uploadSetTimeOut = null;
-      }
-      //延迟1秒再做处理
-      this.uploadSetTimeOut = setTimeout(this.distributionTask, 1000);
+      this.distributionTask();
     },
   },
   created() {
@@ -128,7 +122,7 @@ export default {
       this.$router.push({ name: "streamingVideo" });
     },
     openInteractiveEffect() {
-      //打开树形结构DEMO
+      //打开交互效果DEMO
       this.$router.push({ name: "interactiveEffect" });
     },
     distributionTask() {
@@ -136,18 +130,28 @@ export default {
       for (let i = 0, len = this.uploadBufferPool.length; i < len; i++) {
         if (this.uploadBufferPool[i].uploadType == 0) {
           //有空闲线程先异步执行
-          this.uploadRemainingTask--;
           this.upLoadFun(this.uploadBufferPool[i]);
         }
       }
     },
+    setTaskState(item, stateCode, ano) {
+      //设置任务状态
+      //0等待中 1准备中 2上传中 3上传暂停 4上传完成 5秒传 6文件太小 7文件太大 8文件已存在 404上传错误
+      this.$set(item, "uploadType", stateCode);
+
+      if (ano == 0) {
+        --this.uploadRemainingTask;
+      } else if (ano == 1) {
+        ++this.uploadRemainingTask;
+      }
+    },
     upLoadFun(item) {
-      //uploadType 0等待中 1准备中 2上传中 3上传暂停 4上传完成 5秒传 6文件太小 7文件太大 其他上传错误
       if (item.file.size <= 0) {
-        this.$set(item, "uploadType", 6);
+        //文件太小,无法上传
+        this.setTaskState(item, 6, 0);
         return;
       }
-      this.$set(item, "uploadType", 1);
+      this.setTaskState(item, 1, 1);
       //拿到sha256
       let fr = new FileReader();
       fr.readAsArrayBuffer(item.file);
@@ -182,7 +186,7 @@ export default {
               if (!examineres.data.data.userFileExist) {
                 if (!examineres.data.data.fileExist) {
                   //设置该任务的状态
-                  this.$set(item, "uploadType", 2);
+                  this.setTaskState(item, 2, 3);
                   for (let i = 0, len = chunks; i < len; i++) {
                     // 计算开始读取的位置
                     let start = i * chunkSize;
@@ -226,28 +230,28 @@ export default {
                         if (
                           item.uploadCurrentChunkNum >= item.currentChunkMax
                         ) {
-                          console.log(this.$refs.childRouter);
                           this.$refs.childRouter.getUserFileAndFolder(
                             this.$refs.childRouter.getFolderId
                           );
                           //设置任务上传完成
-                          this.$set(item, "uploadType", 4);
+                          this.setTaskState(item, 4, 0);
                         }
                       });
                   }
                 } else {
                   //秒传文件
-                  //uploadType 0等待中 1准备中 2上传中 3上传暂停 4上传完成 5秒传 6文件太小 7文件太大 其他上传错误
-                  this.$set(this.uploadBufferPool, item.uploadType, 5);
-                  if (item.uploadCurrentChunkNum == item.currentChunkMax) {
-                    this.$set(item, "uploadType", 4);
-                  }
+                  this.$set(this.uploadBufferPool, item.uploadType, 5, 0);
+                  // if (item.uploadCurrentChunkNum == item.currentChunkMax) {
+                  //   this.$set(item, "uploadType", 4);
+                  // }
                 }
               } else {
                 //文件已存在
-                console.log("文件已存在");
+                this.setTaskState(item, 8, 0);
               }
             } else {
+              //上传失败
+              this.setTaskState(item, 404, 0);
               console.log(examineres.data.message);
             }
           })

@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2020-10-14 20:58:01
- * @LastEditTime 2021-12-12 16:31
+ * @LastEditTime 2021-12-13 11:49
  * @Description: 我的云盘
  * 
 -->
@@ -551,11 +551,6 @@ export default {
               typeStr.iconStr = "icon-html";
               break;
             }
-            case "js": {
-              typeStr.type = "text";
-              typeStr.iconStr = "icon-javascript";
-              break;
-            }
             case "css": {
               typeStr.type = "text";
               typeStr.iconStr = "icon-css";
@@ -638,6 +633,10 @@ export default {
               typeStr.type = "*";
               typeStr.iconStr = "icon-windows";
               break;
+            }
+            default:{
+              typeStr.type = "*";
+              typeStr.iconStr = "icon-unknown";
             }
           }
         }
