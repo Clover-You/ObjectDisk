@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2020-10-14 20:58:01
- * @LastEditTime 2021-12-14 16:30
+ * @LastEditTime 2021-12-14 16:36
  * @Description: 我的云盘
  * 
 -->
@@ -886,6 +886,7 @@ export default {
   overflow: hidden;
   top: 20px;
   left: 50%;
+  z-index: 9999;
 
   animation: ease-in forwards fileMenu 0.2s;
   transform-origin: left top;
