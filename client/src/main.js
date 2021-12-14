@@ -16,11 +16,16 @@ import './assets/fonts/cnrIcon.css'
 import lPromptBox from './components/lpromptbox.vue'
 import router from "./router/router.js"
 import axios from './utils/axios'
+import tipMessge from '@/components/tipMessge.js'
+import dialogMessge from '@/components/dialogMessge.js'
 // import driveRouter from "./router/drive.js"
 
 Vue.prototype.$http = axios;
 Vue.component('lPromptBox', lPromptBox);
 Vue.config.productionTip = false
+    //使用全局提示组件
+Vue.prototype.$tipMessge = tipMessge;
+Vue.prototype.$dialogMessge = dialogMessge;
 
 Vue.use(VueRouter);
 
