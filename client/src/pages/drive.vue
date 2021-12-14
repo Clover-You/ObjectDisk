@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2020-10-14 20:58:01
- * @LastEditTime 2021-12-14 22:09
+ * @LastEditTime 2021-12-14 22:17
  * @Description: 我的云盘
  * 
 -->
@@ -94,8 +94,6 @@
     <newFile :isShowNewFileModel.sync="isShowNewFileModel"></newFile>
     <!-- 新建文件夹模态窗 -->
     <newFolder :isShowNewFolderModel.sync="isShowNewFolderModel" @changeValue="addUserFolder"></newFolder>
-    <!-- 提示模态窗 -->
-    <!-- <tipMessge :showTipMessge.sync="isShowTipMessge" :text="showTipText"></tipMessge> -->
     <!-- 视频模态窗 -->
     <lVideo :videoList="videoList" :isShow.sync="isShowlVideo"></lVideo>
     <lPicture :isShow="false"></lPicture>
@@ -105,14 +103,12 @@
 <script>
 import newFile from "@/components/newFile";
 import newFolder from "@/components/newFolder";
-// import tipMessge from "@/components/tipMessge";
 import lVideo from "@/components/lVideo";
 import lPicture from "@/components/lPicture";
 export default {
   components: {
     newFile,
     newFolder,
-    // tipMessge,
     lVideo,
     lPicture,
   },
@@ -120,8 +116,6 @@ export default {
     return {
       isShowlVideo: false, //是否显示视频模态窗
       videoList: [], //视频模态窗数据
-      isShowTipMessge: false, //是否显示提示模态窗
-      showTipText: "", //显示提示内容
       
       isShowNewFileModel: false, //是否显示新建文件模态窗
       isShowNewFolderModel: false, //是否显示新建文件夹模态窗
@@ -169,13 +163,11 @@ export default {
           if (res.data.code == 200) {
             this.getUserFileAndFolder(this.getFolderId);
           } else {
-            this.showTipText = res.data.message;
-            this.isShowTipMessge = true;
+            this.$tipMessge(res.data.message)
           }
         })
         .catch((err) => {
-          this.showTipText = err.data.message;
-          this.isShowTipMessge = true;
+          this.$tipMessge(err.data.message)
         });
     },
     getUserFileAndFolder(value) {
@@ -209,13 +201,11 @@ export default {
               }
             }
           } else {
-            this.showTipText = res.data.message;
-            this.isShowTipMessge = true;
+            this.$tipMessge(res.data.message)
           }
         })
         .catch((err) => {
-          this.showTipText = err.data.message;
-          this.isShowTipMessge = true;
+          this.$tipMessge(err.data.message)
         });
     },
     dragenter(e) {
@@ -277,8 +267,7 @@ export default {
         this.$router.push({ name: "drive", params: { folderId: item.id } });
       } else {
         //打开文件
-        this.showTipText = "啊，文件预览还不能用";
-        this.isShowTipMessge = true;
+        this.$tipMessge('哦吼,文件预览还不能用')
       }
     },
     async getFileFromEntryRecursively(folderId, entry) {
@@ -361,8 +350,7 @@ export default {
           this.$set(this.fileData[i], "blob", bloburl);
         })
         .catch((err) => {
-          this.showTipText = err.data.message;
-          this.isShowTipMessge = true;
+          this.$tipMessge(err.data.message)
         });
     },
     VideoImageToblobUrl(i) {
@@ -382,8 +370,7 @@ export default {
           this.$set(this.fileData[i], "blob", bloburl);
         })
         .catch((err) => {
-          this.showTipText = err.data.message;
-          this.isShowTipMessge = true;
+          this.$tipMessge(err.data.message)
         });
     },
     destroyBlobUrl(blob) {

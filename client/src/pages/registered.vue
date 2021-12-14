@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2021-01-17 20:28:02
- * @LastEditTime 2021-12-11 19:55
+ * @LastEditTime 2021-12-14 22:23
  * @Description: 注册
  * 
 -->
@@ -26,23 +26,16 @@
         <!-- <a class="button bgGreen" href="/publicFile">公开的文件</a> -->
       </div>
     </div>
-
-    <!-- 提示模态窗 -->
-    <tipMessge :showTipMessge.sync="isShowTipMessge" :text="showTipText"></tipMessge>
   </div>
 </template>
 <script>
-import tipMessge from "@/components/tipMessge";
 import lVerificationCodeInput from "../components/lVerificationCodeInput";
 export default {
   components: {
-    tipMessge,
     lVerificationCodeInput,
   },
   data() {
     return {
-      isShowTipMessge: false, //是否显示提示模态窗
-      showTipText: "", //显示提示内容
       nickName: "",
       account: "",
       password: "",
@@ -68,28 +61,23 @@ export default {
     registered() {
       //注册
       if (this.nickName == "") {
-        this.showTipText = "昵称不能为空";
-        this.isShowTipMessge = true;
+        this.$tipMessge("昵称不能为空")
         return;
       }
       if (this.account == "") {
-        this.showTipText = "账号不能为空";
-        this.isShowTipMessge = true;
+        this.$tipMessge("账号不能为空")
         return;
       }
       if (this.password == "") {
-        this.showTipText = "密码不能为空";
-        this.isShowTipMessge = true;
+        this.$tipMessge("密码不能为空")
         return;
       }
       if (this.confirmPassword == "") {
-        this.showTipText = "确认密码不能为空";
-        this.isShowTipMessge = true;
+        this.$tipMessge("确认密码不能为空")
         return;
       }
       if (this.registeredCode == "") {
-        this.showTipText = "内部注册码不能为空";
-        this.isShowTipMessge = true;
+        this.$tipMessge("内部注册码不能为空")
         return;
       }
       this.$http
@@ -106,16 +94,11 @@ export default {
         .then((res) => {
           if (res.data.code == 200) {
             this.$router.push({ name: "login" });
-            this.showTipText = res.data.message;
-            this.isShowTipMessge = true;
-          } else {
-            this.showTipText = res.data.message;
-            this.isShowTipMessge = true;
           }
+          this.$tipMessge(res.data.message)
         })
         .catch((err) => {
-          this.showTipText = err.data.message;
-          this.isShowTipMessge = true;
+          this.$tipMessge(err.data.message)
         });
     },
   },

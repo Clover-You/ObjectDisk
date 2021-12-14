@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2021-10-23 10:40:52
- * @LastEditTime 2021-12-14 18:18
+ * @LastEditTime 2021-12-14 22:21
  * @Description: 登录与注册
  *
 -->
@@ -48,25 +48,18 @@
         <img src="../assets/img/register.svg" alt="" />
       </div>
     </div>
-
-    <!-- 提示模态窗 -->
-    <tipMessge :showTipMessge.sync="isShowTipMessge" :text="showTipText"></tipMessge>
   </div>
 </template>
 
 <script>
-import tipMessge from "@/components/tipMessge";
 import lVerificationCodeInput from "../components/lVerificationCodeInput";
 export default {
   components: {
-    tipMessge,
     lVerificationCodeInput,
   },
   data() {
     return {
       isRegistered: false, //是否是注册
-      isShowTipMessge: false, //是否显示提示模态窗
-      showTipText: "", //显示提示内容
       nickName: "",
       account: "",
       password: "",
@@ -125,13 +118,11 @@ export default {
     login() {
       //登录
       if (this.account == "" || this.account == null) {
-        this.showTipText = "用户名不能为空";
-        this.isShowTipMessge = true;
+        this.$tipMessge("用户名不能为空")
         return;
       }
       if (this.password == "" || this.password == null) {
-        this.showTipText = "密码不能为空";
-        this.isShowTipMessge = true;
+        this.$tipMessge("密码不能为空")
         return;
       }
       this.$http
@@ -160,40 +151,33 @@ export default {
             this.$store.state.nickname = res.data.data.nickName;
             this.$router.push({ name: "drive" });
           } else {
-            this.showTipText = res.data.message;
-            this.isShowTipMessge = true;
+            this.$tipMessge(res.data.message)
           }
         })
         .catch((err) => {
-          this.showTipText = err.data.message;
-          this.isShowTipMessge = true;
+          this.$tipMessge(err.data.message)
         });
     },
     registered() {
       //注册
       if (this.nickName == "") {
-        this.showTipText = "昵称不能为空";
-        this.isShowTipMessge = true;
+        this.$tipMessge("昵称不能为空")
         return;
       }
       if (this.account == "") {
-        this.showTipText = "用户名不能为空";
-        this.isShowTipMessge = true;
+        this.$tipMessge("用户名不能为空")
         return;
       }
       if (this.password == "") {
-        this.showTipText = "密码不能为空";
-        this.isShowTipMessge = true;
+        this.$tipMessge("密码不能为空")
         return;
       }
       if (this.confirmPassword == "") {
-        this.showTipText = "确认密码不能为空";
-        this.isShowTipMessge = true;
+        this.$tipMessge("确认密码不能为空")
         return;
       }
       if (this.registeredCode == "") {
-        this.showTipText = "注册码不能为空";
-        this.isShowTipMessge = true;
+        this.$tipMessge("注册码不能为空")
         return;
       }
       this.$http
@@ -208,19 +192,13 @@ export default {
           }
         )
         .then((res) => {
-          console.log(res.data);
           if (res.data.code == 200) {
             this.$router.push({ name: "login" });
-            this.showTipText = res.data.message;
-            this.isShowTipMessge = true;
-          } else {
-            this.showTipText = res.data.message;
-            this.isShowTipMessge = true;
           }
+          this.$tipMessge(res.data.message)
         })
         .catch((err) => {
-          this.showTipText = err.data.message;
-          this.isShowTipMessge = true;
+          this.$tipMessge(err.data.message)
         });
     },
     resetInput() {

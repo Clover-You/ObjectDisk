@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2021-01-09 13:37:25
- * @LastEditTime 2021-12-11 19:55
+ * @LastEditTime 2021-12-14 22:24
  * @Description: 流视频DEMO
  * 
 -->
@@ -18,24 +18,26 @@
   </div>
 </template>
 <script>
-import lVideo from "@/components/lVideo"
+import lVideo from "@/components/lVideo";
 export default {
   components: {
-    lVideo
+    lVideo,
   },
   data() {
     return {
       isShow: false,
       videoList: [],
       lsSrc: "",
-    }
+    };
   },
   created() {
     if (!this.$store.state.isLogin) {
-      this.$router.replace({ name: 'login' });//没登录直接回到登录页
+      this.$router.replace({ name: "login" }); //没登录直接回到登录页
     }
 
-    this.videoList.push("8a8b0118c620cba9363eefe843491322f282a87efa4481a97500dca0bf2a70b2.mp4");
+    this.videoList.push(
+      "8a8b0118c620cba9363eefe843491322f282a87efa4481a97500dca0bf2a70b2.mp4"
+    );
 
     // this.$http.post(`${this.$store.state.serve.serveUrl}video/playVideoSteam`, {
     //   name: "8a8b0118c620cba9363eefe843491322f282a87efa4481a97500dca0bf2a70b2.mp4"
@@ -43,7 +45,7 @@ export default {
     //   responseType:'blob'
     // }).then(res => {
     //   // console.log(res.data);
-      
+
     //   // let video = document.querySelector("#video");
     //   // video.src = URL.createObjectURL(res.data);
     //   this.videoList.push(
@@ -52,10 +54,8 @@ export default {
     //     src: URL.createObjectURL(res.data),
     //   })
     // }).catch(err => {
-    //   this.showTipText = err.data.message;
-          // this.isShowTipMessge = true;
+    // this.$tipMessge(err.data.message)
     // })
-
   },
   methods: {
     show() {
@@ -65,8 +65,8 @@ export default {
       //销毁blob地址
       window.URL.revokeObjectURL(blob);
     },
-  }
-}
+  },
+};
 </script>
 <style scoped>
 .bodyBox {

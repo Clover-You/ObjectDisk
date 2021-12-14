@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2021-01-05 22:39:52
- * @LastEditTime 2021-12-11 19:55
+ * @LastEditTime 2021-12-14 22:18
  * @Description: 登录
  * 
 -->
@@ -25,21 +25,12 @@
         <!-- <a class="button bgGreen" href="/publicFile">公开的文件</a> -->
       </div>
     </div>
-
-    <!-- 提示模态窗 -->
-    <tipMessge :showTipMessge.sync="isShowTipMessge" :text="showTipText"></tipMessge>
   </div>
 </template>
 <script>
-import tipMessge from "@/components/tipMessge";
 export default {
-  components: {
-    tipMessge,
-  },
   data() {
     return {
-      isShowTipMessge: false, //是否显示提示模态窗
-      showTipText: "", //显示提示内容
       account: "",
       password: "",
       rememberMe: false, //记住账号
@@ -83,13 +74,11 @@ export default {
     login() {
       //登录
       if (this.account == "" || this.account == null) {
-        this.showTipText = "账号不能为空";
-        this.isShowTipMessge = true;
+        this.$tipMessge('账号不能为空')
         return;
       }
       if (this.password == "" || this.password == null) {
-        this.showTipText = "密码不能为空";
-        this.isShowTipMessge = true;
+        this.$tipMessge('密码不能为空')
         return;
       }
       this.$http
@@ -118,13 +107,11 @@ export default {
             this.$store.state.nickname = res.data.data.nickname;
             this.$router.push({ name: "drive" });
           } else {
-            this.showTipText = res.data.message;
-            this.isShowTipMessge = true;
+            this.$tipMessge(res.data.message)
           }
         })
         .catch((err) => {
-          this.showTipText = err.data.message;
-          this.isShowTipMessge = true;
+          this.$tipMessge(err.data.message)
         });
     },
     encryption(str) {
