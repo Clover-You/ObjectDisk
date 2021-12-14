@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2020-10-14 20:58:01
- * @LastEditTime 2021-12-14 17:28
+ * @LastEditTime 2021-12-14 22:09
  * @Description: 我的云盘
  * 
 -->
@@ -83,7 +83,7 @@
           <i class="iconfont iconfont icon-info"></i>
           <p>查看详情信息</p>
         </li>
-        <li v-if="showRightMenuType=='file' || showRightMenuType=='folder'">
+        <li v-if="showRightMenuType=='file' || showRightMenuType=='folder'" @click="delFileOrFolder">
           <i class="iconfont iconfont icon-delete"></i>
           <p>删除</p>
         </li>
@@ -95,7 +95,7 @@
     <!-- 新建文件夹模态窗 -->
     <newFolder :isShowNewFolderModel.sync="isShowNewFolderModel" @changeValue="addUserFolder"></newFolder>
     <!-- 提示模态窗 -->
-    <tipMessge :showTipMessge.sync="isShowTipMessge" :text="showTipText"></tipMessge>
+    <!-- <tipMessge :showTipMessge.sync="isShowTipMessge" :text="showTipText"></tipMessge> -->
     <!-- 视频模态窗 -->
     <lVideo :videoList="videoList" :isShow.sync="isShowlVideo"></lVideo>
     <lPicture :isShow="false"></lPicture>
@@ -105,14 +105,14 @@
 <script>
 import newFile from "@/components/newFile";
 import newFolder from "@/components/newFolder";
-import tipMessge from "@/components/tipMessge";
+// import tipMessge from "@/components/tipMessge";
 import lVideo from "@/components/lVideo";
 import lPicture from "@/components/lPicture";
 export default {
   components: {
     newFile,
     newFolder,
-    tipMessge,
+    // tipMessge,
     lVideo,
     lPicture,
   },
@@ -122,12 +122,14 @@ export default {
       videoList: [], //视频模态窗数据
       isShowTipMessge: false, //是否显示提示模态窗
       showTipText: "", //显示提示内容
-      isShowRightMenu: false, //是否显示右键菜单选择
-      showRightMenuType: "default", //显示的右键菜单类型
+      
       isShowNewFileModel: false, //是否显示新建文件模态窗
       isShowNewFolderModel: false, //是否显示新建文件夹模态窗
       isShowUpdateModel: false, //是否显示上传模态窗
-      fileMenuPos: { x: 0, y: 0 }, //菜单选择显示位置
+      isShowRightMenu: false, //是否显示右键菜单选择
+      showRightMenuType: "default", //显示的右键菜单类型
+      fileMenuPos: { x: 0, y: 0 }, //右键菜单选择显示位置
+      rightMenuItem:null,//右键对应的Item对象
       fileData: [], //用户数据
     };
   },
@@ -259,6 +261,8 @@ export default {
     fileBoxMouseup(e, item) {
       this.isShowRightMenu = false;
       this.showRightMenuType = item === null ? "default" : item.type;
+
+      this.rightMenuItem = item;
       //点击文件与文件夹
       if (e.button == 2) {
         //右键
@@ -335,6 +339,10 @@ export default {
     openNewFileModel() {
       //显示新建文件模态窗
       this.isShowNewFileModel = true;
+    },
+    delFileOrFolder() {
+      //删除文件或文件夹
+      
     },
     ImageToblobUrl(i) {
       //获取图片数据并返回Blob地址
