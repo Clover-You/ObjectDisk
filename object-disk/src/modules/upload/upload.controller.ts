@@ -129,4 +129,43 @@ export class UploadController {
       currentChunkIndex,
     );
   }
+
+  /**
+   * 秒传文件
+   * @param userid
+   * @param folderid
+   * @param fileName
+   * @param filePath
+   * @param fileExt
+   * @param fileSha256
+   */
+  @Post('/uploadSecondPass')
+  async uploadSecondPass(
+    @Body()
+    { userid, folderid, fileName, filePath, fileExt, fileSha256 },
+  ): Promise<AjaxResult> {
+    if (
+      !StringUtils.hasText(userid) ||
+      !StringUtils.hasText(folderid) ||
+      !StringUtils.hasText(fileName) ||
+      !StringUtils.hasText(filePath) ||
+      !StringUtils.hasText(fileExt) ||
+      !StringUtils.hasText(fileSha256)
+    ) {
+      return AjaxResult.fail('参数错误');
+    }
+
+    const decryptUserid = parseInt(MathTools.decryptForKey(userid));
+    const decryptFolderid =
+      folderid == '0' ? 0 : parseInt(MathTools.decryptForKey(folderid));
+
+    return this.uploadService.uploadSecondPass(
+      decryptUserid,
+      decryptFolderid,
+      fileName,
+      filePath,
+      fileExt,
+      fileSha256,
+    );
+  }
 }

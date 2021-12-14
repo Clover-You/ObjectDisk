@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2020-10-14 20:58:01
- * @LastEditTime 2021-12-14 13:03
+ * @LastEditTime 2021-12-14 17:09
  * @Description: 我的云盘
  *
 -->
@@ -241,10 +241,32 @@ export default {
                   }
                 } else {
                   //秒传文件
-                  this.$set(this.uploadBufferPool, item.uploadType, 5, 0);
-                  // if (item.uploadCurrentChunkNum == item.currentChunkMax) {
-                  //   this.$set(item, "uploadType", 4);
-                  // }
+
+                  this.$http
+                    .post(
+                      `${this.$store.state.serve.serveUrl}upload/uploadSecondPass`,
+                      {
+                        userid: this.$store.state.id,
+                        folderid: item.folderId,
+                        fileName: item.fname,
+                        filePath: item.filePath,
+                        fileExt: item.fext,
+                        fileSha256: item.fileSha256,
+                      }
+                    )
+                    .then((SecondPass) => {
+                      if (SecondPass.data.code == 200) {
+                        this.$refs.childRouter.getUserFileAndFolder(
+                          this.$refs.childRouter.getFolderId
+                        );
+                        //设置任务为秒传
+                        this.setTaskState(item, 5, 0);
+                      } else {
+                        //秒传失败
+                        this.setTaskState(item, 404, 0);
+                        console.log(SecondPass.data.message);
+                      }
+                    });
                 }
               } else {
                 //文件已存在

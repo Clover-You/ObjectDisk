@@ -155,4 +155,42 @@ export class UploadService {
 
     return AjaxResult.success('传输完成');
   }
+
+  /**
+   * 秒传文件
+   * @param userid
+   * @param folderid
+   * @param fileName
+   * @param filePath
+   * @param fileExt
+   * @param fileSha256
+   * @returns
+   */
+  async uploadSecondPass(
+    userid: number,
+    folderid: number,
+    fileName: string,
+    filePath: string,
+    fileExt: string,
+    fileSha256: string,
+  ): Promise<AjaxResult> {
+    const date = format(new Date(), DateUtils.DATETIME_DEFAULT_FORMAT);
+    const userfile = UserFilesEntity.instance({
+      userId: userid,
+      folderId: folderid,
+      fileId: fileSha256,
+      fileName: fileName,
+      createTime: date,
+      suffix: fileExt,
+    });
+
+    //写入用户文件表里
+    const count = await this.userFilesEntity.insert(userfile);
+
+    if (count == void 0) {
+      return AjaxResult.fail('秒传失败');
+    }
+
+    return AjaxResult.success('秒传成功');
+  }
 }
