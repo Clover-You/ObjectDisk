@@ -30,7 +30,7 @@ import { StringUtils } from 'src/utils/StringUtils';
  * @author LRolinx
  * @create 2021-12-12 15:08
  */
-@Controller('/upload')
+@Controller('upload')
 export class UploadController {
   constructor(
     @Inject(UploadService)
@@ -46,7 +46,7 @@ export class UploadController {
    * @param fileext
    * @returns
    */
-  @Post('/examineFile')
+  @Post('examineFile')
   async examineFile(
     @Body() { userid, folderid, sha256Id, filename, fileext },
   ): Promise<AjaxResult> {
@@ -85,7 +85,7 @@ export class UploadController {
    * @param currentChunkIndex
    * @returns
    */
-  @Put('/uploadStreamFile')
+  @Put('uploadStreamFile')
   async uploadStreamFile(
     @Req() req: Request,
     @Query()
@@ -139,7 +139,7 @@ export class UploadController {
    * @param fileExt
    * @param fileSha256
    */
-  @Post('/uploadSecondPass')
+  @Post('uploadSecondPass')
   async uploadSecondPass(
     @Body()
     { userid, folderid, fileName, filePath, fileExt, fileSha256 },

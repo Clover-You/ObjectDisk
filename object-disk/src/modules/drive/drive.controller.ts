@@ -21,7 +21,7 @@ import { StringUtils } from 'src/utils/StringUtils';
  * @author LRolinx
  * @create 2021-12-10 17:26
  */
-@Controller('/drive')
+@Controller('drive')
 export class DriveController {
   constructor(
     @Inject(DriveService)
@@ -35,7 +35,7 @@ export class DriveController {
    * @param name
    * @returns
    */
-  @Post('/addUserFolder')
+  @Post('addUserFolder')
   async addUserFolder(@Body() { userid, folderid, name }): Promise<AjaxResult> {
     if (
       !StringUtils.hasText(userid) ||
@@ -43,13 +43,13 @@ export class DriveController {
       !StringUtils.hasText(name)
     ) {
       return AjaxResult.fail('参数错误');
-    } else {
-      const decryptUserid = parseInt(MathTools.decryptForKey(userid));
-      const decryptFolderid =
-        folderid == '0' ? 0 : parseInt(MathTools.decryptForKey(folderid));
-
-      return this.driveService.addFolder(decryptUserid, decryptFolderid, name);
     }
+
+    const decryptUserid = parseInt(MathTools.decryptForKey(userid));
+    const decryptFolderid =
+      folderid == '0' ? 0 : parseInt(MathTools.decryptForKey(folderid));
+
+    return this.driveService.addFolder(decryptUserid, decryptFolderid, name);
   }
 
   /**
@@ -58,7 +58,7 @@ export class DriveController {
    * @param folderid
    * @returns
    */
-  @Post('/getUserFileAndFolder')
+  @Post('getUserFileAndFolder')
   async getUserFileAndFolder(
     @Body() { userid, folderid },
   ): Promise<AjaxResult> {
@@ -84,7 +84,25 @@ export class DriveController {
    */
   @Post('getUserFileForFileId')
   async getUserFileForFileId(@Body() { id }) {
+    if (!StringUtils.hasText(id)) {
+      return AjaxResult.fail('参数错误');
+    }
+
     const did = parseInt(MathTools.decryptForKey(id));
     return this.driveService.getUserFileForFileId(did);
+  }
+
+  /**
+   * 删除用户文件或者文件夹
+   * @param id
+   * @param type
+   */
+  @Post('delUserFileOrFolder')
+  async delUserFileOrFolder(@Body() { id, type }): Promise<AjaxResult> {
+    if (!StringUtils.hasText(id) || !StringUtils.hasText(type)) {
+      return AjaxResult.fail('参数错误');
+    }
+    const did = parseInt(MathTools.decryptForKey(id));
+    return this.driveService.delUserFileOrFolder(did, type);
   }
 }

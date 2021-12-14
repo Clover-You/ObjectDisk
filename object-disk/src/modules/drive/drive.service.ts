@@ -89,8 +89,20 @@ export class DriveService {
     userId: number,
     folderId: number,
   ): Promise<AjaxResult> {
-    const folders = await this.folderEntity.find({ userId, folderId });
-    const files = await this.userFilesEntity.find({ userId, folderId });
+    const folder = FolderEntity.instance({
+      userId,
+      folderId,
+      del: false,
+    });
+
+    const userfile = UserFilesEntity.instance({
+      userId,
+      folderId,
+      del: false,
+    });
+
+    const folders = await this.folderEntity.find(folder);
+    const files = await this.userFilesEntity.find(userfile);
     const result: UserFileAndFolder[] = [];
 
     if (folders !== null) {
@@ -125,7 +137,11 @@ export class DriveService {
    * @param id
    */
   async getUserFileForFileId(id: number): Promise<StreamableFile> {
-    const files = await this.userFilesEntity.findOne({ id });
+    const userfile = UserFilesEntity.instance({
+      id,
+      del: false,
+    });
+    const files = await this.userFilesEntity.findOne(userfile);
     const path = `${conf.upload.path}${files.fileId}`;
     if (!fs.existsSync(path)) {
       //文件不存在
@@ -133,5 +149,36 @@ export class DriveService {
     }
     const file = fs.createReadStream(path);
     return new StreamableFile(file);
+  }
+
+  /**
+   * 删除用户文件或者文件夹
+   * @param id
+   * @param type
+   * @returns
+   */
+  async delUserFileOrFolder(id: number, type: string): Promise<AjaxResult> {
+    if (type == 'file') {
+      //删除文件
+      const userfile = UserFilesEntity.instance({
+        id,
+      });
+      const count = this.userFilesEntity.update({ del: true }, userfile);
+      if (count == void 0) {
+        return AjaxResult.fail('删除失败');
+      }
+      return AjaxResult.success('删除文件成功');
+    } else {
+      //删除文件夹
+      const userfile = FolderEntity.instance({
+        id,
+      });
+      const count = this.folderEntity.update({ del: true }, userfile);
+      if (count == void 0) {
+        return AjaxResult.fail('删除失败');
+      }
+      return AjaxResult.success('删除文件夹成功');
+    }
+    return AjaxResult.fail('删除失败');
   }
 }

@@ -37,6 +37,15 @@ export class UploadService {
     private readonly userFilesEntity: Repository<UserFilesEntity>,
   ) {}
 
+  /**
+   * 检查文件
+   * @param userid
+   * @param folderid
+   * @param sha256Id
+   * @param filename
+   * @param fileext
+   * @returns
+   */
   async examineFile(
     userid: number,
     folderid: number,
@@ -54,6 +63,7 @@ export class UploadService {
         folderId: folderid,
         fileName: filename,
         suffix: fileext,
+        del: false,
       }),
     );
 

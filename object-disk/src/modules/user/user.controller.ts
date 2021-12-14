@@ -22,7 +22,7 @@ import { HttpParameterException } from '../../exceptions/http-parameter.exceptio
  * @author Clover
  * @create 2021-11-08 15:24
  */
-@Controller('/users')
+@Controller('user')
 export class UserController {
   constructor(
     @Inject(UserService)
@@ -39,7 +39,7 @@ export class UserController {
    * @author Clover·You
    * @date 2021/11/09 11:29
    */
-  @Post('/objectCloudDiskRegistered')
+  @Post('objectCloudDiskRegistered')
   async userRegistered(
     @Body() { nickName, account, password, registeredCode },
   ): Promise<AjaxResult> {
@@ -67,7 +67,7 @@ export class UserController {
    * @author Clover You
    * @date 2021/11/9 14:37
    */
-  @Post('/objectCloudDiskLogin')
+  @Post('objectCloudDiskLogin')
   async userLogin(
     @Body() { account, password }: UserEntity,
   ): Promise<AjaxResult> {
