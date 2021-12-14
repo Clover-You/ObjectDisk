@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2020-10-14 20:58:01
- * @LastEditTime 2021-12-13 11:42
+ * @LastEditTime 2021-12-14 13:03
  * @Description: 我的云盘
  *
 -->
@@ -130,6 +130,7 @@ export default {
       for (let i = 0, len = this.uploadBufferPool.length; i < len; i++) {
         if (this.uploadBufferPool[i].uploadType == 0) {
           //有空闲线程先异步执行
+          this.setTaskState(this.uploadBufferPool[i], 0, 1);
           this.upLoadFun(this.uploadBufferPool[i]);
         }
       }
@@ -151,7 +152,7 @@ export default {
         this.setTaskState(item, 6, 0);
         return;
       }
-      this.setTaskState(item, 1, 1);
+      this.setTaskState(item, 1, 3);
       //拿到sha256
       let fr = new FileReader();
       fr.readAsArrayBuffer(item.file);

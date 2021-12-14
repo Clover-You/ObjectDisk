@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2020-10-14 20:58:01
- * @LastEditTime 2021-12-13 11:49
+ * @LastEditTime 2021-12-14 16:30
  * @Description: 我的云盘
  * 
 -->
@@ -879,6 +879,7 @@ export default {
 .fileMenu {
   display: block;
   background: rgba(217, 224, 241, 0.6);
+  backdrop-filter:blur(10px);
   box-shadow: 0 0.02rem 0.08rem 0 rgba(0, 0, 0, 0.1);
   border-radius: 0.12rem;
   position: fixed;

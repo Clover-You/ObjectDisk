@@ -1,25 +1,25 @@
 <!--
  * @Author: LRolinx
  * @Date: 2021-01-09 21:55:39
- * @LastEditTime 2021-12-13 11:07
+ * @LastEditTime 2021-12-14 16:17
  * @Description: 上传模态窗
  * 
 -->
 <template>
   <div class="body" v-if="uploadBufferPool.length!=0">
-    <div class="upLoadListBox" ref="upLoadListBox">
-      <div class="head">
+    <div :class="{minimize:isMinimize}" class="upLoadListBox" ref="upLoadListBox">
+      <div class="head" :style="{flex:isMinimize?1:0}" @click="isMinimize && minimizeOrMaximize()">
         <div class="head_left">
           <i class="headLeftIcon iconfont icon-transfer"></i>
           <p class="headLeftP">正在上传·剩余{{uploadRemainingTask}}项</p>
         </div>
         <div class="head_right">
           <i class="headRightIcon iconfont icon-pause"></i>
-          <i class="headRightIcon iconfont icon-close-circle-sm"></i>
+          <!-- <i class="headRightIcon iconfont icon-close-circle-sm" @click="minimizeOrMaximize"></i> -->
         </div>
       </div>
 
-      <ul class="upLoadListUlBox">
+      <ul class="upLoadListUlBox" v-show="!isMinimize">
         <li class="upLoadListLiBox" v-for="(item,index) in uploadBufferPool" :key="index">
           <div class="upLoadListLiLeftBox">
             <i class="iconfont" :class="fileIcon(item.fileType)"></i>
@@ -42,7 +42,7 @@
         </li>
       </ul>
 
-      <div class="foot">
+      <div class="foot" @click="minimizeOrMaximize" v-show="!isMinimize">
         <p>收起</p>
       </div>
     </div>
@@ -50,21 +50,31 @@
 </template>
 <script>
 export default {
+  data() {
+    return {
+      isMinimize: false,
+    };
+  },
   props: {
     uploadBufferPool: {
       type: Array,
       define: [],
     },
-    uploadRemainingTask:{
-      type:Number,
-      default:0,
-    }
+    uploadRemainingTask: {
+      type: Number,
+      default: 0,
+    },
   },
   watch: {},
+  methods: {
+    minimizeOrMaximize() {
+      //最小化或最大化
+      this.isMinimize = this.isMinimize ? false : true;
+    },
+  },
   computed: {
     fileIcon: function () {
       return function (value) {
-        console.log(value);
         if (value == "video/mp4") {
           return "icon-video";
         }
@@ -169,6 +179,16 @@ export default {
   bottom: 0.2rem;
   right: 0.2rem;
   z-index: 999;
+  display: flex;
+}
+
+.minimize {
+  height: 1rem !important;
+  width: 2rem !important;
+  cursor: pointer;
+  opacity: 0.8;
+  background-color: rgba(255,255,255,0.8) !important;
+  backdrop-filter: blur(10px);
 }
 
 .upLoadListBox {
@@ -177,10 +197,10 @@ export default {
   background-color: #fff;
   border-radius: 0.2rem;
   box-shadow: 0 0.02rem 0.08rem 0 rgb(0 0 0 / 10%);
-  /* box-shadow: 0 0 4px rgba(117, 139, 189, 0.1); */
-  overflow: auto;
   display: flex;
   flex-direction: column;
+  transition: ease-in-out 0.2s;
+  flex: 1;
 }
 
 .head {
@@ -220,6 +240,7 @@ export default {
   justify-content: center;
   padding: 0.2rem;
   font-size: 0.14rem;
+  user-select: none;
 }
 
 .upLoadListUlBox {
@@ -228,6 +249,7 @@ export default {
   margin: 0;
   padding: 0;
   font-size: 0.12rem;
+  overflow: auto;
 }
 
 .upLoadListUlBox li {
