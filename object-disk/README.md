@@ -26,6 +26,9 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## 必需安装额外插件
+1. ffmpeg http://www.ffmpeg.org/ *视频处理
+
 ## Installation
 
 ```bash
