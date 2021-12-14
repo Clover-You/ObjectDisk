@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2020-10-14 20:58:01
- * @LastEditTime 2021-12-14 16:36
+ * @LastEditTime 2021-12-14 17:28
  * @Description: 我的云盘
  * 
 -->
@@ -241,7 +241,9 @@ export default {
       //拖拽放入
       this.isShowUpdateModel = false;
 
-      let items = e.dataTransfer.items;
+      // 修复拖拽获取不了文件的情况
+      let items = [];
+      [].forEach.call(e.dataTransfer.items, function(file) {items.push(file);},false);
       items.forEach((item) => {
         if (item.kind === "file") {
           //是文件才触发
