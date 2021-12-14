@@ -34,7 +34,7 @@ export class FilesStatusEntity {
   /**
    * 文件是否删除
    */
-  @Column({ type: 'bit', comment: '文件是否删除' })
+  @Column({ type: 'bit', comment: '文件是否删除', default: false })
   del?: boolean;
 
   /**

@@ -58,13 +58,13 @@ export class FolderEntity {
   /**
    * 是否删除
    */
-  @Column({ type: 'bit' })
+  @Column({ type: 'bit', default: true })
   del?: boolean;
 
   /**
    * 删除时间
    */
-  @Column({ type: 'char', length: 19 })
+  @Column({ type: 'char', length: 19, nullable: true })
   delTime?: string;
 
   /**

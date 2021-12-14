@@ -22,8 +22,7 @@ import { Request, response } from 'express';
 export class LoggerMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: () => void) {
     const { method, path } = req;
-    console.log(`DEBUG: =============>>> ${method}
-      ====>>> PATH: ${path}`);
+    console.log(`DEBUG:${method} =============>>> PATH: ${path}`);
     next();
   }
 }

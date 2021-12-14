@@ -33,8 +33,6 @@ export class HttpParameterExceptionFilter
     const ctx = host.switchToHttp();
     const resp = ctx.getResponse<Response>();
 
-    resp
-      .status(HttpStatus.NOT_ACCEPTABLE)
-      .json(AjaxResult.fail(exception.message, 406));
+    resp.status(HttpStatus.OK).json(AjaxResult.fail(exception.message, 406));
   }
 }
