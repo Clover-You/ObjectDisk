@@ -56,7 +56,6 @@ export class UploadService {
         suffix: fileext,
       }),
     );
-    console.log(file, userfile);
 
     if (file != undefined) {
       enres.fileExist = true;
