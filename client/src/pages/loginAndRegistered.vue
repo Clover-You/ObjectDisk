@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2021-10-23 10:40:52
- * @LastEditTime 2021-12-11 19:55
+ * @LastEditTime 2021-12-14 18:18
  * @Description: 登录与注册
  *
 -->
@@ -135,7 +135,7 @@ export default {
         return;
       }
       this.$http
-        .post(`${this.$store.state.serve.serveUrl}users/objectCloudDiskLogin`, {
+        .post(`${this.$store.state.serve.serveUrl}user/objectCloudDiskLogin`, {
           account: this.account,
           password: this.password,
         })
@@ -198,7 +198,7 @@ export default {
       }
       this.$http
         .post(
-          `${this.$store.state.serve.serveUrl}users/objectCloudDiskRegistered`,
+          `${this.$store.state.serve.serveUrl}user/objectCloudDiskRegistered`,
           {
             nickName: this.nickName,
             account: this.account,
