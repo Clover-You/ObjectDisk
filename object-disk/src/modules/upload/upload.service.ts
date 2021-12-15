@@ -111,6 +111,7 @@ export class UploadService {
     const sha256Path = `${conf.upload.temp}${fileSha256}\\`;
     const uploadPath = `${conf.upload.path}${fileSha256}`;
     const buffers: Buffer[] = [];
+
     if (!fs.existsSync(sha256Path)) {
       //创建对应的Sha256文件夹
       fs.mkdirSync(sha256Path, { recursive: true });
