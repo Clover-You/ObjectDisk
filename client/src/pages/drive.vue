@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2020-10-14 20:58:01
- * @LastEditTime 2021-12-15 15:40
+ * @LastEditTime 2021-12-15 17:03
  * @Description: 我的云盘
  * 
 -->
@@ -15,9 +15,11 @@
 
     <div class="toolbar">
       <div class="toolbarLeft">
-        <p class="toolbarTitle colorR">我的云盘</p>
-        <P class="toolbarArrow colorR">›</P>
-        <p class="toolbarTitle toolbarOn">我的云盘<span>({{fileData.length}})</span></p>
+        <p class="toolbarTitle" :class="{colorR:currentFolder.length >= 1}">{{currentFolder.length == 0?`我的云盘(${fileData.length})`:'我的云盘'}}</p>
+        <div v-for="(item,index) in currentFolder" :key="index" style="display:inline-flex" :class="{toolbarOn:index!=currentFolder.length-1}">
+          <P class="toolbarArrow colorR">›</P>
+          <p class="toolbarTitle" :class="{colorR:index!=currentFolder.length-1}">{{item.text}}<span v-if="index==currentFolder.length-1">({{fileData.length}})</span></p>
+        </div>
       </div>
       <div class="toolbarRight">
         <div class="updateButton" @click="openNewFileModel">
@@ -125,6 +127,7 @@ export default {
       fileMenuPos: { x: 0, y: 0 }, //右键菜单选择显示位置
       rightMenuItem: null, //右键对应的Item对象
       fileData: [], //用户数据
+      currentFolder: [], //导航文件夹
     };
   },
   watch: {
@@ -132,6 +135,18 @@ export default {
       //监听路由变化
       // console.log(to,from);
       this.getUserFileAndFolder(this.getFolderId);
+
+      //倒序删除导航
+      for (let i = this.currentFolder.length; i >= 0; i--) {
+        if (
+          this.getFolderId !=
+          this.currentFolder[this.currentFolder.length - 1].id
+        ) {
+          this.currentFolder.splice(i, 1);
+        } else {
+          break;
+        }
+      }
     },
   },
   computed: {
@@ -270,6 +285,7 @@ export default {
     openFileOrFolder(item) {
       //打开文件或打开文件夹
       if (item.type == "folder") {
+        this.currentFolder.push({ text: item.name, id: item.id });
         this.$router.push({ name: "drive", params: { folderId: item.id } });
       } else {
         //打开文件
