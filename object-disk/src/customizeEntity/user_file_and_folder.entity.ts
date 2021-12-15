@@ -12,7 +12,7 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
  * ░     ░ ░      ░  ░
  * Copyright 2022 LRolinx.
  * <p>
- *  -
+ *  -自定义文件夹以及文件表
  * </p>
  * @author LRolinx
  * @create 2021-12-11 17:24

@@ -1,3 +1,4 @@
+import { FolderEntity } from 'src/entity/folder.entity';
 import { Request } from 'express';
 import { AjaxResult } from 'src/utils/ajax-result.classes';
 import { Injectable } from '@nestjs/common';
@@ -35,6 +36,8 @@ export class UploadService {
     private readonly filesEntity: Repository<FilesEntity>,
     @InjectRepository(UserFilesEntity)
     private readonly userFilesEntity: Repository<UserFilesEntity>,
+    @InjectRepository(FolderEntity)
+    private readonly folderEntity: Repository<FolderEntity>,
   ) {}
 
   /**
@@ -57,6 +60,9 @@ export class UploadService {
     const file = await this.filesEntity.findOne(
       FilesEntity.instance({ sha256: sha256Id }),
     );
+    const folder = await this.folderEntity.findOne(
+      FolderEntity.instance({ id: folderid, del: false }),
+    );
     const userfile = await this.userFilesEntity.findOne(
       UserFilesEntity.instance({
         userId: userid,
@@ -71,7 +77,7 @@ export class UploadService {
       enres.fileExist = true;
     }
 
-    if (userfile != undefined) {
+    if (userfile != undefined && folder != undefined) {
       enres.userFileExist = true;
     }
 
@@ -126,7 +132,7 @@ export class UploadService {
         //关闭
         const files = fs.readdirSync(sha256Path);
         if (files.length != currentChunkMax) {
-          return AjaxResult.success('传输进行中');
+          return AjaxResult.success(null, '传输进行中');
         }
 
         //开始合并片段文件
@@ -157,13 +163,13 @@ export class UploadService {
         });
         this.filesEntity.insert(file);
 
-        return AjaxResult.success('传输完成');
+        return AjaxResult.success(null, '传输完成');
       })
       .on('error', () => {
         return AjaxResult.fail('传输出错');
       });
 
-    return AjaxResult.success('传输完成');
+    return AjaxResult.success(null, '传输完成');
   }
 
   /**
@@ -201,6 +207,6 @@ export class UploadService {
       return AjaxResult.fail('秒传失败');
     }
 
-    return AjaxResult.success('秒传成功');
+    return AjaxResult.success(null, '秒传成功');
   }
 }

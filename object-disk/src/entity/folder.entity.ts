@@ -41,7 +41,7 @@ export class FolderEntity {
    * 父文件夹id
    */
   @Column({ type: 'int' })
-  folderId?: number;
+  pId?: number;
 
   /**
    * 文件夹大小
