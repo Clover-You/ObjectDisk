@@ -52,12 +52,12 @@ const conf: ConfType = {
   },
   port: 3000,
   key: {
-    path: `${USER_HOME}\\.objectcloud\\key\\`,
+    path: `${USER_HOME}/.objectcloud/key/`,
   },
   upload: {
     // rootPath:`${USER_HOME}/.objectcloud/`,
-    temp: `${USER_HOME}\\.objectcloud\\temp\\`,
-    path: `${USER_HOME}\\.objectcloud\\upload\\`,
+    temp: `${USER_HOME}/.objectcloud/temp/`,
+    path: `${USER_HOME}/.objectcloud/upload/`,
   },
 };
 
