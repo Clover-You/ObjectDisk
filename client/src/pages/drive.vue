@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2020-10-14 20:58:01
- * @LastEditTime 2021-12-14 22:17
+ * @LastEditTime 2021-12-15 12:26
  * @Description: 我的云盘
  * 
 -->
@@ -83,7 +83,7 @@
           <i class="iconfont iconfont icon-info"></i>
           <p>查看详情信息</p>
         </li>
-        <li v-if="showRightMenuType=='file' || showRightMenuType=='folder'" @click="delFileOrFolder">
+        <li v-if="showRightMenuType=='file' || showRightMenuType=='folder'" @click="showdelDialog">
           <i class="iconfont iconfont icon-delete"></i>
           <p>删除</p>
         </li>
@@ -116,14 +116,14 @@ export default {
     return {
       isShowlVideo: false, //是否显示视频模态窗
       videoList: [], //视频模态窗数据
-      
+
       isShowNewFileModel: false, //是否显示新建文件模态窗
       isShowNewFolderModel: false, //是否显示新建文件夹模态窗
       isShowUpdateModel: false, //是否显示上传模态窗
       isShowRightMenu: false, //是否显示右键菜单选择
       showRightMenuType: "default", //显示的右键菜单类型
       fileMenuPos: { x: 0, y: 0 }, //右键菜单选择显示位置
-      rightMenuItem:null,//右键对应的Item对象
+      rightMenuItem: null, //右键对应的Item对象
       fileData: [], //用户数据
     };
   },
@@ -163,11 +163,11 @@ export default {
           if (res.data.code == 200) {
             this.getUserFileAndFolder(this.getFolderId);
           } else {
-            this.$tipMessge(res.data.message)
+            this.$tipMessge(res.data.message);
           }
         })
         .catch((err) => {
-          this.$tipMessge(err.data.message)
+          this.$tipMessge(err.data.message);
         });
     },
     getUserFileAndFolder(value) {
@@ -201,11 +201,11 @@ export default {
               }
             }
           } else {
-            this.$tipMessge(res.data.message)
+            this.$tipMessge(res.data.message);
           }
         })
         .catch((err) => {
-          this.$tipMessge(err.data.message)
+          this.$tipMessge(err.data.message);
         });
     },
     dragenter(e) {
@@ -235,7 +235,13 @@ export default {
 
       // 修复拖拽获取不了文件的情况
       let items = [];
-      [].forEach.call(e.dataTransfer.items, function(file) {items.push(file);},false);
+      [].forEach.call(
+        e.dataTransfer.items,
+        function (file) {
+          items.push(file);
+        },
+        false
+      );
       items.forEach((item) => {
         if (item.kind === "file") {
           //是文件才触发
@@ -267,7 +273,7 @@ export default {
         this.$router.push({ name: "drive", params: { folderId: item.id } });
       } else {
         //打开文件
-        this.$tipMessge('哦吼,文件预览还不能用')
+        this.$tipMessge("哦吼,文件预览还不能用");
       }
     },
     async getFileFromEntryRecursively(folderId, entry) {
@@ -317,6 +323,7 @@ export default {
 
           // entries.forEach(entry => this.getFileFromEntryRecursively(entry));
         });
+        //刷新
         this.getUserFileAndFolder(this.getFolderId);
       }
     },
@@ -329,9 +336,43 @@ export default {
       //显示新建文件模态窗
       this.isShowNewFileModel = true;
     },
+    showdelDialog() {
+      this.isShowRightMenu = false;
+      if (this.rightMenuItem.type == "file") {
+        //删除文件
+        this.$dialogMessge({
+          title: "确定删除",
+          text: `确定删除该文件嘛?`,
+          onOk: () => this.delFileOrFolder(),
+          onCancel: () => {},
+        });
+      } else {
+        //删除文件夹
+        this.$dialogMessge({
+          title: "确定删除",
+          text: "确定删除该文件夹嘛?文件夹内的文件将全部删除!!!",
+          onOk: () => this.delFileOrFolder(),
+          onCancel: () => {},
+        });
+      }
+    },
     delFileOrFolder() {
       //删除文件或文件夹
-      
+      this.$http
+        .post(`${this.$store.state.serve.serveUrl}drive/delUserFileOrFolder`, {
+          id: this.rightMenuItem.id,
+          type: this.rightMenuItem.type,
+        })
+        .then((res) => {
+          if(res.data.code == 200) {
+            //刷新
+            this.getUserFileAndFolder(this.getFolderId);
+          }
+          this.$tipMessge(res.data.message);
+        })
+        .catch((err) => {
+          this.$tipMessge(err.data.message);
+        });
     },
     ImageToblobUrl(i) {
       //获取图片数据并返回Blob地址
@@ -350,7 +391,7 @@ export default {
           this.$set(this.fileData[i], "blob", bloburl);
         })
         .catch((err) => {
-          this.$tipMessge(err.data.message)
+          this.$tipMessge(err.data.message);
         });
     },
     VideoImageToblobUrl(i) {
@@ -370,7 +411,7 @@ export default {
           this.$set(this.fileData[i], "blob", bloburl);
         })
         .catch((err) => {
-          this.$tipMessge(err.data.message)
+          this.$tipMessge(err.data.message);
         });
     },
     destroyBlobUrl(blob) {
@@ -631,7 +672,7 @@ export default {
               typeStr.iconStr = "icon-windows";
               break;
             }
-            default:{
+            default: {
               typeStr.type = "*";
               typeStr.iconStr = "icon-unknown";
             }
@@ -876,7 +917,7 @@ export default {
 .fileMenu {
   display: block;
   background: rgba(217, 224, 241, 0.6);
-  backdrop-filter:blur(10px);
+  backdrop-filter: blur(10px);
   box-shadow: 0 0.02rem 0.08rem 0 rgba(0, 0, 0, 0.1);
   border-radius: 0.12rem;
   position: fixed;
