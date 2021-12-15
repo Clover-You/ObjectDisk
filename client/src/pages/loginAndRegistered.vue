@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2021-10-23 10:40:52
- * @LastEditTime 2021-12-14 22:21
+ * @LastEditTime 2021-12-15 13:35
  * @Description: 登录与注册
  *
 -->
@@ -118,11 +118,11 @@ export default {
     login() {
       //登录
       if (this.account == "" || this.account == null) {
-        this.$tipMessge("用户名不能为空")
+        this.$tipMessge("用户名不能为空");
         return;
       }
       if (this.password == "" || this.password == null) {
-        this.$tipMessge("密码不能为空")
+        this.$tipMessge("密码不能为空");
         return;
       }
       this.$http
@@ -151,33 +151,33 @@ export default {
             this.$store.state.nickname = res.data.data.nickName;
             this.$router.push({ name: "drive" });
           } else {
-            this.$tipMessge(res.data.message)
+            this.$tipMessge(res.data.message);
           }
         })
         .catch((err) => {
-          this.$tipMessge(err.data.message)
+          this.$tipMessge(err.data.message);
         });
     },
     registered() {
       //注册
       if (this.nickName == "") {
-        this.$tipMessge("昵称不能为空")
+        this.$tipMessge("昵称不能为空");
         return;
       }
       if (this.account == "") {
-        this.$tipMessge("用户名不能为空")
+        this.$tipMessge("用户名不能为空");
         return;
       }
       if (this.password == "") {
-        this.$tipMessge("密码不能为空")
+        this.$tipMessge("密码不能为空");
         return;
       }
       if (this.confirmPassword == "") {
-        this.$tipMessge("确认密码不能为空")
+        this.$tipMessge("确认密码不能为空");
         return;
       }
       if (this.registeredCode == "") {
-        this.$tipMessge("注册码不能为空")
+        this.$tipMessge("注册码不能为空");
         return;
       }
       this.$http
@@ -195,10 +195,10 @@ export default {
           if (res.data.code == 200) {
             this.$router.push({ name: "login" });
           }
-          this.$tipMessge(res.data.message)
+          this.$tipMessge(res.data.message);
         })
         .catch((err) => {
-          this.$tipMessge(err.data.message)
+          this.$tipMessge(err.data.message);
         });
     },
     resetInput() {
@@ -327,13 +327,13 @@ input::placeholder {
   left: 0;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
+  user-select: none;
 }
 .desc-warp-item {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   justify-content: space-around;
-  text-align: center;
   text-align: center;
   padding: 0rem 17% 0rem 12%;
   z-index: 6;

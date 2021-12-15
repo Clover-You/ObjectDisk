@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2020-10-14 20:58:01
- * @LastEditTime 2021-12-14 17:09
+ * @LastEditTime 2021-12-15 15:14
  * @Description: 我的云盘
  *
 -->
@@ -222,20 +222,25 @@ export default {
                           },
                         }
                       )
-                      .then(() => {
-                        this.$set(
-                          item,
-                          "uploadCurrentChunkNum",
-                          item.uploadCurrentChunkNum + 1
-                        );
-                        if (
-                          item.uploadCurrentChunkNum >= item.currentChunkMax
-                        ) {
-                          this.$refs.childRouter.getUserFileAndFolder(
-                            this.$refs.childRouter.getFolderId
+                      .then((res) => {
+                        if (res.data.code == 200) {
+                          this.$set(
+                            item,
+                            "uploadCurrentChunkNum",
+                            item.uploadCurrentChunkNum + 1
                           );
-                          //设置任务上传完成
-                          this.setTaskState(item, 4, 0);
+                          if (
+                            item.uploadCurrentChunkNum >= item.currentChunkMax
+                          ) {
+                            this.$refs.childRouter.getUserFileAndFolder(
+                              this.$refs.childRouter.getFolderId
+                            );
+                            //设置任务上传完成
+                            this.setTaskState(item, 4, 0);
+                          }
+                        } else {
+                          this.setTaskState(item, 404, 0);
+                          console.log("上传出错");
                         }
                       });
                   }

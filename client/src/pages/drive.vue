@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2020-10-14 20:58:01
- * @LastEditTime 2021-12-15 12:26
+ * @LastEditTime 2021-12-15 15:15
  * @Description: 我的云盘
  * 
 -->
@@ -90,8 +90,8 @@
       </ul>
     </div>
 
-    <!-- 新建文件模态窗 -->
-    <newFile :isShowNewFileModel.sync="isShowNewFileModel"></newFile>
+    <!-- 新建模态窗 -->
+    <newFile @oneFile="oneFile" :isShowNewFileModel.sync="isShowNewFileModel"></newFile>
     <!-- 新建文件夹模态窗 -->
     <newFolder :isShowNewFolderModel.sync="isShowNewFolderModel" @changeValue="addUserFolder"></newFolder>
     <!-- 视频模态窗 -->
@@ -276,6 +276,30 @@ export default {
         this.$tipMessge("哦吼,文件预览还不能用");
       }
     },
+    async oneFile(file) {
+      //单文件处理
+      let fname = file.name.substring(0, file.name.lastIndexOf(".")); //获取文件名
+      let fext = file.name.substring(file.name.lastIndexOf(".") + 1); //获取后缀名
+      let path = `-/${file.name}`;
+
+      let fileInfoOBJ = {
+            uploadType: 0,
+            uploadCurrentChunkNum: 0,
+            currentChunkMax: 0,
+            file,
+            fileSize: file.size,
+            fileType: file.type,
+            fname,
+            fext,
+            filePath: path,
+            fileSha256: "",
+            folderId: this.getFolderId,
+            // currentChunkList: []
+          };
+          // console.log(fileInfoOBJ);
+          this.$parent.uploadBufferPool.push(fileInfoOBJ); //将任务写入数据
+
+    },
     async getFileFromEntryRecursively(folderId, entry) {
       // 处理文件夹里的文件
       if (entry.isFile) {
@@ -364,7 +388,7 @@ export default {
           type: this.rightMenuItem.type,
         })
         .then((res) => {
-          if(res.data.code == 200) {
+          if (res.data.code == 200) {
             //刷新
             this.getUserFileAndFolder(this.getFolderId);
           }
@@ -804,7 +828,7 @@ export default {
   flex: 1;
   z-index: 0;
   overflow: auto;
-  display: flex;
+  /* display: flex; */
   flex-wrap: wrap;
 }
 
