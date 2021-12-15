@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2020-10-14 20:58:01
- * @LastEditTime 2021-12-15 15:22
+ * @LastEditTime 2021-12-15 15:40
  * @Description: 我的云盘
  * 
 -->
@@ -829,7 +829,7 @@ export default {
   flex: 1;
   z-index: 0;
   overflow: auto;
-  /* display: flex; */
+  display: flex;
   flex-wrap: wrap;
 }
 
