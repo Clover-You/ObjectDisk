@@ -133,7 +133,8 @@ export class UploadService {
         fs.writeFileSync(`${sha256Path}${currentChunkIndex}`, buffer);
       })
       .on('close', () => {
-        //关闭
+        //连接关闭
+
         const files = fs.readdirSync(sha256Path);
         if (files.length != currentChunkMax) {
           return AjaxResult.success(null, '传输进行中');
@@ -144,28 +145,30 @@ export class UploadService {
           const content = fs.readFileSync(path.join(sha256Path, i.toString()));
           fs.appendFileSync(uploadPath, content);
         }
-        const date = format(new Date(), DateUtils.DATETIME_DEFAULT_FORMAT);
-        const userfile = UserFilesEntity.instance({
-          userId: userid,
-          folderId: folderid,
-          fileId: fileSha256,
-          fileName: fileName,
-          createTime: date,
-          suffix: fileExt,
-        });
 
+        const date = format(new Date(), DateUtils.DATETIME_DEFAULT_FORMAT);
         //写入用户文件表里
-        this.userFilesEntity.insert(userfile);
+        this.userFilesEntity.insert(
+          UserFilesEntity.instance({
+            userId: userid,
+            folderId: folderid,
+            fileId: fileSha256,
+            fileName: fileName,
+            createTime: date,
+            suffix: fileExt,
+          }),
+        );
 
         //写入文件表里
         const sqlurl = uploadPath.replace(/\\/g, '\\\\');
-        const file = FilesEntity.instance({
-          sha256: fileSha256,
-          url: sqlurl,
-          statusId: 0,
-          fileTypeId: 0,
-        });
-        this.filesEntity.insert(file);
+        this.filesEntity.insert(
+          FilesEntity.instance({
+            sha256: fileSha256,
+            url: sqlurl,
+            statusId: 0,
+            fileTypeId: 0,
+          }),
+        );
 
         return AjaxResult.success(null, '传输完成');
       })

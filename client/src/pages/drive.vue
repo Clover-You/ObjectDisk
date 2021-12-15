@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2020-10-14 20:58:01
- * @LastEditTime 2021-12-15 17:03
+ * @LastEditTime 2021-12-15 20:17
  * @Description: 我的云盘
  * 
 -->
@@ -446,8 +446,10 @@ export default {
           }
         )
         .then((res) => {
-          let bloburl = window.URL.createObjectURL(res.data);
-          this.$set(this.fileData[i], "blob", bloburl);
+          if (res.data != null) {
+            let bloburl = window.URL.createObjectURL(res.data);
+            this.$set(this.fileData[i], "blob", bloburl);
+          }
         })
         .catch((err) => {
           this.$tipMessge(err.data.message);
@@ -908,13 +910,14 @@ export default {
   right: 50%;
   width: max-content;
   transform: translateX(-50%);
-  width: 0.24rem;
-  height: 0.24rem;
+  width: 0.4rem;
+  height: 0.4rem;
   color: white;
   border-radius: 100rem;
   background: rgba(30, 30, 30, 0.3);
   padding: 0.08rem;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(2px);
+  padding-left: 0.1rem;
 }
 
 .imagePreview,

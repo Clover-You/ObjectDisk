@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2020-10-14 20:58:01
- * @LastEditTime 2021-12-15 15:44
+ * @LastEditTime 2021-12-15 17:28
  * @Description: 我的云盘
  *
 -->
@@ -13,7 +13,7 @@
     <div class="main">
       <div class="siderbar">
         <div class="logo">
-          <p>对象内部云盘</p>
+          <p>对象云盘</p>
         </div>
 
         <ul class="siderbarUl">
