@@ -164,13 +164,17 @@ export class DriveService {
    * @returns
    */
   async delUserFileOrFolder(id: number, type: string): Promise<AjaxResult> {
+    const date = format(new Date(), DateUtils.DATETIME_DEFAULT_FORMAT);
     if (type == 'file') {
       //删除文件
       const userfile = UserFilesEntity.instance({
         id,
         del: false,
       });
-      const count = await this.userFilesEntity.update(userfile, { del: true });
+      const count = await this.userFilesEntity.update(userfile, {
+        del: true,
+        delTime: date,
+      });
       if (count == void 0) {
         return AjaxResult.fail('删除失败');
       }
@@ -180,7 +184,10 @@ export class DriveService {
       const userfile = FolderEntity.instance({
         id,
       });
-      const count = await this.folderEntity.update(userfile, { del: true });
+      const count = await this.folderEntity.update(userfile, {
+        del: true,
+        delTime: date,
+      });
       if (count == void 0) {
         return AjaxResult.fail('删除失败');
       }
