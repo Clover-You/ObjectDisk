@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2020-10-14 20:58:01
- * @LastEditTime 2021-12-15 15:15
+ * @LastEditTime 2021-12-15 15:22
  * @Description: 我的云盘
  * 
 -->
@@ -283,22 +283,21 @@ export default {
       let path = `-/${file.name}`;
 
       let fileInfoOBJ = {
-            uploadType: 0,
-            uploadCurrentChunkNum: 0,
-            currentChunkMax: 0,
-            file,
-            fileSize: file.size,
-            fileType: file.type,
-            fname,
-            fext,
-            filePath: path,
-            fileSha256: "",
-            folderId: this.getFolderId,
-            // currentChunkList: []
-          };
-          // console.log(fileInfoOBJ);
-          this.$parent.uploadBufferPool.push(fileInfoOBJ); //将任务写入数据
-
+        uploadType: 0,
+        uploadCurrentChunkNum: 0,
+        currentChunkMax: 0,
+        file,
+        fileSize: file.size,
+        fileType: file.type,
+        fname,
+        fext,
+        filePath: path,
+        fileSha256: "",
+        folderId: this.getFolderId,
+        // currentChunkList: []
+      };
+      // console.log(fileInfoOBJ);
+      this.$parent.uploadBufferPool.push(fileInfoOBJ); //将任务写入数据
     },
     async getFileFromEntryRecursively(folderId, entry) {
       // 处理文件夹里的文件
@@ -644,25 +643,6 @@ export default {
               break;
             }
 
-            //其他文件
-            case "psd": {
-              typeStr.type = "*";
-              typeStr.iconStr = "icon-unknown";
-              break;
-            }
-            case "xmind": {
-              typeStr.type = "*";
-              typeStr.iconStr = "icon-xmind";
-              break;
-            }
-
-            //种子
-            case "bt": {
-              typeStr.type = "*";
-              typeStr.iconStr = "icon-bt";
-              break;
-            }
-
             //压缩
             case "zip": {
               typeStr.type = "*";
@@ -685,7 +665,22 @@ export default {
               break;
             }
 
-            //window可运行文件
+            //其他文件
+            case "psd": {
+              typeStr.type = "*";
+              typeStr.iconStr = "icon-unknown";
+              break;
+            }
+            case "xmind": {
+              typeStr.type = "*";
+              typeStr.iconStr = "icon-xmind";
+              break;
+            }
+            case "bt": {
+              typeStr.type = "*";
+              typeStr.iconStr = "icon-bt";
+              break;
+            }
             case "exe": {
               typeStr.type = "*";
               typeStr.iconStr = "icon-windows";
@@ -696,6 +691,12 @@ export default {
               typeStr.iconStr = "icon-windows";
               break;
             }
+            case "apk": {
+              typeStr.type = "*";
+              typeStr.iconStr = "icon-Android-hover";
+              break;
+            }
+
             default: {
               typeStr.type = "*";
               typeStr.iconStr = "icon-unknown";

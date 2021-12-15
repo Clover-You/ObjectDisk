@@ -77,7 +77,10 @@ export class UploadService {
       enres.fileExist = true;
     }
 
-    if (userfile != undefined && folder != undefined) {
+    if (
+      (userfile != undefined && folder != undefined) ||
+      userfile != undefined
+    ) {
       enres.userFileExist = true;
     }
 
