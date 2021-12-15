@@ -147,6 +147,17 @@ export class UploadService {
         }
 
         const date = format(new Date(), DateUtils.DATETIME_DEFAULT_FORMAT);
+        //写入文件表里
+        const sqlurl = uploadPath.replace(/\\/g, '\\\\');
+        this.filesEntity.save(
+          FilesEntity.instance({
+            sha256: fileSha256,
+            url: sqlurl,
+            statusId: 0,
+            fileTypeId: 0,
+          }),
+        );
+
         //写入用户文件表里
         this.userFilesEntity.insert(
           UserFilesEntity.instance({
@@ -156,17 +167,6 @@ export class UploadService {
             fileName: fileName,
             createTime: date,
             suffix: fileExt,
-          }),
-        );
-
-        //写入文件表里
-        const sqlurl = uploadPath.replace(/\\/g, '\\\\');
-        this.filesEntity.insert(
-          FilesEntity.instance({
-            sha256: fileSha256,
-            url: sqlurl,
-            statusId: 0,
-            fileTypeId: 0,
           }),
         );
 
