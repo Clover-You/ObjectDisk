@@ -103,12 +103,11 @@ export class UploadController {
     if (
       !StringUtils.hasText(userid) ||
       !StringUtils.hasText(folderid) ||
-      !StringUtils.hasText(fileName) ||
       !StringUtils.hasText(filePath) ||
-      !StringUtils.hasText(fileExt) ||
       !StringUtils.hasText(fileSha256) ||
       !StringUtils.hasText(currentChunkMax) ||
-      !StringUtils.hasText(currentChunkIndex)
+      !StringUtils.hasText(currentChunkIndex) ||
+      (!StringUtils.hasText(fileName) && !StringUtils.hasText(fileExt))
     ) {
       return AjaxResult.fail('参数错误');
     }
