@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2020-10-14 20:58:01
- * @LastEditTime 2021-12-14 22:17
+ * @LastEditTime 2021-12-15 20:17
  * @Description: 我的云盘
  * 
 -->
@@ -15,9 +15,11 @@
 
     <div class="toolbar">
       <div class="toolbarLeft">
-        <p class="toolbarTitle colorR">我的云盘</p>
-        <P class="toolbarArrow colorR">›</P>
-        <p class="toolbarTitle toolbarOn">我的云盘<span>({{fileData.length}})</span></p>
+        <p class="toolbarTitle" :class="{colorR:currentFolder.length >= 1}">{{currentFolder.length == 0?`我的云盘(${fileData.length})`:'我的云盘'}}</p>
+        <div v-for="(item,index) in currentFolder" :key="index" style="display:inline-flex" :class="{toolbarOn:index!=currentFolder.length-1}">
+          <P class="toolbarArrow colorR">›</P>
+          <p class="toolbarTitle" :class="{colorR:index!=currentFolder.length-1}">{{item.text}}<span v-if="index==currentFolder.length-1">({{fileData.length}})</span></p>
+        </div>
       </div>
       <div class="toolbarRight">
         <div class="updateButton" @click="openNewFileModel">
@@ -83,15 +85,15 @@
           <i class="iconfont iconfont icon-info"></i>
           <p>查看详情信息</p>
         </li>
-        <li v-if="showRightMenuType=='file' || showRightMenuType=='folder'" @click="delFileOrFolder">
+        <li v-if="showRightMenuType=='file' || showRightMenuType=='folder'" @click="showdelDialog">
           <i class="iconfont iconfont icon-delete"></i>
           <p>删除</p>
         </li>
       </ul>
     </div>
 
-    <!-- 新建文件模态窗 -->
-    <newFile :isShowNewFileModel.sync="isShowNewFileModel"></newFile>
+    <!-- 新建模态窗 -->
+    <newFile @oneFile="oneFile" :isShowNewFileModel.sync="isShowNewFileModel"></newFile>
     <!-- 新建文件夹模态窗 -->
     <newFolder :isShowNewFolderModel.sync="isShowNewFolderModel" @changeValue="addUserFolder"></newFolder>
     <!-- 视频模态窗 -->
@@ -116,15 +118,16 @@ export default {
     return {
       isShowlVideo: false, //是否显示视频模态窗
       videoList: [], //视频模态窗数据
-      
+
       isShowNewFileModel: false, //是否显示新建文件模态窗
       isShowNewFolderModel: false, //是否显示新建文件夹模态窗
       isShowUpdateModel: false, //是否显示上传模态窗
       isShowRightMenu: false, //是否显示右键菜单选择
       showRightMenuType: "default", //显示的右键菜单类型
       fileMenuPos: { x: 0, y: 0 }, //右键菜单选择显示位置
-      rightMenuItem:null,//右键对应的Item对象
+      rightMenuItem: null, //右键对应的Item对象
       fileData: [], //用户数据
+      currentFolder: [], //导航文件夹
     };
   },
   watch: {
@@ -132,6 +135,18 @@ export default {
       //监听路由变化
       // console.log(to,from);
       this.getUserFileAndFolder(this.getFolderId);
+
+      //倒序删除导航
+      for (let i = this.currentFolder.length; i >= 0; i--) {
+        if (
+          this.getFolderId !=
+          this.currentFolder[this.currentFolder.length - 1].id
+        ) {
+          this.currentFolder.splice(i, 1);
+        } else {
+          break;
+        }
+      }
     },
   },
   computed: {
@@ -163,11 +178,11 @@ export default {
           if (res.data.code == 200) {
             this.getUserFileAndFolder(this.getFolderId);
           } else {
-            this.$tipMessge(res.data.message)
+            this.$tipMessge(res.data.message);
           }
         })
         .catch((err) => {
-          this.$tipMessge(err.data.message)
+          this.$tipMessge(err.data.message);
         });
     },
     getUserFileAndFolder(value) {
@@ -201,11 +216,11 @@ export default {
               }
             }
           } else {
-            this.$tipMessge(res.data.message)
+            this.$tipMessge(res.data.message);
           }
         })
         .catch((err) => {
-          this.$tipMessge(err.data.message)
+          this.$tipMessge(err.data.message);
         });
     },
     dragenter(e) {
@@ -235,7 +250,13 @@ export default {
 
       // 修复拖拽获取不了文件的情况
       let items = [];
-      [].forEach.call(e.dataTransfer.items, function(file) {items.push(file);},false);
+      [].forEach.call(
+        e.dataTransfer.items,
+        function (file) {
+          items.push(file);
+        },
+        false
+      );
       items.forEach((item) => {
         if (item.kind === "file") {
           //是文件才触发
@@ -264,11 +285,35 @@ export default {
     openFileOrFolder(item) {
       //打开文件或打开文件夹
       if (item.type == "folder") {
+        this.currentFolder.push({ text: item.name, id: item.id });
         this.$router.push({ name: "drive", params: { folderId: item.id } });
       } else {
         //打开文件
-        this.$tipMessge('哦吼,文件预览还不能用')
+        this.$tipMessge("哦吼,文件预览还不能用");
       }
+    },
+    async oneFile(file) {
+      //单文件处理
+      let fname = file.name.substring(0, file.name.lastIndexOf(".")); //获取文件名
+      let fext = file.name.substring(file.name.lastIndexOf(".") + 1); //获取后缀名
+      let path = `-/${file.name}`;
+
+      let fileInfoOBJ = {
+        uploadType: 0,
+        uploadCurrentChunkNum: 0,
+        currentChunkMax: 0,
+        file,
+        fileSize: file.size,
+        fileType: file.type,
+        fname,
+        fext,
+        filePath: path,
+        fileSha256: "",
+        folderId: this.getFolderId,
+        // currentChunkList: []
+      };
+      // console.log(fileInfoOBJ);
+      this.$parent.uploadBufferPool.push(fileInfoOBJ); //将任务写入数据
     },
     async getFileFromEntryRecursively(folderId, entry) {
       // 处理文件夹里的文件
@@ -317,6 +362,7 @@ export default {
 
           // entries.forEach(entry => this.getFileFromEntryRecursively(entry));
         });
+        //刷新
         this.getUserFileAndFolder(this.getFolderId);
       }
     },
@@ -329,9 +375,43 @@ export default {
       //显示新建文件模态窗
       this.isShowNewFileModel = true;
     },
+    showdelDialog() {
+      this.isShowRightMenu = false;
+      if (this.rightMenuItem.type == "file") {
+        //删除文件
+        this.$dialogMessge({
+          title: "确定删除",
+          text: `确定删除该文件嘛?`,
+          onOk: () => this.delFileOrFolder(),
+          onCancel: () => {},
+        });
+      } else {
+        //删除文件夹
+        this.$dialogMessge({
+          title: "确定删除",
+          text: "确定删除该文件夹嘛?文件夹内的文件将全部删除!!!",
+          onOk: () => this.delFileOrFolder(),
+          onCancel: () => {},
+        });
+      }
+    },
     delFileOrFolder() {
       //删除文件或文件夹
-      
+      this.$http
+        .post(`${this.$store.state.serve.serveUrl}drive/delUserFileOrFolder`, {
+          id: this.rightMenuItem.id,
+          type: this.rightMenuItem.type,
+        })
+        .then((res) => {
+          if (res.data.code == 200) {
+            //刷新
+            this.getUserFileAndFolder(this.getFolderId);
+          }
+          this.$tipMessge(res.data.message);
+        })
+        .catch((err) => {
+          this.$tipMessge(err.data.message);
+        });
     },
     ImageToblobUrl(i) {
       //获取图片数据并返回Blob地址
@@ -350,7 +430,7 @@ export default {
           this.$set(this.fileData[i], "blob", bloburl);
         })
         .catch((err) => {
-          this.$tipMessge(err.data.message)
+          this.$tipMessge(err.data.message);
         });
     },
     VideoImageToblobUrl(i) {
@@ -366,11 +446,13 @@ export default {
           }
         )
         .then((res) => {
-          let bloburl = window.URL.createObjectURL(res.data);
-          this.$set(this.fileData[i], "blob", bloburl);
+          if (res.data != null) {
+            let bloburl = window.URL.createObjectURL(res.data);
+            this.$set(this.fileData[i], "blob", bloburl);
+          }
         })
         .catch((err) => {
-          this.$tipMessge(err.data.message)
+          this.$tipMessge(err.data.message);
         });
     },
     destroyBlobUrl(blob) {
@@ -579,25 +661,6 @@ export default {
               break;
             }
 
-            //其他文件
-            case "psd": {
-              typeStr.type = "*";
-              typeStr.iconStr = "icon-unknown";
-              break;
-            }
-            case "xmind": {
-              typeStr.type = "*";
-              typeStr.iconStr = "icon-xmind";
-              break;
-            }
-
-            //种子
-            case "bt": {
-              typeStr.type = "*";
-              typeStr.iconStr = "icon-bt";
-              break;
-            }
-
             //压缩
             case "zip": {
               typeStr.type = "*";
@@ -620,7 +683,22 @@ export default {
               break;
             }
 
-            //window可运行文件
+            //其他文件
+            case "psd": {
+              typeStr.type = "*";
+              typeStr.iconStr = "icon-unknown";
+              break;
+            }
+            case "xmind": {
+              typeStr.type = "*";
+              typeStr.iconStr = "icon-xmind";
+              break;
+            }
+            case "bt": {
+              typeStr.type = "*";
+              typeStr.iconStr = "icon-bt";
+              break;
+            }
             case "exe": {
               typeStr.type = "*";
               typeStr.iconStr = "icon-windows";
@@ -631,7 +709,13 @@ export default {
               typeStr.iconStr = "icon-windows";
               break;
             }
-            default:{
+            case "apk": {
+              typeStr.type = "*";
+              typeStr.iconStr = "icon-Android-hover";
+              break;
+            }
+
+            default: {
               typeStr.type = "*";
               typeStr.iconStr = "icon-unknown";
             }
@@ -826,13 +910,14 @@ export default {
   right: 50%;
   width: max-content;
   transform: translateX(-50%);
-  width: 0.24rem;
-  height: 0.24rem;
+  width: 0.4rem;
+  height: 0.4rem;
   color: white;
   border-radius: 100rem;
   background: rgba(30, 30, 30, 0.3);
   padding: 0.08rem;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(2px);
+  padding-left: 0.1rem;
 }
 
 .imagePreview,
@@ -876,7 +961,7 @@ export default {
 .fileMenu {
   display: block;
   background: rgba(217, 224, 241, 0.6);
-  backdrop-filter:blur(10px);
+  backdrop-filter: blur(10px);
   box-shadow: 0 0.02rem 0.08rem 0 rgba(0, 0, 0, 0.1);
   border-radius: 0.12rem;
   position: fixed;

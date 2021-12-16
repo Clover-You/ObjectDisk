@@ -49,13 +49,19 @@ export class DriveService {
     name: string,
   ): Promise<AjaxResult> {
     //检查指定的folder_id文件夹里是否已有对应的name文件夹
-    const folder = await this.folderEntity.findOne({ userId, name, folderId });
-    if (folder == undefined) {
+    const folder = FolderEntity.instance({
+      userId,
+      name,
+      pId: folderId,
+      del: false,
+    });
+    const folders = await this.folderEntity.findOne(folder);
+    if (folders == undefined) {
       //文件夹不存在
       const date = format(new Date(), DateUtils.DATETIME_DEFAULT_FORMAT);
       const folderDB = FolderEntity.instance({
         userId,
-        folderId,
+        pId: folderId,
         name,
         size: 0,
         createTime: date,
@@ -75,7 +81,7 @@ export class DriveService {
       return AjaxResult.fail(
         '文件夹存在',
         500,
-        MathTools.encryptForKey(folder.id),
+        MathTools.encryptForKey(folders.id),
       );
     }
   }
@@ -91,7 +97,7 @@ export class DriveService {
   ): Promise<AjaxResult> {
     const folder = FolderEntity.instance({
       userId,
-      folderId,
+      pId: folderId,
       del: false,
     });
 
@@ -158,26 +164,34 @@ export class DriveService {
    * @returns
    */
   async delUserFileOrFolder(id: number, type: string): Promise<AjaxResult> {
+    const date = format(new Date(), DateUtils.DATETIME_DEFAULT_FORMAT);
     if (type == 'file') {
       //删除文件
       const userfile = UserFilesEntity.instance({
         id,
+        del: false,
       });
-      const count = this.userFilesEntity.update({ del: true }, userfile);
+      const count = await this.userFilesEntity.update(userfile, {
+        del: true,
+        delTime: date,
+      });
       if (count == void 0) {
         return AjaxResult.fail('删除失败');
       }
-      return AjaxResult.success('删除文件成功');
+      return AjaxResult.success(null, '删除文件成功');
     } else {
       //删除文件夹
       const userfile = FolderEntity.instance({
         id,
       });
-      const count = this.folderEntity.update({ del: true }, userfile);
+      const count = await this.folderEntity.update(userfile, {
+        del: true,
+        delTime: date,
+      });
       if (count == void 0) {
         return AjaxResult.fail('删除失败');
       }
-      return AjaxResult.success('删除文件夹成功');
+      return AjaxResult.success(null, '删除文件夹成功');
     }
     return AjaxResult.fail('删除失败');
   }

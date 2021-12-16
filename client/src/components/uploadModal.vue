@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2021-01-09 21:55:39
- * @LastEditTime 2021-12-14 16:17
+ * @LastEditTime 2021-12-15 15:30
  * @Description: 上传模态窗
  * 
 -->
@@ -75,8 +75,12 @@ export default {
   computed: {
     fileIcon: function () {
       return function (value) {
+        console.log(value);
         if (value == "video/mp4") {
           return "icon-video";
+        }
+        if(value == "application/vnd.android.package-archive") {
+          return "icon-Android-hover"
         }
         // if (value == "application/octet-stream") {
         //   return ""

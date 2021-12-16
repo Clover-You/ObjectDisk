@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2021-01-24 15:41:50
- * @LastEditTime: 2021-01-24 18:51:04
+ * @LastEditTime 2021-12-15 14:54
  * @Description: 新建文件模态窗
  * 
 -->
@@ -9,11 +9,11 @@
   <div class="componentBody">
     <div class="mask" @click="closeNewFileModel" v-if="isShowNewFileModel">
       <ul class="newFileBox" @click.stop="">
-        <li>
+        <li @click="checkFile">
           <div>
             <i class="iconfont icon-add"></i>
             <p>选择文件</p>
-            <input title="点击选择文件" class="updateButton" multiple="" accept="*/*" type="file" name="html5uploader" style="display:none;">
+            <input id="checkFile" @change="change()" title="点击选择文件" class="updateButton" multiple="" accept="*/*" type="file" name="html5uploader" style="display:none;">
           </div>
         </li>
         <!-- <li>
@@ -42,12 +42,21 @@ export default {
     }
   },
   methods: {
+    change() {
+     const file = document.querySelector("#checkFile").files[0];
+     this.$emit("oneFile",file);
+     this.closeNewFileModel();
+    },
+    checkFile() {
+      //选择文件
+      document.querySelector("#checkFile").click();
+    },
     openNewFolderModel() {
       this.$parent.openNewFolderModel();
       this.closeNewFileModel();
     },
     closeNewFileModel() {
-      //关闭新建文件模态窗
+      //关闭新建模态窗
       this.$emit("update:isShowNewFileModel", false);
     },
   }
@@ -66,7 +75,7 @@ export default {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  z-index: 1;
+  z-index: 9999;
   user-select: none;
 }
 

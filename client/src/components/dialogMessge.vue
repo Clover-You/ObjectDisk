@@ -1,12 +1,15 @@
 <!--
  * @Author: LRolinx
  * @Date: 2021-01-24 17:44:47
- * @LastEditTime 2021-12-14 22:05
+ * @LastEditTime 2021-12-15 12:14
  * @Description: 确定模态窗
  * 
 -->
 <template>
   <div class="componentBody">
+    <div class="mask">
+
+    </div>
     <div class="contentBox">
       <p>{{title}}</p>
       <span>{{text}}</span>
@@ -26,8 +29,8 @@ export default {
       type: "tip",
       title: "提示",
       text: "你好，世界",
-      left_buttton:'取消',
-      right_buttton:'确定'
+      left_buttton: "取消",
+      right_buttton: "确定",
     };
   },
   methods: {
@@ -47,6 +50,28 @@ export default {
 };
 </script>
 <style scoped>
+.mask {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  animation: linear 0.2s forwards animaMask;
+  /* background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px); */
+}
+
+@keyframes animaMask {
+  0% {
+    background-color: rgba(255, 255, 255, 0);
+    backdrop-filter: blur(0px);
+  }
+  100% {
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+  }
+}
+
 .contentBox {
   position: fixed;
   left: 50%;
@@ -57,21 +82,21 @@ export default {
   display: flex;
   flex-direction: column;
   transform: translate(-50%, -50%);
-  width: 2rem;
+  width: 3rem;
   animation: ease-in 2s forwards contentBox;
   box-shadow: 0 0 8px #ddd;
 }
 
 .btn-box {
-  padding:0.2rem 0;
+  padding: 0.2rem 0;
   box-sizing: border-box;
   display: flex;
-  flex:1;
+  flex: 1;
   justify-content: space-around;
 }
 
 button {
-  width: 65px;
+  width: 35%;
   height: 38px;
   font-size: 16px;
   border-radius: 0.1rem;

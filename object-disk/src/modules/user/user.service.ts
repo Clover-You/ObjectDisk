@@ -56,7 +56,7 @@ export class UserService {
       if (insertResult == void 0) {
         return AjaxResult.fail('注册失败');
       }
-      return AjaxResult.success('注册成功');
+      return AjaxResult.success(null, '注册成功');
     } else {
       return AjaxResult.fail('用户已存在');
     }

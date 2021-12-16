@@ -1,4 +1,9 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { FilesEntity } from 'src/entity/files.entity';
+import { UserFilesEntity } from 'src/entity/user_files.entity';
+import { VideoController } from './video.controller';
+import { VideoService } from './video.service';
 
 /*
  * █████▒█      ██  ▄████▄   ██ ▄█▀     ██████╗ ██╗   ██╗ ██████╗
@@ -12,39 +17,14 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
  * ░     ░ ░      ░  ░
  * Copyright 2022 LRolinx.
  * <p>
- *  -自定义文件夹以及文件表
+ *  -
  * </p>
  * @author LRolinx
- * @create 2021-12-11 17:24
+ * @create 2021-12-15 17:34
  */
-@Entity('t_user_file_and_folder')
-export class UserFileAndFolder {
-  /**
-   * 加密用户ID
-   */
-  @PrimaryColumn({
-    type: 'varchar',
-  })
-  id?: string;
-
-  @Column({ type: 'varchar', length: 255 })
-  name?: string;
-
-  @Column({ type: 'varchar', length: 255 })
-  type?: string;
-
-  @Column({ type: 'double' })
-  size?: number;
-
-  @Column({ type: 'varchar', length: 255 })
-  path?: string;
-
-  @Column({ type: 'varchar', length: 255 })
-  updateTime?: string;
-
-  @Column({ type: 'varchar', length: 255 })
-  suffix?: string;
-
-  @Column({ type: 'varchar', length: 255 })
-  fileType?: string;
-}
+@Module({
+  controllers: [VideoController],
+  imports: [TypeOrmModule.forFeature([FilesEntity, UserFilesEntity])],
+  providers: [VideoService],
+})
+export class VideoModule {}

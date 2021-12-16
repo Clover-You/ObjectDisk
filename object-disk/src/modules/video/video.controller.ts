@@ -1,4 +1,8 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { AjaxResult } from 'src/utils/ajax-result.classes';
+import { Controller, Post, Body, Inject } from '@nestjs/common';
+import { StringUtils } from 'src/utils/StringUtils';
+import { VideoService } from './video.service';
+import MathTools from 'src/utils/MathTools';
 
 /*
  * █████▒█      ██  ▄████▄   ██ ▄█▀     ██████╗ ██╗   ██╗ ██████╗
@@ -12,39 +16,28 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
  * ░     ░ ░      ░  ░
  * Copyright 2022 LRolinx.
  * <p>
- *  -自定义文件夹以及文件表
+ *  -
  * </p>
  * @author LRolinx
- * @create 2021-12-11 17:24
+ * @create 2021-12-15 17:35
  */
-@Entity('t_user_file_and_folder')
-export class UserFileAndFolder {
+@Controller('video')
+export class VideoController {
+  constructor(
+    @Inject(VideoService)
+    private readonly videoService: VideoService,
+  ) {}
+
   /**
-   * 加密用户ID
+   * 获取视频缩略图
+   * @param id
    */
-  @PrimaryColumn({
-    type: 'varchar',
-  })
-  id?: string;
-
-  @Column({ type: 'varchar', length: 255 })
-  name?: string;
-
-  @Column({ type: 'varchar', length: 255 })
-  type?: string;
-
-  @Column({ type: 'double' })
-  size?: number;
-
-  @Column({ type: 'varchar', length: 255 })
-  path?: string;
-
-  @Column({ type: 'varchar', length: 255 })
-  updateTime?: string;
-
-  @Column({ type: 'varchar', length: 255 })
-  suffix?: string;
-
-  @Column({ type: 'varchar', length: 255 })
-  fileType?: string;
+  @Post('getVideoSceenshots')
+  async getVideoSceenshots(@Body() { id }) {
+    if (!StringUtils.hasText(id)) {
+      return AjaxResult.fail('参数错误');
+    }
+    const decryptId = id == '0' ? 0 : parseInt(MathTools.decryptForKey(id));
+    return this.videoService.getVideoSceenshots(decryptId);
+  }
 }

@@ -1,3 +1,4 @@
+import { FolderEntity } from 'src/entity/folder.entity';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FilesEntity } from 'src/entity/files.entity';
@@ -24,7 +25,9 @@ import { UploadService } from './upload.service';
  */
 @Module({
   controllers: [UploadController],
-  imports: [TypeOrmModule.forFeature([FilesEntity, UserFilesEntity])],
+  imports: [
+    TypeOrmModule.forFeature([FilesEntity, UserFilesEntity, FolderEntity]),
+  ],
   providers: [UploadService],
 })
 export class UploadModule {}

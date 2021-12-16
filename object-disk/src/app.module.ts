@@ -7,6 +7,7 @@ import { LoggerMiddleware } from './common/logger/logger.middleware';
 import { DataBaseConfig } from './config/orm.config';
 import { DriveModule } from './modules/drive/drive.module';
 import { UploadModule } from './modules/upload/upload.module';
+import { VideoModule } from './modules/video/video.module';
 
 /**
  * █████▒█      ██  ▄████▄   ██ ▄█▀     ██████╗ ██╗   ██╗ ██████╗
@@ -26,13 +27,14 @@ import { UploadModule } from './modules/upload/upload.module';
  * @create 2021-11-08 15:23
  */
 @Module({
+  controllers: [AppController],
   imports: [
     UserModule,
     DriveModule,
     UploadModule,
+    VideoModule,
     TypeOrmModule.forRoot(DataBaseConfig),
   ],
-  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule implements NestModule {
