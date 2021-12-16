@@ -17,6 +17,8 @@ import * as path from 'path';
  * @author Clover·You
  * @create 2021-11-09 10:50
  */
+import * as path from 'path';
+
 export type MysqlType = {
   user?: string;
   password: string;
