@@ -54,8 +54,7 @@ export class UploadController {
       !StringUtils.hasText(userid) ||
       !StringUtils.hasText(folderid) ||
       !StringUtils.hasText(sha256Id) ||
-      !StringUtils.hasText(filename) ||
-      !StringUtils.hasText(fileext)
+      (!StringUtils.hasText(filename) && !StringUtils.hasText(fileext))
     ) {
       return AjaxResult.fail('参数错误');
     } else {
