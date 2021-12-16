@@ -15,6 +15,8 @@
  * @author Clover·You
  * @create 2021-11-09 10:50
  */
+import * as path from 'path';
+
 export type MysqlType = {
   user?: string;
   password: string;
@@ -52,12 +54,12 @@ const conf: ConfType = {
   },
   port: 3000,
   key: {
-    path: `${USER_HOME}\\.objectcloud\\key\\`,
+    path: path.join(USER_HOME, `/.objectcloud/key/`),
   },
   upload: {
     // rootPath:`${USER_HOME}/.objectcloud/`,
-    temp: `${USER_HOME}\\.objectcloud\\temp\\`,
-    path: `${USER_HOME}\\.objectcloud\\upload\\`,
+    temp: path.join(USER_HOME, `/.objectcloud/temp/`),
+    path: path.join(USER_HOME, `/.objectcloud/upload/`),
   },
 };
 
