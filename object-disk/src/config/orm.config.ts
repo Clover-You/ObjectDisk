@@ -25,7 +25,7 @@ const DataBaseConfig: TypeOrmModuleOptions = {
   password: '123',
   database: 'objcloud',
   // 不要打开这个设置
-  synchronize: false,
+  synchronize: true,
   entities: ['dist/entity/*.entity{.ts,.js}'],
 };
 

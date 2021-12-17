@@ -63,6 +63,7 @@ export class UploadService {
     const folder = await this.folderEntity.findOne(
       FolderEntity.instance({ id: folderid, del: false }),
     );
+
     const userfile = await this.userFilesEntity.findOne(
       UserFilesEntity.instance({
         userId: userid,
@@ -100,7 +101,7 @@ export class UploadService {
    * @param currentChunkIndex
    * @returns
    */
-  async uploadStreamFile(
+  uploadStreamFile(
     req: Request,
     userid: number,
     folderid: number,
@@ -111,73 +112,97 @@ export class UploadService {
     currentChunkMax: number,
     currentChunkIndex: number,
   ): Promise<AjaxResult> {
-    const sha256Path = `${conf.upload.temp}${fileSha256}\\`;
-    const uploadPath = `${conf.upload.path}${fileSha256}`;
-    const buffers: Buffer[] = [];
+    return new Promise<AjaxResult>(async (resolve, reject) => {
+      try {
+        const sha256Path = `${conf.upload.temp}${fileSha256}/`;
+        const uploadPath = `${conf.upload.path}${fileSha256}`;
+        const buffers: Buffer[] = [];
 
-    if (!fs.existsSync(sha256Path)) {
-      //创建对应的Sha256文件夹
-      fs.mkdirSync(sha256Path, { recursive: true });
-    }
-    // if (fs.existsSync(`${dPath}${ctx.request.query.files.file.name}`)) {
-    //   //有文件则删除
-    //   fs.unlinkSync(`${dPath}${ctx.request.files.file.name}`)
-    // }
-
-    req
-      .on('data', (trunk) => {
-        buffers.push(trunk);
-      })
-      .on('end', () => {
-        const buffer = Buffer.concat(buffers);
-        fs.writeFileSync(`${sha256Path}${currentChunkIndex}`, buffer);
-      })
-      .on('close', () => {
-        //连接关闭
-
-        const files = fs.readdirSync(sha256Path);
-        if (files.length != currentChunkMax) {
-          return AjaxResult.success(null, '传输进行中');
+        if (!fs.existsSync(sha256Path)) {
+          //创建对应的Sha256文件夹
+          fs.mkdirSync(sha256Path, { recursive: true });
         }
+        // if (fs.existsSync(`${dPath}${ctx.request.query.files.file.name}`)) {
+        //   //有文件则删除
+        //   fs.unlinkSync(`${dPath}${ctx.request.files.file.name}`)
+        // }
 
-        //开始合并片段文件
-        for (let i = 0, len = files.length; i < len; i++) {
-          const content = fs.readFileSync(path.join(sha256Path, i.toString()));
-          fs.appendFileSync(uploadPath, content);
-        }
+        req
+          .on('data', (trunk) => {
+            console.log('data');
+            buffers.push(trunk);
+          })
+          .on('end', () => {
+            console.log('结束');
+            const buffer = Buffer.concat(buffers);
+            fs.writeFileSync(`${sha256Path}${currentChunkIndex}`, buffer);
+            //连接关闭
+            const files = fs.readdirSync(sha256Path);
+            if (files.length != currentChunkMax) {
+              resolve(AjaxResult.success(null, '传输进行中'));
+              return;
+            }
 
-        const date = format(new Date(), DateUtils.DATETIME_DEFAULT_FORMAT);
-        //写入文件表里
-        const sqlurl = uploadPath.replace(/\\/g, '\\\\');
-        this.filesEntity.save(
-          FilesEntity.instance({
-            sha256: fileSha256,
-            url: sqlurl,
-            statusId: 0,
-            fileTypeId: 0,
-          }),
-        );
+            //开始合并片段文件
+            for (let i = 0, len = files.length; i < len; i++) {
+              const content = fs.readFileSync(
+                path.join(sha256Path, i.toString()),
+              );
+              fs.appendFileSync(uploadPath, content);
+            }
 
-        //写入用户文件表里
-        this.userFilesEntity.insert(
-          UserFilesEntity.instance({
-            userId: userid,
-            folderId: folderid,
-            fileId: fileSha256,
-            fileName: fileName,
-            createTime: date,
-            suffix: fileExt,
-          }),
-        );
+            const date = format(new Date(), DateUtils.DATETIME_DEFAULT_FORMAT);
+            //写入文件表里
+            const sqlurl = uploadPath.replace(/\\/g, '\\\\');
 
-        return AjaxResult.success(null, '传输完成');
-      })
-      .on('error', () => {
-        return AjaxResult.fail('传输出错');
-      });
-
-    return AjaxResult.success(null, '传输完成');
+            this.filesEntity
+              .save(
+                FilesEntity.instance({
+                  sha256: fileSha256,
+                  url: sqlurl,
+                  statusId: 0,
+                  fileTypeId: 0,
+                }),
+              )
+              .then(async (v) => {
+                // 写入用户文件表里
+                await this.userFilesEntity.insert(
+                  UserFilesEntity.instance({
+                    userId: userid,
+                    folderId: folderid,
+                    fileId: fileSha256,
+                    fileName: fileName,
+                    createTime: date,
+                    suffix: fileExt,
+                  }),
+                );
+                resolve(AjaxResult.success(null, '传输完成'));
+              })
+              .catch((e) => {
+                console.log(e);
+                resolve(AjaxResult.fail('传输出错'));
+              });
+          })
+          // .on('close', () => {
+          //   console.log('close');
+          //
+          // })
+          .on('error', () => {
+            resolve(AjaxResult.fail('传输出错'));
+            console.log('error');
+          });
+      } catch (e) {
+        console.log(e);
+        resolve(AjaxResult.fail('传输出错'));
+      }
+    });
   }
+
+  // private asyRequestListener(): Promise<AjaxResult>{
+  //   return new Promise<AjaxResult>((resolve, reject) => {
+
+  //   });
+  // }
 
   /**
    * 秒传文件

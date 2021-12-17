@@ -114,8 +114,7 @@ export class UploadController {
     const decryptUserid = parseInt(MathTools.decryptForKey(userid));
     const decryptFolderid =
       folderid == '0' ? 0 : parseInt(MathTools.decryptForKey(folderid));
-
-    return this.uploadService.uploadStreamFile(
+    const ajaxResult = await this.uploadService.uploadStreamFile(
       req,
       decryptUserid,
       decryptFolderid,
@@ -126,6 +125,8 @@ export class UploadController {
       currentChunkMax,
       currentChunkIndex,
     );
+    console.log(ajaxResult);
+    return ajaxResult;
   }
 
   /**

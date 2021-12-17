@@ -46,7 +46,7 @@ export class FilesEntity {
   /**
    * 是否已检查违规情况
    */
-  @Column({ type: 'bit', comment: '是否已检查违规情况' })
+  @Column({ type: 'bit', comment: '是否已检查违规情况', default: false })
   checked?: boolean;
 
   /**

@@ -22,25 +22,25 @@ export class FolderEntity {
   /**
    * 文件夹id
    */
-  @PrimaryGeneratedColumn({ type: 'int' })
+  @PrimaryGeneratedColumn({ type: 'int', comment: '文件夹id' })
   id?: number;
 
   /**
    * 文件夹名称
    */
-  @Column({ type: 'varchar', length: 64 })
+  @Column({ type: 'varchar', length: 64, comment: '文件夹名称' })
   name?: string;
 
   /**
    * 用户id
    */
-  @Column({ type: 'int' })
+  @Column({ type: 'int', comment: '用户id' })
   userId?: number;
 
   /**
    * 父文件夹id
    */
-  @Column({ type: 'int' })
+  @Column({ type: 'int', name: 'p_id', comment: '父文件夹' })
   pId?: number;
 
   /**
@@ -58,7 +58,7 @@ export class FolderEntity {
   /**
    * 是否删除
    */
-  @Column({ type: 'bit', default: true })
+  @Column({ type: 'bit', default: false })
   del?: boolean;
 
   /**
