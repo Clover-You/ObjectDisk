@@ -52,7 +52,7 @@ export class UserFilesEntity {
   /**
    * 是否公开
    */
-  @Column({ type: 'bit' })
+  @Column({ type: 'bit', default: false })
   open?: boolean;
 
   /**

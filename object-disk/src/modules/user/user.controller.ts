@@ -1,8 +1,8 @@
 import { Body, Controller, HttpStatus, Inject, Post } from '@nestjs/common';
-import { UserEntity } from 'src/entity/user.entity';
-import { AjaxResult } from 'src/utils/ajax-result.classes';
+import { UserEntity } from '../../entity/user.entity';
+import { AjaxResult } from '../../utils/ajax-result.classes';
 import { UserService } from './user.service';
-import { StringUtils } from 'src/utils/StringUtils';
+import { StringUtils } from '../../utils/StringUtils';
 import { HttpParameterException } from '../../exceptions/http-parameter.exception';
 
 /**
