@@ -18,6 +18,10 @@ import router from "./router/router.js"
 import axios from './utils/axios'
 import tipMessge from '@/components/tipMessge.js'
 import dialogMessge from '@/components/dialogMessge.js'
+import VueVirtualScroller from 'vue-virtual-scroller'
+import VirtualCollection from 'vue-virtual-collection'
+
+
 // import driveRouter from "./router/drive.js"
 
 Vue.prototype.$http = axios;
@@ -27,6 +31,8 @@ Vue.config.productionTip = false
 Vue.prototype.$tipMessge = tipMessge;
 Vue.prototype.$dialogMessge = dialogMessge;
 
+Vue.use(VirtualCollection)
+Vue.use(VueVirtualScroller)
 Vue.use(VueRouter);
 
 // 解决ElementUI导航栏中的vue-router在3.0版本以上重复点菜单报错问题
