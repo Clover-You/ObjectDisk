@@ -54,8 +54,7 @@ export class UploadController {
       !StringUtils.hasText(userid) ||
       !StringUtils.hasText(folderid) ||
       !StringUtils.hasText(sha256Id) ||
-      !StringUtils.hasText(filename) ||
-      !StringUtils.hasText(fileext)
+      (!StringUtils.hasText(filename) && !StringUtils.hasText(fileext))
     ) {
       return AjaxResult.fail('参数错误');
     } else {
@@ -103,12 +102,11 @@ export class UploadController {
     if (
       !StringUtils.hasText(userid) ||
       !StringUtils.hasText(folderid) ||
-      !StringUtils.hasText(fileName) ||
       !StringUtils.hasText(filePath) ||
-      !StringUtils.hasText(fileExt) ||
       !StringUtils.hasText(fileSha256) ||
       !StringUtils.hasText(currentChunkMax) ||
-      !StringUtils.hasText(currentChunkIndex)
+      !StringUtils.hasText(currentChunkIndex) ||
+      (!StringUtils.hasText(fileName) && !StringUtils.hasText(fileExt))
     ) {
       return AjaxResult.fail('参数错误');
     }

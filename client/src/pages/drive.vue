@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2020-10-14 20:58:01
- * @LastEditTime 2021-12-15 20:17
+ * @LastEditTime 2021-12-16 10:01
  * @Description: 我的云盘
  *
 -->
@@ -327,8 +327,7 @@ export default {
     },
     async oneFile(file) {
       //单文件处理
-      let fname = file.name.substring(0, file.name.lastIndexOf(".")); //获取文件名
-      let fext = file.name.substring(file.name.lastIndexOf(".") + 1); //获取后缀名
+      let filenameAndfext = this.getFileNameAndFext(file.name);
       let path = `-/${file.name}`;
 
       let fileInfoOBJ = {
@@ -338,8 +337,8 @@ export default {
         file,
         fileSize: file.size,
         fileType: file.type,
-        fname,
-        fext,
+        fname: filenameAndfext.fname,
+        fext: filenameAndfext.fext,
         filePath: path,
         fileSha256: "",
         folderId: this.getFolderId,
@@ -348,12 +347,25 @@ export default {
       // console.log(fileInfoOBJ);
       this.$parent.uploadBufferPool.push(fileInfoOBJ); //将任务写入数据
     },
+    getFileNameAndFext(string) {
+      //获取文件名和后缀
+      let fname = "";
+      let fext = "";
+      if (string.indexOf(".") != -1) {
+        fname = string.substring(0, string.lastIndexOf(".")); //获取文件名
+        fext = string.substring(string.lastIndexOf(".") + 1); //获取后缀名
+      } else {
+        fname = string.substring(string.lastIndexOf(".") + 1); //获取文件名
+        fext = "";
+      }
+      return { fname, fext };
+    },
     async getFileFromEntryRecursively(folderId, entry) {
       // 处理文件夹里的文件
       if (entry.isFile) {
         entry.file((file) => {
-          let fname = file.name.substring(0, file.name.lastIndexOf(".")); //获取文件名
-          let fext = file.name.substring(file.name.lastIndexOf(".") + 1); //获取后缀名
+          let filenameAndfext = this.getFileNameAndFext(file.name);
+
           let path = entry.fullPath.substring(1);
 
           let fileInfoOBJ = {
@@ -363,8 +375,8 @@ export default {
             file,
             fileSize: file.size,
             fileType: file.type,
-            fname,
-            fext,
+            fname: filenameAndfext.fname,
+            fext: filenameAndfext.fext,
             filePath: path,
             fileSha256: "",
             folderId: folderId == "0" ? this.getFolderId : folderId,

@@ -1,9 +1,11 @@
 # objectCloudDiskClient
 
 #### 介绍
-objectCloudDiskClient
-1. 自动获取局域网:只要一个开关就能解放双手，妈妈再也不用担当我要手动获取局域网IP了
-2. 人性化页面，不用担心不会使用
+1. 人性化页面，不用担心不会使用
+
+#### 非常感谢以下开源
+![img](https://github.com/zeroojs/landing-ux/raw/main/doc/preview.jpg)
+登录与注册页面 https://github.com/zeroojs/landing-ux
 
 #### 软件架构
 软件架构说明

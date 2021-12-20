@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2021-01-09 21:55:39
- * @LastEditTime 2021-12-15 15:30
+ * @LastEditTime 2021-12-16 10:05
  * @Description: 上传模态窗
  * 
 -->
@@ -25,7 +25,7 @@
             <i class="iconfont" :class="fileIcon(item.fileType)"></i>
             <div class="rightContentBox">
               <div class="rightContentTitle">
-                <p>{{item.fname}}.{{item.fext}}</p>
+                <p>{{item.fname}}{{item.fext==null||item.fext==''?'':`.${item.fext}`}}</p>
               </div>
               <div class="rightContent">
                 <p>{{fileSize(item.fileSize)}}</p>
