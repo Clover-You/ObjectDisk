@@ -19,7 +19,6 @@ import axios from './utils/axios'
 import tipMessge from '@/components/tipMessge.js'
 import dialogMessge from '@/components/dialogMessge.js'
 import VueVirtualScroller from 'vue-virtual-scroller'
-import VirtualCollection from 'vue-virtual-collection'
 
 
 // import driveRouter from "./router/drive.js"
@@ -31,7 +30,6 @@ Vue.config.productionTip = false
 Vue.prototype.$tipMessge = tipMessge;
 Vue.prototype.$dialogMessge = dialogMessge;
 
-Vue.use(VirtualCollection)
 Vue.use(VueVirtualScroller)
 Vue.use(VueRouter);
 
