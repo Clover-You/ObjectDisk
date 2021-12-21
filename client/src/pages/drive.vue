@@ -3,7 +3,7 @@
  * @Date: 2020-10-14 20:58:01
  * @LastEditTime 2021-12-16 10:01
  * @Description: 我的云盘
- * 
+ *
 -->
 <template>
   <div class="driveBody" @mouseup="driveBodyMouseup" @dragenter.prevent.stop="dragenter" @mouseup.stop="fileBoxMouseup($event,null)" @contextmenu.prevent="">
@@ -16,7 +16,7 @@
     <div class="toolbar">
       <div class="toolbarLeft">
         <p class="toolbarTitle" :class="{colorR:currentFolder.length >= 1}">{{currentFolder.length == 0?`我的云盘(${fileData.length})`:'我的云盘'}}</p>
-        <div v-for="(item,index) in currentFolder" :key="index" style="display:inline-flex" :class="{toolbarOn:index!=currentFolder.length-1}">
+        <div v-for="(item,index) in currentFolder" :key="item.id" style="display:inline-flex" :class="{toolbarOn:index!=currentFolder.length-1}">
           <P class="toolbarArrow colorR">›</P>
           <p class="toolbarTitle" :class="{colorR:index!=currentFolder.length-1}">{{item.text}}<span v-if="index==currentFolder.length-1">({{fileData.length}})</span></p>
         </div>
@@ -28,29 +28,39 @@
         </div>
       </div>
     </div>
-    <div class="dropZone">
+    <div class="dropZone" ref="recycleScroller">
       <div v-if="fileData.length==0" class="emptyBox">
         <img src="../static/img/empty.png" draggable="false" />
         <p>这里啥也没有呢~</p>
       </div>
 
       <div class="file-container" v-if="fileData.length!=0">
-        <div class="fileBox" @dblclick="openFileOrFolder(item)" @mouseup.stop="fileBoxMouseup($event,item)" @contextmenu.prevent="" v-for="(item,index) in fileData" :key="index">
-          <div class="fileContentBox">
-            <div class="fileContentImg">
-              <img class="imagePreview" src="../static/img/folder.png" draggable="false" v-if="item.type == 'folder'" />
-              <div class="imgBox" v-if="item.type == 'file' && item.blob != null">
-                <img class="imagePreview" ref="img" :src="item.blob" draggable="false" @load="destroyBlobUrl(item.blob)">
-                <i class="iconfont icon-or-play videoImg" v-if="checkType(item).type == 'video'"></i>
+        <RecycleScroller
+          :items="getFileData"
+          class="scroller"
+          :item-size="15"
+          key-field="key"
+          v-slot="data"
+        >
+        <div style="display: flex">
+            <div v-for="(item) in data.item.data" :key="item.id" class="fileBox" @dblclick="openFileOrFolder(item)" @mouseup.stop="fileBoxMouseup($event,item)" @contextmenu.prevent="" >
+              <div class="fileContentBox">
+                <div class="fileContentImg">
+                  <img class="imagePreview" src="../static/img/folder.png" draggable="false" v-if="item.type == 'folder'" />
+                  <div class="imgBox" v-if="item.type == 'file' && item.blob != null">
+                    <img class="imagePreview" ref="img" :src="item.blob" draggable="false" @load="destroyBlobUrl(item.blob)">
+                    <i class="iconfont icon-or-play videoImg" v-if="checkType(item).type == 'video'"></i>
+                  </div>
+                  <i class="iconfont iconPreview" :class="checkType(item).iconStr" v-if="item.type == 'file' && item.blob == null"></i>
+                </div>
+                <div class="fileContentText">
+                  <p class="fileContentName">{{item.name}}{{item.suffix==null?'':`.${item.suffix}`}}</p>
+                  <p class="fileContentDate">{{item.updateTime.slice(0,item.updateTime.length-3)}}</p>
+                </div>
               </div>
-              <i class="iconfont iconPreview" :class="checkType(item).iconStr" v-if="item.type == 'file' && item.blob == null"></i>
-            </div>
-            <div class="fileContentText">
-              <p class="fileContentName">{{item.name}}{{item.suffix==null||item.suffix==''?'':`.${item.suffix}`}}</p>
-              <p class="fileContentDate">{{item.updateTime.slice(0,item.updateTime.length-3)}}</p>
             </div>
           </div>
-        </div>
+        </RecycleScroller>
       </div>
     </div>
 
@@ -116,9 +126,10 @@ export default {
   },
   data() {
     return {
+      width: 0, // 宽
+      height: 0, // 高
       isShowlVideo: false, //是否显示视频模态窗
       videoList: [], //视频模态窗数据
-
       isShowNewFileModel: false, //是否显示新建文件模态窗
       isShowNewFolderModel: false, //是否显示新建文件夹模态窗
       isShowUpdateModel: false, //是否显示上传模态窗
@@ -150,6 +161,25 @@ export default {
     },
   },
   computed: {
+    getFileData() {
+      const colNum = Number.parseInt(Math.abs(this.width / 190));
+      let arr = [];
+      const rowNum = Number.parseInt(Math.abs((this.fileData.length / colNum)));
+      const rowNumReal =( (this.fileData.length / colNum) > rowNum) ? rowNum + 1 :rowNum;
+      for (let i = 0; i < rowNumReal; i++) {
+        arr.push([])
+        for (let j = (i * colNum); j < ((i * colNum) + colNum); j++) {
+          arr[i].push(this.fileData[j])
+        }
+      }
+      arr[arr.length - 1] = arr[arr.length - 1].filter(item => item!= void 0)
+      return arr.map((item, i) => {
+        return {
+          key: i,
+          data: item
+        }
+      });
+    },
     getFolderId() {
       //获取路由中的参数文件夹id
       return this.$route.params.folderId == undefined
@@ -161,11 +191,13 @@ export default {
     if (!this.$store.state.isLogin) {
       this.$router.replace({ name: "login" }); //没登录直接回到登录页
     }
-
     this.getUserFileAndFolder(this.getFolderId);
   },
 
   methods: {
+    test(data) {
+      console.log(data);
+    },
     addUserFolder(value) {
       //添加用户文件夹
       this.$http
@@ -193,6 +225,7 @@ export default {
           folderid: value,
         })
         .then((res) => {
+
           if (res.data.code == 200) {
             console.log(res.data.data);
             for (let i = 0; i < res.data.data.length; i++) {
@@ -467,9 +500,9 @@ export default {
           this.$tipMessge(err.data.message);
         });
     },
-    destroyBlobUrl(blob) {
+    destroyBlobUrl() {
       //销毁blob地址
-      window.URL.revokeObjectURL(blob);
+      // window.URL.revokeObjectURL(blob);
     },
     checkType(item) {
       let typeStr = {
@@ -737,6 +770,10 @@ export default {
       return typeStr;
     },
   },
+  mounted(){
+    this.width = (this.$refs.recycleScroller.offsetWidth - 100);
+    this.height = this.$refs.recycleScroller.offsetHeight;
+  }
 };
 </script>
 
@@ -802,8 +839,8 @@ export default {
   cursor: default;
   flex: 1;
   display: flex;
-  padding: 0 0.5rem;
-  overflow: auto;
+  padding: 0 50px;
+  /* overflow: auto; */
 }
 
 .draging {
@@ -858,7 +895,7 @@ export default {
   position: relative;
   flex: 1;
   z-index: 0;
-  overflow: auto;
+  /* overflow: auto; */
   display: flex;
   flex-wrap: wrap;
 }
@@ -871,7 +908,8 @@ export default {
   display: inline-flex;
 
   user-select: none;
-  margin: 0.2rem;
+  /* margin: 0.2rem; */
+  margin: 15px;
   padding-top: 0.12rem;
   letter-spacing: 0.01px;
   transition: ease-in 0.2s;
@@ -1074,4 +1112,14 @@ export default {
     display: flex;
   }
 }
+
+.scroller .vue-recycle-scroller__item-wrapper .vue-recycle-scroller__item-view {
+  display: flex !important;
+}
+
+.scroller {
+  height: 100%;
+  overflow-y: auto;
+}
+
 </style>

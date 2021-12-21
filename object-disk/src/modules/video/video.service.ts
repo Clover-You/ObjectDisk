@@ -5,7 +5,7 @@ import { FilesEntity } from 'src/entity/files.entity';
 import { Repository } from 'typeorm';
 import { UserFilesEntity } from 'src/entity/user_files.entity';
 import conf from 'src/config/config';
-import * as ffmpeg from 'ffmpeg';
+// import * as ffmpeg from 'ffmpeg';
 import * as fs from 'fs';
 import * as cmd from 'child_process';
 import * as path from 'path';
