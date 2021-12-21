@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2021-01-09 13:37:25
- * @LastEditTime 2021-12-14 22:24
+ * @LastEditTime 2021-12-16 11:36
  * @Description: 流视频DEMO
  * 
 -->
@@ -36,7 +36,7 @@ export default {
     }
 
     this.videoList.push(
-      "8a8b0118c620cba9363eefe843491322f282a87efa4481a97500dca0bf2a70b2.mp4"
+      "m2+c7R+kU2IF4Kn8v9c/kCJqZGx5f2Ioj3XOX6HxXjTg7X1gXnTXMz9C4lTvk7ql4m39H6UXqdcKF8SbUzI5VU0ronOI+aYmYMRglsAVGWawtXD41vrJEfonMiM3fdD9+ehR+LDcjfAuPYc/aoAbzJcxnBBkwD7YKyvPB+hrvDA="
     );
 
     // this.$http.post(`${this.$store.state.serve.serveUrl}video/playVideoSteam`, {

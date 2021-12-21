@@ -1,5 +1,6 @@
+import { Response } from 'express';
 import { AjaxResult } from 'src/utils/ajax-result.classes';
-import { Controller, Post, Body, Inject } from '@nestjs/common';
+import { Controller, Post, Body, Inject, Res, Header } from '@nestjs/common';
 import { StringUtils } from 'src/utils/StringUtils';
 import { VideoService } from './video.service';
 import MathTools from 'src/utils/MathTools';
@@ -27,6 +28,23 @@ export class VideoController {
     @Inject(VideoService)
     private readonly videoService: VideoService,
   ) {}
+
+  /**
+   * 播放视频流
+   * @param id
+   * @returns
+   */
+  @Post('playVideoSteam')
+  async playVideoSteam(
+    @Res({ passthrough: false }) res,
+    @Body() { id, range },
+  ) {
+    if (!StringUtils.hasText(id)) {
+      return AjaxResult.fail('参数错误');
+    }
+    const decryptId = id == '0' ? 0 : parseInt(MathTools.decryptForKey(id));
+    return this.videoService.playVideoSteam(res, decryptId, range);
+  }
 
   /**
    * 获取视频缩略图

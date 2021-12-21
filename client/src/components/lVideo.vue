@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2021-01-25 15:02:00
- * @LastEditTime: 2021-01-27 12:57:16
+ * @LastEditTime 2021-12-16 13:07
  * @Description: L视频播放器组件
  * 
 -->
@@ -100,11 +100,11 @@ export default {
     this.destroyBlobUrl(this.$refs.video.src);
     // 设置 媒体的编码类型
   //  var mime = 'video/webm; codecs="vorbis,vp8"';
-   var mime = 'video/mp4; codecs="avc1.42E01E,mp4a.40.2"';
-   var sourceBuffer = this.mediaSource.addSourceBuffer(mime);
+   const mime = 'video/mp4; codecs="avc1.42E01E,mp4a.40.2"';
+   let sourceBuffer = this.mediaSource.addSourceBuffer(mime);
 
    this.$http.post(`${this.$store.state.serve.serveUrl}video/playVideoSteam`, {
-      name: `${this.videoList[this.index]}`
+      id: `${this.videoList[this.index]}`
     },{
       responseType:'arraybuffer'
     }).then(res => {
@@ -116,12 +116,12 @@ export default {
                                 this.$refs.video.play().then(function() {}).catch(function(err) {
                                     console.log(err)
                                 });
+                            }else {
+                              console.log(this.mediaSource.readyState,"没动作？",sourceBuffer.updating)
                             }
                         });
                         console.log(res);
       sourceBuffer.appendBuffer(res.data);
-      
-
     }).catch(err => {
       console.log(err);
     })
