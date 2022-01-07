@@ -30,7 +30,7 @@ const routes = [{
         component: loginAndRegistered,
         name: "login",
         meta: {
-            title: '登录对象内部云盘'
+            title: '登录对象云盘'
         }
     },
     {
@@ -38,7 +38,7 @@ const routes = [{
         component: registered,
         name: "registered",
         meta: {
-            title: '注册对象内部云盘'
+            title: '注册对象云盘'
         }
     },
     {
@@ -46,14 +46,14 @@ const routes = [{
         component: home,
         name: "home",
         meta: {
-            title: '对象内部云盘'
+            title: '对象云盘'
         },
         children: [{
                 path: "/home/drive/:folderId",
                 component: drive,
                 name: "drive",
                 meta: {
-                    title: '对象内部云盘'
+                    title: '对象云盘'
                 }
             },
             {
@@ -61,7 +61,7 @@ const routes = [{
                 component: driveResourcePool,
                 name: "driveResourcePool",
                 meta: {
-                    title: '对象内部云盘-资源池'
+                    title: '对象云盘-资源池'
                 }
             },
             {
@@ -69,7 +69,7 @@ const routes = [{
                 component: iconList,
                 name: "iconList",
                 meta: {
-                    title: '对象内部云盘-图标库'
+                    title: '对象云盘-图标库'
                 }
             },
             {
@@ -77,7 +77,7 @@ const routes = [{
                 component: streamingVideo,
                 name: "streamingVideo",
                 meta: {
-                    title: '对象内部云盘-视频流DEMO'
+                    title: '对象云盘-视频流DEMO'
                 }
             },
             {
@@ -85,7 +85,7 @@ const routes = [{
                 component: interactiveEffect,
                 name: "interactiveEffect",
                 meta: {
-                    title: '对象内部云盘-交互效果DEMO'
+                    title: '对象云盘-交互效果DEMO'
                 }
             },
         ],

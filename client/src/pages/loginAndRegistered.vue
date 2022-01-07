@@ -1,9 +1,9 @@
 <!--
  * @Author: LRolinx
  * @Date: 2021-10-23 10:40:52
- * @LastEditTime: 2021-10-24 18:20:25
+ * @LastEditTime 2021-12-15 13:35
  * @Description: 登录与注册
- * 
+ *
 -->
 <template>
   <div class="container">
@@ -15,11 +15,7 @@
 
         <div class="rememberMeBox">
           <label class="rememberMeBoxLabel">记住账号</label>
-          <div
-            class="switchBox"
-            :class="{ switchBoxOn: rememberMe }"
-            @click="switchRememberMe"
-          >
+          <div class="switchBox" :class="{ switchBoxOn: rememberMe }" @click="switchRememberMe">
             <div class="switch" :class="{ switchOn: rememberMe }"></div>
           </div>
         </div>
@@ -28,37 +24,12 @@
       </form>
       <form class="sign-up-form">
         <h6 class="form-title">注册</h6>
-        <input
-          v-model="nickName"
-          type="text"
-          placeholder="昵称"
-          maxlength="32"
-        />
-        <input
-          v-model="account"
-          type="text"
-          placeholder="用户名"
-          maxlength="32"
-        />
-        <input
-          v-model="password"
-          type="password"
-          placeholder="密码"
-          maxlength="32"
-        />
-        <input
-          v-model="confirmPassword"
-          type="password"
-          placeholder="重复密码"
-          maxlength="32"
-        />
+        <input v-model="nickName" type="text" placeholder="昵称" maxlength="32" />
+        <input v-model="account" type="text" placeholder="用户名" maxlength="32" />
+        <input v-model="password" type="password" placeholder="密码" maxlength="32" />
+        <input v-model="confirmPassword" type="password" placeholder="重复密码" maxlength="32" />
         <div class="verificationCodeInputBox">
-          <l-verification-code-input
-            class="verificationCodeInput"
-            :maxLength="6"
-            placeholder="注册码"
-            :value.sync="registeredCode"
-          ></l-verification-code-input>
+          <l-verification-code-input class="verificationCodeInput" :maxLength="6" placeholder="注册码" :value.sync="registeredCode"></l-verification-code-input>
         </div>
         <div class="submit-btn" @click="registered">立即注册</div>
       </form>
@@ -77,28 +48,18 @@
         <img src="../assets/img/register.svg" alt="" />
       </div>
     </div>
-
-    <!-- 提示模态窗 -->
-    <tipMessge
-      :showTipMessge.sync="isShowTipMessge"
-      :text="showTipText"
-    ></tipMessge>
   </div>
 </template>
 
 <script>
-import tipMessge from "@/components/tipMessge";
 import lVerificationCodeInput from "../components/lVerificationCodeInput";
 export default {
   components: {
-    tipMessge,
     lVerificationCodeInput,
   },
   data() {
     return {
       isRegistered: false, //是否是注册
-      isShowTipMessge: false, //是否显示提示模态窗
-      showTipText: "", //显示提示内容
       nickName: "",
       account: "",
       password: "",
@@ -157,85 +118,71 @@ export default {
     login() {
       //登录
       if (this.account == "" || this.account == null) {
-        this.showTipText = "用户名不能为空";
-        this.isShowTipMessge = true;
+        this.$tipMessge("用户名不能为空");
         return;
       }
       if (this.password == "" || this.password == null) {
-        this.showTipText = "密码不能为空";
-        this.isShowTipMessge = true;
+        this.$tipMessge("密码不能为空");
         return;
       }
       this.$http
-        .post(`${this.$store.state.serve.serveUrl}users/objectCloudDiskLogin`, {
+        .post(`${this.$store.state.serve.serveUrl}user/objectCloudDiskLogin`, {
           account: this.account,
           password: this.password,
         })
         .then((res) => {
-          switch (res.data.code) {
-            case 200:
-              if (this.rememberMe) {
-                localStorage.setItem("account", this.encryption(this.account));
-                localStorage.setItem(
-                  "password",
-                  this.encryption(this.password)
-                );
-              } else {
-                localStorage.removeItem("account");
-                localStorage.removeItem("password");
-              }
+          if (res.data.code == 200) {
+            if (this.rememberMe) {
+              localStorage.setItem("account", this.encryption(this.account));
+              localStorage.setItem("password", this.encryption(this.password));
+            } else {
+              localStorage.removeItem("account");
+              localStorage.removeItem("password");
+            }
 
-              sessionStorage.setItem("isLogin", true);
-              sessionStorage.setItem("id", res.data.data.id);
-              sessionStorage.setItem("photo", res.data.data.photo);
-              sessionStorage.setItem("nickname", res.data.data.nickname);
+            sessionStorage.setItem("isLogin", true);
+            sessionStorage.setItem("id", res.data.data.id);
+            sessionStorage.setItem("photo", res.data.data.photo);
+            sessionStorage.setItem("nickname", res.data.data.nickName);
 
-              this.$store.state.isLogin = true;
-              this.$store.state.id = res.data.data.id;
-              this.$store.state.photo = res.data.data.photo;
-              this.$store.state.nickname = res.data.data.nickname;
-              this.$router.push({ name: "drive" });
-              break;
-            case 500:
-              this.showTipText = res.data.msg;
-              this.isShowTipMessge = true;
-              break;
+            this.$store.state.isLogin = true;
+            this.$store.state.id = res.data.data.id;
+            this.$store.state.photo = res.data.data.photo;
+            this.$store.state.nickname = res.data.data.nickName;
+            this.$router.push({ name: "drive" });
+          } else {
+            this.$tipMessge(res.data.message);
           }
         })
         .catch((err) => {
-          console.log(err);
+          this.$tipMessge(err.data.message);
         });
     },
     registered() {
       //注册
       if (this.nickName == "") {
-        this.showTipText = "昵称不能为空";
-        this.isShowTipMessge = true;
+        this.$tipMessge("昵称不能为空");
         return;
       }
       if (this.account == "") {
-        this.showTipText = "用户名不能为空";
-        this.isShowTipMessge = true;
+        this.$tipMessge("用户名不能为空");
         return;
       }
       if (this.password == "") {
-        this.showTipText = "密码不能为空";
-        this.isShowTipMessge = true;
+        this.$tipMessge("密码不能为空");
         return;
       }
       if (this.confirmPassword == "") {
-        this.showTipText = "确认密码不能为空";
-        this.isShowTipMessge = true;
+        this.$tipMessge("确认密码不能为空");
         return;
       }
       if (this.registeredCode == "") {
-        this.showTipText = "注册码不能为空";
-        this.isShowTipMessge = true;
+        this.$tipMessge("注册码不能为空");
         return;
       }
       this.$http
         .post(
-          `${this.$store.state.serve.serveUrl}users/objectCloudDiskRegistered`,
+          `${this.$store.state.serve.serveUrl}user/objectCloudDiskRegistered`,
           {
             nickName: this.nickName,
             account: this.account,
@@ -245,20 +192,13 @@ export default {
           }
         )
         .then((res) => {
-          switch (res.data.code) {
-            case 200:
-              this.$router.push({ name: "login" });
-              this.showTipText = res.data.msg;
-              this.isShowTipMessge = true;
-              break;
-            case 500:
-              this.showTipText = res.data.msg;
-              this.isShowTipMessge = true;
-              break;
+          if (res.data.code == 200) {
+            this.$router.push({ name: "login" });
           }
+          this.$tipMessge(res.data.message);
         })
         .catch((err) => {
-          console.log(err);
+          this.$tipMessge(err.data.message);
         });
     },
     resetInput() {
@@ -387,13 +327,13 @@ input::placeholder {
   left: 0;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
+  user-select: none;
 }
 .desc-warp-item {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   justify-content: space-around;
-  text-align: center;
   text-align: center;
   padding: 0rem 17% 0rem 12%;
   z-index: 6;

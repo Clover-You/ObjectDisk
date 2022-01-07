@@ -1,7 +1,11 @@
 # objectCloudDiskClient
 
 #### 介绍
-objectCloudDiskClient
+1. 人性化页面，不用担心不会使用
+
+#### 非常感谢以下开源
+![img](https://github.com/zeroojs/landing-ux/raw/main/doc/preview.jpg)
+登录与注册页面 https://github.com/zeroojs/landing-ux
 
 #### 软件架构
 软件架构说明

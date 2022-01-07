@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2021-01-05 22:39:52
- * @LastEditTime: 2021-01-24 18:20:25
+ * @LastEditTime 2021-12-14 22:18
  * @Description: 登录
  * 
 -->
@@ -25,41 +25,32 @@
         <!-- <a class="button bgGreen" href="/publicFile">公开的文件</a> -->
       </div>
     </div>
-
-    <!-- 提示模态窗 -->
-    <tipMessge :showTipMessge.sync="isShowTipMessge" :text="showTipText"></tipMessge>
   </div>
 </template>
 <script>
-import tipMessge from "@/components/tipMessge";
 export default {
-  components: {
-    tipMessge
-  },
   data() {
     return {
-      isShowTipMessge: false,//是否显示提示模态窗
-      showTipText: "",//显示提示内容
-      account: '',
-      password: '',
-      rememberMe: false,//记住账号
-    }
+      account: "",
+      password: "",
+      rememberMe: false, //记住账号
+    };
   },
   created() {
-    if(localStorage.getItem("account") != null) {
+    if (localStorage.getItem("account") != null) {
       this.account = this.decrypt(localStorage.getItem("account"));
     }
 
-    if(localStorage.getItem("password") != null) {
+    if (localStorage.getItem("password") != null) {
       this.password = this.decrypt(localStorage.getItem("password"));
     }
     if (this.account && this.password) {
       this.rememberMe = true;
     }
 
-    this.$store.state.isLogin = sessionStorage.getItem('isLogin');
+    this.$store.state.isLogin = sessionStorage.getItem("isLogin");
     if (this.$store.state.isLogin) {
-      this.$router.replace({ name: 'drive' });//已登录直接进入云盘
+      this.$router.replace({ name: "drive" }); //已登录直接进入云盘
     }
   },
   methods: {
@@ -69,11 +60,11 @@ export default {
     },
     gotoLogin() {
       //跳转到登录
-      this.$router.replace({ name: 'registered' });
+      this.$router.replace({ name: "registered" });
     },
     gotoRgistered() {
       //跳转到注册
-      this.$router.replace({ name: 'registered' });
+      this.$router.replace({ name: "registered" });
     },
     keydown(e) {
       if (e.keyCode == 13) {
@@ -82,64 +73,61 @@ export default {
     },
     login() {
       //登录
-      if (this.account == '' || this.account == null) {
-        this.showTipText = "账号不能为空";
-        this.isShowTipMessge = true;
+      if (this.account == "" || this.account == null) {
+        this.$tipMessge('账号不能为空')
         return;
       }
-      if (this.password == '' || this.password == null) {
-        this.showTipText = "密码不能为空";
-        this.isShowTipMessge = true;
+      if (this.password == "" || this.password == null) {
+        this.$tipMessge('密码不能为空')
         return;
       }
-      this.$http.post(`${this.$store.state.serve.serveUrl}users/objectCloudDiskLogin`, {
-        account: this.account,
-        password: this.password
-      }).then(res => {
-        switch (res.data.code) {
-          case 200:
+      this.$http
+        .post(`${this.$store.state.serve.serveUrl}users/objectCloudDiskLogin`, {
+          account: this.account,
+          password: this.password,
+        })
+        .then((res) => {
+          if (res.data.code == 200) {
             if (this.rememberMe) {
               localStorage.setItem("account", this.encryption(this.account));
-              localStorage.setItem("password",this.encryption(this.password));
-            }else {
-              localStorage.removeItem("account")
-              localStorage.removeItem("password")
+              localStorage.setItem("password", this.encryption(this.password));
+            } else {
+              localStorage.removeItem("account");
+              localStorage.removeItem("password");
             }
 
-            sessionStorage.setItem('isLogin', true);
-            sessionStorage.setItem('id', res.data.data.id);
-            sessionStorage.setItem('photo', res.data.data.photo);
-            sessionStorage.setItem('nickname', res.data.data.nickname);
+            sessionStorage.setItem("isLogin", true);
+            sessionStorage.setItem("id", res.data.data.id);
+            sessionStorage.setItem("photo", res.data.data.photo);
+            sessionStorage.setItem("nickname", res.data.data.nickname);
 
             this.$store.state.isLogin = true;
             this.$store.state.id = res.data.data.id;
             this.$store.state.photo = res.data.data.photo;
             this.$store.state.nickname = res.data.data.nickname;
-            this.$router.push({ name: 'drive' });
-            break;
-          case 500:
-            this.showTipText = res.data.msg;
-            this.isShowTipMessge = true;
-            break;
-        }
-      }).catch(err => {
-        console.log(err);
-      })
+            this.$router.push({ name: "drive" });
+          } else {
+            this.$tipMessge(res.data.message)
+          }
+        })
+        .catch((err) => {
+          this.$tipMessge(err.data.message)
+        });
     },
     encryption(str) {
       //加密
-      let num1 = window.btoa(str).replace(/=/g,"··");
-      let num2 = window.btoa(num1).replace(/=/g,"s+");
+      let num1 = window.btoa(str).replace(/=/g, "··");
+      let num2 = window.btoa(num1).replace(/=/g, "s+");
       return num2;
     },
     decrypt(str) {
       //解密
-      let num1 = window.atob(str.replace(/s\+/g,"="));
-      let num2 = window.atob(num1.replace(/··/g,"="));
+      let num1 = window.atob(str.replace(/s\+/g, "="));
+      let num2 = window.atob(num1.replace(/··/g, "="));
       return num2;
-    }
-  }
-}
+    },
+  },
+};
 </script>
 <style scoped>
 .body {
@@ -264,7 +252,6 @@ export default {
   box-shadow: 1px 2px 2px 0 rgba(0, 0, 0, 0.05), 0 2px 2px 0 rgba(0, 0, 0, 0.1),
     0 3px 3px 0 rgba(0, 0, 0, 0.05);
   transition: ease-in 0.2s;
-  
 }
 
 .switchOn {
