@@ -1,12 +1,15 @@
 /*
  * @Author: LRolinx
  * @Date: 2020-11-20 09:36:28
- * @LastEditTime: 2021-01-23 21:07:20
+ * @LastEditTime: 2022-03-16 17:39:29
  * @Description: app路由
  * 
  */
-import Vue from "vue";
-import VueRouter from "vue-router";
+// import Vue from "vue";
+
+import { createRouter, createWebHistory } from "vue-router";
+// 还有 createWebHashHistory 和 createMemoryHistory
+
 
 // 引入组件
 // import login from "../pages/login.vue"; //登录
@@ -23,93 +26,93 @@ import error404 from "../pages/error404.vue"; //404错误
 import error500 from "../pages/error500.vue"; //500错误
 
 // 使用 vueRouter
-Vue.use(VueRouter);
+// Vue.use(VueRouter);
 
 const routes = [{
-        path: "/login",
-        component: loginAndRegistered,
-        name: "login",
-        meta: {
-            title: '登录对象云盘'
-        }
+    path: "/login",
+    component: loginAndRegistered,
+    name: "login",
+    meta: {
+        title: '登录对象云盘'
+    }
+},
+{
+    path: "/registered",
+    component: registered,
+    name: "registered",
+    meta: {
+        title: '注册对象云盘'
+    }
+},
+{
+    path: "/home",
+    component: home,
+    name: "home",
+    meta: {
+        title: '对象云盘'
     },
-    {
-        path: "/registered",
-        component: registered,
-        name: "registered",
-        meta: {
-            title: '注册对象云盘'
-        }
-    },
-    {
-        path: "/home",
-        component: home,
-        name: "home",
+    children: [{
+        path: "/home/drive/:folderId",
+        component: drive,
+        name: "drive",
         meta: {
             title: '对象云盘'
-        },
-        children: [{
-                path: "/home/drive/:folderId",
-                component: drive,
-                name: "drive",
-                meta: {
-                    title: '对象云盘'
-                }
-            },
-            {
-                path: "/home/driveResourcePool",
-                component: driveResourcePool,
-                name: "driveResourcePool",
-                meta: {
-                    title: '对象云盘-资源池'
-                }
-            },
-            {
-                path: "/home/iconList",
-                component: iconList,
-                name: "iconList",
-                meta: {
-                    title: '对象云盘-图标库'
-                }
-            },
-            {
-                path: "/home/streamingVideo",
-                component: streamingVideo,
-                name: "streamingVideo",
-                meta: {
-                    title: '对象云盘-视频流DEMO'
-                }
-            },
-            {
-                path: "/home/interactiveEffect",
-                component: interactiveEffect,
-                name: "interactiveEffect",
-                meta: {
-                    title: '对象云盘-交互效果DEMO'
-                }
-            },
-        ],
+        }
     },
     {
-        path: "/error404",
-        component: error404,
-        name: "error404",
+        path: "/home/driveResourcePool",
+        component: driveResourcePool,
+        name: "driveResourcePool",
+        meta: {
+            title: '对象云盘-资源池'
+        }
     },
     {
-        path: "/error500",
-        component: error500,
-        name: "error500",
+        path: "/home/iconList",
+        component: iconList,
+        name: "iconList",
+        meta: {
+            title: '对象云盘-图标库'
+        }
     },
     {
-        // 重定向到登录
-        path: '/',
-        redirect: '/login'
+        path: "/home/streamingVideo",
+        component: streamingVideo,
+        name: "streamingVideo",
+        meta: {
+            title: '对象云盘-视频流DEMO'
+        }
     },
     {
-        // 没这个路径
-        path: '**',
-        redirect: '/error404' //重定向到404
+        path: "/home/interactiveEffect",
+        component: interactiveEffect,
+        name: "interactiveEffect",
+        meta: {
+            title: '对象云盘-交互效果DEMO'
+        }
     },
+    ],
+},
+{
+    path: "/error404",
+    component: error404,
+    name: "error404",
+},
+{
+    path: "/error500",
+    component: error500,
+    name: "error500",
+},
+{
+    // 重定向到登录
+    path: '/',
+    redirect: '/login'
+},
+{
+    // 没这个路径
+    path: '/:pathMatch(.*)*',
+    redirect: '/error404' //重定向到404
+},
     // {
     //   path: "/blog",
     //   component: blog,
@@ -143,10 +146,15 @@ const routes = [{
     // }
 ]
 
-var router = new VueRouter({
-    mode: 'history', //去掉url中的#
+const router = createRouter({
+    history: createWebHistory(),
     routes
 })
+
+// var router = new VueRouter({
+//     mode: 'history', //去掉url中的#
+//     routes
+// })
 
 router.beforeEach((to, from, next) => {
     /* 路由发生变化修改页面title */

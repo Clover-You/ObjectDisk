@@ -5,10 +5,10 @@
  * @Description: 
  * 
  */
-import Vuex from "vuex";
+import {createStore} from "vuex";
 import serve from "./modules/serve"
 
-const store = Vuex.createStore({
+export default createStore({
   modules: {
     serve
   },
@@ -34,4 +34,4 @@ const store = Vuex.createStore({
   },
 });
 
-export default store;
+// export default store;

@@ -16,24 +16,25 @@
  * @create 2021-12-14 20:14
  */
 
-import Vue from 'vue'
-import tipmessge from './tipMessge.vue'
+// import {createApp} from 'vue'
+// import tipmessge from './tipMessge.vue'
+// const Vue = createApp()
 
-let ToastConstrutor = Vue.extend(tipmessge);
-let instance;
+// let ToastConstrutor = Vue.extend(tipmessge);
+// let instance;
 
-const tipMessge = function(options) {
-    if (typeof options === 'string') {
-        options = {
-            text: options
-        }
-    }
+// const tipMessge = function(options) {
+//     if (typeof options === 'string') {
+//         options = {
+//             text: options
+//         }
+//     }
 
-    instance = new ToastConstrutor({
-        data: options
-    })
+//     instance = new ToastConstrutor({
+//         data: options
+//     })
 
-    document.body.appendChild(instance.$mount().$el)
-}
+//     document.body.appendChild(instance.$mount().$el)
+// }
 
-export default tipMessge
+// export default tipMessge
