@@ -6,11 +6,9 @@
  * 
  */
 import Vuex from "vuex";
-import Vue from 'vue';
 import serve from "./modules/serve"
-Vue.use(Vuex);
 
-const store = new Vuex.Store({
+const store = Vuex.createStore({
   modules: {
     serve
   },

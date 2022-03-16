@@ -103,11 +103,11 @@
     </div>
 
     <!-- 新建模态窗 -->
-    <newFile @oneFile="oneFile" :isShowNewFileModel.sync="isShowNewFileModel"></newFile>
+    <newFile @oneFile="oneFile" v-model:isShowNewFileModel="isShowNewFileModel"></newFile>
     <!-- 新建文件夹模态窗 -->
-    <newFolder :isShowNewFolderModel.sync="isShowNewFolderModel" @changeValue="addUserFolder"></newFolder>
+    <newFolder v-model:isShowNewFolderModel="isShowNewFolderModel" @changeValue="addUserFolder"></newFolder>
     <!-- 视频模态窗 -->
-    <lVideo :videoList="videoList" :isShow.sync="isShowlVideo"></lVideo>
+    <lVideo :videoList="videoList" v-model:isShow="isShowlVideo"></lVideo>
     <lPicture :isShow="false"></lPicture>
   </div>
 </template>

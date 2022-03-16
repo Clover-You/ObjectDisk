@@ -17,7 +17,7 @@
 
         <div class="verificationCodeInputBox">
           <label>内部注册码</label>
-          <l-verification-code-input class="verificationCodeInput" :maxLength="6" placeholder="内部注册码" :value.sync="registeredCode"></l-verification-code-input>
+          <l-verification-code-input class="verificationCodeInput" :maxLength="6" placeholder="内部注册码" v-model:value="registeredCode"></l-verification-code-input>
         </div>
 
         <!-- <input v-model="registeredCode" class="zp-input" type="password" placeholder="对象内部注册码" maxlength="10"> -->

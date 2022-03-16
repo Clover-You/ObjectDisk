@@ -6,7 +6,7 @@
  *
  */
 import './static/css/iconFont.css'
-import Vue from 'vue'
+import Vue, { createApp } from 'vue';
 import store from './store'
 import VueRouter from 'vue-router'
 // import VueAxios from 'vue-axios'
@@ -25,13 +25,10 @@ import VueVirtualScroller from 'vue-virtual-scroller'
 
 Vue.prototype.$http = axios;
 Vue.component('lPromptBox', lPromptBox);
-Vue.config.productionTip = false
-    //使用全局提示组件
 Vue.prototype.$tipMessge = tipMessge;
 Vue.prototype.$dialogMessge = dialogMessge;
 
 Vue.use(VueVirtualScroller)
-Vue.use(VueRouter);
 
 // 解决ElementUI导航栏中的vue-router在3.0版本以上重复点菜单报错问题
 const originalPush = VueRouter.prototype.push
@@ -42,8 +39,4 @@ VueRouter.prototype.push = function push(location) {
 // Vue.use(VueAxios, axios);
 
 
-new Vue({
-    store,
-    router,
-    render: h => h(App),
-}).$mount('#app')
+createApp(App).use(router).use(store).mount('#app')

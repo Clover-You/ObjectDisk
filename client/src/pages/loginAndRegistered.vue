@@ -29,7 +29,7 @@
         <input v-model="password" type="password" placeholder="密码" maxlength="32" />
         <input v-model="confirmPassword" type="password" placeholder="重复密码" maxlength="32" />
         <div class="verificationCodeInputBox">
-          <l-verification-code-input class="verificationCodeInput" :maxLength="6" placeholder="注册码" :value.sync="registeredCode"></l-verification-code-input>
+          <l-verification-code-input class="verificationCodeInput" :maxLength="6" placeholder="注册码" v-model:value="registeredCode"></l-verification-code-input>
         </div>
         <div class="submit-btn" @click="registered">立即注册</div>
       </form>

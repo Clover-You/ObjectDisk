@@ -12,7 +12,7 @@
 
     </div>
     <!-- <video id="DEMO" controls></video> -->
-    <lVideo :videoList="videoList" :isShow.sync="isShow"></lVideo>
+    <lVideo :videoList="videoList" v-model:isShow="isShow"></lVideo>
     <!-- <video class="video" :src="`${$store.state.serve.serveUrl}video/playVideo?name=59b615ae720a9912661f22d4608db65dc6d5a576bf3d9f95296ec25002efd06a.mp4`" controls></video> -->
     <!-- <video width="100%" class="video" id="video" ref="video" :src="lsSrc" controls @loadedmetadata="destroyBlobUrl(lsSrc)"></video> -->
   </div>

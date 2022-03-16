@@ -36,7 +36,7 @@ export default {
     this.notOpenMovenNatural = this.isPc();
     addEventListener("resize", this.scrollResize);
   },
-  destroyed() {
+  unmounted() {
     //离开事件
     removeEventListener("resize",this.scrollResize);
   },
