@@ -1,7 +1,7 @@
 /*
  * @Author: LRolinx
  * @Date: 2020-11-20 09:36:28
- * @LastEditTime: 2022-03-16 17:39:29
+ * @LastEditTime: 2022-03-16 19:22:11
  * @Description: app路由
  * 
  */
@@ -12,8 +12,6 @@ import { createRouter, createWebHistory } from "vue-router";
 
 
 // 引入组件
-// import login from "../pages/login.vue"; //登录
-import registered from "../pages/registered.vue"; //注册
 import loginAndRegistered from "../pages/loginAndRegistered.vue"; //登录与注册
 
 import home from "../pages/home.vue"; //主页
@@ -34,14 +32,6 @@ const routes = [{
     name: "login",
     meta: {
         title: '登录对象云盘'
-    }
-},
-{
-    path: "/registered",
-    component: registered,
-    name: "registered",
-    meta: {
-        title: '注册对象云盘'
     }
 },
 {

@@ -1,7 +1,7 @@
 <!--
  * @Author: LRolinx
  * @Date: 2021-10-23 10:40:52
- * @LastEditTime 2021-12-15 13:35
+ * @LastEditTime: 2022-03-16 17:45:34
  * @Description: 登录与注册
  *
 -->
@@ -193,7 +193,8 @@ export default {
         )
         .then((res) => {
           if (res.data.code == 200) {
-            this.$router.push({ name: "login" });
+            // this.$router.push({ name: "login" });
+            this.switchLogin();
           }
           this.$tipMessge(res.data.message);
         })

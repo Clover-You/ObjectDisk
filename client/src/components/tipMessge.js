@@ -16,25 +16,18 @@
  * @create 2021-12-14 20:14
  */
 
-// import {createApp} from 'vue'
-// import tipmessge from './tipMessge.vue'
-// const Vue = createApp()
+// import { createApp } from 'vue'
+// import Tipmessge from './tipMessge.vue'
 
-// let ToastConstrutor = Vue.extend(tipmessge);
-// let instance;
+// export default {
+//     install: function (app) {
+//         let tipmessge = createApp(Tipmessge)
+//         let div = document.createElement("div")
+//         div.id = "tipMessge"
+//         document.body.appendChild(div)
+//         let tipmessgeInstance = tipmessge.mount("#tipMessge")
 
-// const tipMessge = function(options) {
-//     if (typeof options === 'string') {
-//         options = {
-//             text: options
-//         }
+//         // instance.click 中的click 指向message.vue 中的事件
+//         app.config.globalProperties.$tipMessge = tipmessgeInstance;
 //     }
-
-//     instance = new ToastConstrutor({
-//         data: options
-//     })
-
-//     document.body.appendChild(instance.$mount().$el)
 // }
-
-// export default tipMessge

@@ -1,12 +1,12 @@
 <!--
  * @Author: LRolinx
  * @Date: 2021-01-24 17:44:47
- * @LastEditTime 2021-12-14 21:42
+ * @LastEditTime: 2022-03-16 19:07:02
  * @Description: 提示模态窗
  * 
 -->
 <template>
-  <div class="componentBody">
+  <div id="tipMessge" class="componentBody">
     <div class="contentBox">
       <p>{{title}}</p>
       <span>{{text}}</span>
