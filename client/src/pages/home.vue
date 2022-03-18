@@ -59,8 +59,8 @@
 </template>
 
 <script>
-import {toRefs,getCurrentInstance} from "vue"
-import {useStore} from "@/store/index.ts"
+import { toRefs, getCurrentInstance } from "vue";
+import { useStore } from "@/store/index.ts";
 import uploadModal from "@/components/uploadModal.vue";
 import { sha256 } from "js-sha256";
 
@@ -74,20 +74,24 @@ export default {
       uploadBufferPool: [], //上传缓冲池
       uploadSetTimeOut: null, //延迟倒计时
       uploadRemainingTask: 0, //剩余上传任务
-    }
+    };
     const store = useStore();
-    const {appContext} = getCurrentInstance();
-    const globalProperties = appContext.config.globalProperties
-
+    const { appContext } = getCurrentInstance();
+    const globalProperties = appContext.config.globalProperties;
 
     const judgmentIsLogin = () => {
       //检查登录
-
-      if (!store.isLogin) {
+      if (!sessionStorage.isLogin) {
         sessionStorage.setItem("siderbarStr", "drive"); //重置最后路由
         globalProperties.$router.replace({ name: "login" }); //没登录直接回到登录页
+      } else {
+        //已登录
+        store.isLogin = sessionStorage.isLogin;
+        store.id = sessionStorage.id;
+        store.photo = sessionStorage.photo;
+        store.nickname = sessionStorage.nickname;
       }
-    }
+    };
 
     // 检查登录状态
     judgmentIsLogin();
@@ -96,32 +100,30 @@ export default {
       store.siderbarStr = sessionStorage.getItem("siderbarStr");
     }
 
-    
-
     const openDrive = () => {
       //打开我的云盘
       this.$router.push({ name: "drive" });
-    }
+    };
 
     const openDriveResourcePool = () => {
       // 打开资源池
       this.$router.push({ name: "driveResourcePool" });
-    }
+    };
 
     const openIconList = () => {
       //打开图标库
       this.$router.push({ name: "iconList" });
-    }
+    };
 
     const openStreamingVideo = () => {
       //打开视频流DEMO
       this.$router.push({ name: "streamingVideo" });
-    }
+    };
 
     const openInteractiveEffect = () => {
       //打开交互效果DEMO
       this.$router.push({ name: "interactiveEffect" });
-    }
+    };
 
     const distributionTask = () => {
       //分配任务
@@ -132,7 +134,7 @@ export default {
           this.upLoadFun(this.uploadBufferPool[i]);
         }
       }
-    }
+    };
 
     const setTaskState = (item, stateCode, ano) => {
       //设置任务状态
@@ -144,8 +146,8 @@ export default {
       } else if (ano == 1) {
         ++this.uploadRemainingTask;
       }
-    }
-    
+    };
+
     const upLoadFun = (item) => {
       if (item.file.size <= 0) {
         //文件太小,无法上传
@@ -248,17 +250,14 @@ export default {
                   //秒传文件
 
                   this.$http
-                    .post(
-                      `${store.serve.serveUrl}upload/uploadSecondPass`,
-                      {
-                        userid: store.id,
-                        folderid: item.folderId,
-                        fileName: item.fname,
-                        filePath: item.filePath,
-                        fileExt: item.fext,
-                        fileSha256: item.fileSha256,
-                      }
-                    )
+                    .post(`${store.serve.serveUrl}upload/uploadSecondPass`, {
+                      userid: store.id,
+                      folderid: item.folderId,
+                      fileName: item.fname,
+                      filePath: item.filePath,
+                      fileExt: item.fext,
+                      fileSha256: item.fileSha256,
+                    })
                     .then((SecondPass) => {
                       if (SecondPass.data.code == 200) {
                         this.$refs.childRouter.getUserFileAndFolder(
@@ -287,7 +286,7 @@ export default {
             console.log(err);
           });
       };
-    }
+    };
 
     const calculateSliceSize = (size) => {
       //计算分段
@@ -299,9 +298,7 @@ export default {
       } else {
         return 10;
       }
-    }
-
-
+    };
 
     return {
       ...toRefs(data),
@@ -315,8 +312,8 @@ export default {
       distributionTask,
       setTaskState,
       upLoadFun,
-      calculateSliceSize
-    }
+      calculateSliceSize,
+    };
   },
   watch: {
     $route(toRouter) {

@@ -793,7 +793,7 @@ export default {
       this.getUserFileAndFolder(this.getFolderId);
 
       //倒序删除导航
-      for (let i = this.currentFolder.length; i >= 0; i--) {
+      for (let i = this.currentFolder.length; i >  0; i--) {
         if (
           this.getFolderId !=
           this.currentFolder[this.currentFolder.length - 1].id
