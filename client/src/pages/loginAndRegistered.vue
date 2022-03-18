@@ -52,89 +52,97 @@
 </template>
 
 <script>
+import {toRefs,getCurrentInstance} from "vue"
 import lVerificationCodeInput from "../components/lVerificationCodeInput";
+import {useStore} from "@/store/index.ts"
 export default {
   components: {
     lVerificationCodeInput,
   },
-  data() {
-    return {
-      isRegistered: false, //是否是注册
+  setup() {
+    const data = {
+      isRegistered: false, //是否是注册页面
       nickName: "",
       account: "",
       password: "",
       confirmPassword: "",
       registeredCode: "",
       rememberMe: false, //记住账号
-    };
-  },
-  created() {
+    }
+
+    const {proxy,appContext} = getCurrentInstance();
+
+    const globalProperties = appContext.config.globalProperties
+
+    const store = useStore();
+
     if (localStorage.getItem("account") != null) {
-      this.account = this.decrypt(localStorage.getItem("account"));
+      data.account = decrypt(localStorage.getItem("account"));
     }
 
     if (localStorage.getItem("password") != null) {
-      this.password = this.decrypt(localStorage.getItem("password"));
+      data.password = decrypt(localStorage.getItem("password"));
     }
-    if (this.account && this.password) {
-      this.rememberMe = true;
+    if (data.account && data.password) {
+      data.rememberMe = true;
     }
 
-    this.$store.state.isLogin = sessionStorage.getItem("isLogin");
-    if (this.$store.state.isLogin) {
-      this.$router.replace({ name: "drive" }); //已登录直接进入云盘
+    store.isLogin = sessionStorage.getItem("isLogin");
+    if (store.isLogin) {
+      proxy.$router.replace({ name: "drive" }); //已登录直接进入云盘
     }
-  },
-  methods: {
-    switchRememberMe() {
+
+
+  const switchRememberMe = ()=> {
       //切换记住我开关
-      this.rememberMe = !this.rememberMe;
-    },
-    switchLogin() {
+      data.rememberMe = !data.rememberMe;
+    };
+   const switchLogin = () => {
       //切换到登录
-      this.isRegistered = false;
-      this.resetInput();
+      data.isRegistered = false;
+      resetInput();
       const container = document.querySelector(".container");
       container.classList.remove("sign-up-mode");
       document.title = "登录对象内部云盘";
-    },
-    switchRgistered() {
+    }
+    const switchRgistered = () => {
       //切换到注册
-      this.isRegistered = true;
-      this.resetInput();
+      data.isRegistered = true;
+      resetInput();
       const container = document.querySelector(".container");
       container.classList.add("sign-up-mode");
       document.title = "注册对象内部云盘";
-    },
-    keydown(e) {
+    }
+    const keydown = (e) => {
       if (e.keyCode == 13) {
-        if (!this.isRegistered) {
-          this.login();
+        if (!data.isRegistered) {
+          login();
         } else {
-          this.registered();
+          registered();
         }
       }
-    },
-    login() {
+    }
+    const login = () => {
       //登录
-      if (this.account == "" || this.account == null) {
-        this.$tipMessge("用户名不能为空");
+      if (data.account == "" || data.account == null) {
+
+        globalProperties.$tipMessge.open("用户名不能为空");
         return;
       }
-      if (this.password == "" || this.password == null) {
-        this.$tipMessge("密码不能为空");
+      if (data.password == "" || data.password == null) {
+        globalProperties.$tipMessge.open("密码不能为空");
         return;
       }
-      this.$http
-        .post(`${this.$store.state.serve.serveUrl}user/objectCloudDiskLogin`, {
-          account: this.account,
-          password: this.password,
+      proxy.$http
+        .post(`${store.serve.serveUrl}user/objectCloudDiskLogin`, {
+          account: data.account,
+          password: data.password,
         })
         .then((res) => {
           if (res.data.code == 200) {
-            if (this.rememberMe) {
-              localStorage.setItem("account", this.encryption(this.account));
-              localStorage.setItem("password", this.encryption(this.password));
+            if (data.rememberMe) {
+              localStorage.setItem("account", encryption(data.account));
+              localStorage.setItem("password", encryption(data.password));
             } else {
               localStorage.removeItem("account");
               localStorage.removeItem("password");
@@ -145,83 +153,99 @@ export default {
             sessionStorage.setItem("photo", res.data.data.photo);
             sessionStorage.setItem("nickname", res.data.data.nickName);
 
-            this.$store.state.isLogin = true;
-            this.$store.state.id = res.data.data.id;
-            this.$store.state.photo = res.data.data.photo;
-            this.$store.state.nickname = res.data.data.nickName;
-            this.$router.push({ name: "drive" });
+            store.isLogin = true;
+            store.id = res.data.data.id;
+            store.photo = res.data.data.photo;
+            store.nickname = res.data.data.nickName;
+            proxy.$router.push({ name: "drive" });
           } else {
-            this.$tipMessge(res.data.message);
+            proxy.$tipMessge(res.data.message);
           }
         })
         .catch((err) => {
-          this.$tipMessge(err.data.message);
+          console.log(err)
+          // globalProperties.$tipMessge.open(err.data.message);
         });
-    },
-    registered() {
+    }
+    const registered= () => {
       //注册
-      if (this.nickName == "") {
-        this.$tipMessge("昵称不能为空");
+      if (data.nickName == "") {
+        globalProperties.$tipMessge.open("昵称不能为空");
         return;
       }
-      if (this.account == "") {
-        this.$tipMessge("用户名不能为空");
+      if (data.account == "") {
+        globalProperties.$tipMessge.open("用户名不能为空");
         return;
       }
-      if (this.password == "") {
-        this.$tipMessge("密码不能为空");
+      if (data.password == "") {
+        globalProperties.$tipMessge.open("密码不能为空");
         return;
       }
-      if (this.confirmPassword == "") {
-        this.$tipMessge("确认密码不能为空");
+      if (data.confirmPassword == "") {
+        globalProperties.$tipMessge.open("确认密码不能为空");
         return;
       }
-      if (this.registeredCode == "") {
-        this.$tipMessge("注册码不能为空");
+      if (data.registeredCode == "") {
+        globalProperties.$tipMessge.open("注册码不能为空");
         return;
       }
-      this.$http
+      proxy.$http
         .post(
-          `${this.$store.state.serve.serveUrl}user/objectCloudDiskRegistered`,
+          `${store.serve.serveUrl}user/objectCloudDiskRegistered`,
           {
-            nickName: this.nickName,
-            account: this.account,
-            password: this.password,
-            confirmPassword: this.confirmPassword,
-            registeredCode: this.registeredCode,
+            nickName: data.nickName,
+            account: data.account,
+            password: data.password,
+            confirmPassword: data.confirmPassword,
+            registeredCode: data.registeredCode,
           }
         )
         .then((res) => {
           if (res.data.code == 200) {
             // this.$router.push({ name: "login" });
-            this.switchLogin();
+            switchLogin();
           }
-          this.$tipMessge(res.data.message);
+          globalProperties.$tipMessge.open(res.data.message);
         })
         .catch((err) => {
-          this.$tipMessge(err.data.message);
+          console.log(err)
+          globalProperties.$tipMessge.open(err.data.message);
         });
-    },
-    resetInput() {
+    }
+    const resetInput = () => {
       //重置所有输入
-      this.nickName = "";
-      this.account = "";
-      this.password = "";
-      this.confirmPassword = "";
-      this.registeredCode = "";
-    },
-    encryption(str) {
+      data.nickName = "";
+      data.account = "";
+      data.password = "";
+      data.confirmPassword = "";
+      data.registeredCode = "";
+    }
+    const encryption = (str) => {
       //加密
       let num1 = window.btoa(str).replace(/=/g, "··");
       let num2 = window.btoa(num1).replace(/=/g, "s+");
       return num2;
-    },
-    decrypt(str) {
+    }
+    const decrypt = (str) => {
       //解密
       let num1 = window.atob(str.replace(/s\+/g, "="));
       let num2 = window.atob(num1.replace(/··/g, "="));
       return num2;
-    },
+    }
+
+    return {
+      ...toRefs(data),
+      store,
+      switchRememberMe,
+      switchLogin,
+      switchRgistered,
+      keydown,
+      login,
+      registered,
+      resetInput,
+      encryption,
+      decrypt
+    }
   },
 };
 </script>

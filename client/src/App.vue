@@ -25,7 +25,7 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch("setAll");
+    // this.$store.dispatch("setAll");
   }
 };
 </script>

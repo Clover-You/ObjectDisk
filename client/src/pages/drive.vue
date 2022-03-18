@@ -113,6 +113,8 @@
 </template>
 
 <script>
+import {toRefs,getCurrentInstance} from "vue"
+import {useStore} from "@/store/index.ts"
 import newFile from "@/components/newFile";
 import newFolder from "@/components/newFolder";
 import lVideo from "@/components/lVideo";
@@ -124,8 +126,9 @@ export default {
     lVideo,
     lPicture,
   },
-  data() {
-    return {
+
+  setup() {
+    const data = {
       width: 0, // 宽
       height: 0, // 高
       isShowlVideo: false, //是否显示视频模态窗
@@ -139,89 +142,21 @@ export default {
       rightMenuItem: null, //右键对应的Item对象
       fileData: [], //用户数据
       currentFolder: [], //导航文件夹
-    };
-  },
-  watch: {
-    $route() {
-      //监听路由变化
-      // console.log(to,from);
-      this.getUserFileAndFolder(this.getFolderId);
-
-      //倒序删除导航
-      for (let i = this.currentFolder.length; i >= 0; i--) {
-        if (
-          this.getFolderId !=
-          this.currentFolder[this.currentFolder.length - 1].id
-        ) {
-          this.currentFolder.splice(i, 1);
-        } else {
-          break;
-        }
-      }
-    },
-  },
-  computed: {
-    getFileData() {
-      const colNum = Number.parseInt(Math.abs(this.width / 190));
-      let arr = [];
-      const rowNum = Number.parseInt(Math.abs((this.fileData.length / colNum)));
-      const rowNumReal =( (this.fileData.length / colNum) > rowNum) ? rowNum + 1 :rowNum;
-      for (let i = 0; i < rowNumReal; i++) {
-        arr.push([])
-        for (let j = (i * colNum); j < ((i * colNum) + colNum); j++) {
-          arr[i].push(this.fileData[j])
-        }
-      }
-      arr[arr.length - 1] = arr[arr.length - 1].filter(item => item!= void 0)
-      return arr.map((item, i) => {
-        return {
-          key: i,
-          data: item
-        }
-      });
-    },
-    getFolderId() {
-      //获取路由中的参数文件夹id
-      return this.$route.params.folderId == undefined
-        ? "0"
-        : this.$route.params.folderId;
-    },
-  },
-  created() {
-    if (!this.$store.state.isLogin) {
-      this.$router.replace({ name: "login" }); //没登录直接回到登录页
     }
-    this.getUserFileAndFolder(this.getFolderId);
-  },
 
-  methods: {
-    test(data) {
-      console.log(data);
-    },
-    addUserFolder(value) {
-      //添加用户文件夹
-      this.$http
-        .post(`${this.$store.state.serve.serveUrl}drive/addUserFolder`, {
-          userid: this.$store.state.id,
-          folderid: this.getFolderId,
-          name: value,
-        })
-        .then((res) => {
-          if (res.data.code == 200) {
-            this.getUserFileAndFolder(this.getFolderId);
-          } else {
-            this.$tipMessge(res.data.message);
-          }
-        })
-        .catch((err) => {
-          this.$tipMessge(err.data.message);
-        });
-    },
-    getUserFileAndFolder(value) {
+    const store = useStore();
+    const {proxy,appContext} = getCurrentInstance();
+    const globalProperties = appContext.config.globalProperties
+
+    if (!store.isLogin) {
+      globalProperties.$router.replace({ name: "login" }); //没登录直接回到登录页
+    }
+
+    const getUserFileAndFolder = (value) => {
       // 获取用户的文件夹与文件
-      this.$http
-        .post(`${this.$store.state.serve.serveUrl}drive/getUserFileAndFolder`, {
-          userid: this.$store.state.id,
+      proxy.$http
+        .post(`${store.serve.serveUrl}drive/getUserFileAndFolder`, {
+          userid: store.id,
           folderid: value,
         })
         .then((res) => {
@@ -232,31 +167,52 @@ export default {
               res.data.data[i].blob = null;
             }
 
-            this.fileData = res.data.data;
+            data.fileData = res.data.data;
 
             for (let i = 0; i < res.data.data.length; i++) {
               if (
                 res.data.data[i].type == "file" &&
-                this.checkType(res.data.data[i]).type == "image"
+                checkType(res.data.data[i]).type == "image"
               ) {
-                this.ImageToblobUrl(i);
+                ImageToblobUrl(i);
               }
               if (
                 res.data.data[i].type == "file" &&
-                this.checkType(res.data.data[i]).type == "video"
+                checkType(res.data.data[i]).type == "video"
               ) {
-                this.VideoImageToblobUrl(i);
+                VideoImageToblobUrl(i);
               }
             }
           } else {
-            this.$tipMessge(res.data.message);
+            globalProperties.$tipMessge.show(res.data.message);
           }
         })
         .catch((err) => {
-          this.$tipMessge(err.data.message);
+          globalProperties.$tipMessge.show(err.data.message);
         });
-    },
-    dragenter(e) {
+    }
+
+    const addUserFolder = (value) => {
+      //添加用户文件夹
+      proxy.$http
+        .post(`${store.serve.serveUrl}drive/addUserFolder`, {
+          userid: store.id,
+          folderid: data.getFolderId,
+          name: value,
+        })
+        .then((res) => {
+          if (res.data.code == 200) {
+            getUserFileAndFolder(data.getFolderId);
+          } else {
+            globalProperties.$tipMessge.show(res.data.message);
+          }
+        })
+        .catch((err) => {
+          globalProperties.$tipMessge.show(err.data.message);
+        });
+    }
+    
+    const dragenter = (e) => {
       //拖拽进入
       let items = e.dataTransfer.items;
       for (let i = 0; i <= items.length - 1; i++) {
@@ -264,22 +220,22 @@ export default {
         if (item.kind === "file") {
           //是文件才触发显示效果
           e.dataTransfer.dropEffect = "copy";
-          this.isShowUpdateModel = true;
+          data.isShowUpdateModel = true;
         }
       }
-    },
-    dragover(e) {
+    }
+    const dragover = (e) => {
       //拖拽持续移动
       e.dataTransfer.dropEffect = "copy";
-      this.isShowUpdateModel = true;
-    },
-    dragleave() {
+      data.isShowUpdateModel = true;
+    }
+    const dragleave = () => {
       //拖拽离开
-      this.isShowUpdateModel = false;
-    },
-    drop(e) {
+      data.isShowUpdateModel = false;
+    }
+    const drop = (e) => {
       //拖拽放入
-      this.isShowUpdateModel = false;
+      data.isShowUpdateModel = false;
 
       // 修复拖拽获取不了文件的情况
       let items = [];
@@ -294,40 +250,40 @@ export default {
         if (item.kind === "file") {
           //是文件才触发
           let entry = item.webkitGetAsEntry();
-          this.getFileFromEntryRecursively("0", entry);
+          getFileFromEntryRecursively("0", entry);
         }
       });
-    },
-    driveBodyMouseup() {
+    }
+    const driveBodyMouseup = () => {
       //父级点击
-      this.isShowRightMenu = false;
-    },
-    fileBoxMouseup(e, item) {
-      this.isShowRightMenu = false;
-      this.showRightMenuType = item === null ? "default" : item.type;
+      data.isShowRightMenu = false;
+    }
+    const fileBoxMouseup = (e, item) => {
+      data.isShowRightMenu = false;
+      data.showRightMenuType = item === null ? "default" : item.type;
 
-      this.rightMenuItem = item;
+      data.rightMenuItem = item;
       //点击文件与文件夹
       if (e.button == 2) {
         //右键
-        this.$set(this.fileMenuPos, "x", e.x);
-        this.$set(this.fileMenuPos, "y", e.y);
-        this.isShowRightMenu = true;
+        this.$set(data.fileMenuPos, "x", e.x);
+        this.$set(data.fileMenuPos, "y", e.y);
+        data.isShowRightMenu = true;
       }
-    },
-    openFileOrFolder(item) {
+    }
+    const openFileOrFolder = (item) => {
       //打开文件或打开文件夹
       if (item.type == "folder") {
-        this.currentFolder.push({ text: item.name, id: item.id });
-        this.$router.push({ name: "drive", params: { folderId: item.id } });
+        data.currentFolder.push({ text: item.name, id: item.id });
+        proxy.$router.push({ name: "drive", params: { folderId: item.id } });
       } else {
         //打开文件
-        this.$tipMessge("哦吼,文件预览还不能用");
+        globalProperties.$tipMessge.show("哦吼,文件预览还不能用");
       }
-    },
-    async oneFile(file) {
+    }
+    const oneFile = async (file) => {
       //单文件处理
-      let filenameAndfext = this.getFileNameAndFext(file.name);
+      let filenameAndfext = getFileNameAndFext(file.name);
       let path = `-/${file.name}`;
 
       let fileInfoOBJ = {
@@ -341,13 +297,13 @@ export default {
         fext: filenameAndfext.fext,
         filePath: path,
         fileSha256: "",
-        folderId: this.getFolderId,
+        folderId: data.getFolderId,
         // currentChunkList: []
       };
       // console.log(fileInfoOBJ);
       this.$parent.uploadBufferPool.push(fileInfoOBJ); //将任务写入数据
-    },
-    getFileNameAndFext(string) {
+    }
+    const getFileNameAndFext = (string) => {
       //获取文件名和后缀
       let fname = "";
       let fext = "";
@@ -359,12 +315,12 @@ export default {
         fext = "";
       }
       return { fname, fext };
-    },
-    async getFileFromEntryRecursively(folderId, entry) {
+    }
+    const getFileFromEntryRecursively = async (folderId, entry) => {
       // 处理文件夹里的文件
       if (entry.isFile) {
         entry.file((file) => {
-          let filenameAndfext = this.getFileNameAndFext(file.name);
+          let filenameAndfext = getFileNameAndFext(file.name);
 
           let path = entry.fullPath.substring(1);
 
@@ -379,7 +335,7 @@ export default {
             fext: filenameAndfext.fext,
             filePath: path,
             fileSha256: "",
-            folderId: folderId == "0" ? this.getFolderId : folderId,
+            folderId: folderId == "0" ? data.getFolderId : folderId,
             // currentChunkList: []
           };
           // console.log(fileInfoOBJ);
@@ -387,11 +343,11 @@ export default {
         });
       } else {
         //检测到文件夹
-        let createfolderres = await this.$http.post(
-          `${this.$store.state.serve.serveUrl}drive/addUserFolder`,
+        let createfolderres = await proxy.$http.post(
+          `${store.serve.serveUrl}drive/addUserFolder`,
           {
-            userid: this.$store.state.id,
-            folderid: folderId == "0" ? this.getFolderId : folderId,
+            userid: store.id,
+            folderid: folderId == "0" ? data.getFolderId : folderId,
             name: entry.name,
           }
         );
@@ -399,7 +355,7 @@ export default {
         let reader = entry.createReader();
         reader.readEntries((entries) => {
           for (let i = 0, len = entries.length; i < len; i++) {
-            this.getFileFromEntryRecursively(
+            getFileFromEntryRecursively(
               createfolderres.data.data,
               entries[i]
             );
@@ -408,26 +364,26 @@ export default {
           // entries.forEach(entry => this.getFileFromEntryRecursively(entry));
         });
         //刷新
-        this.getUserFileAndFolder(this.getFolderId);
+        getUserFileAndFolder(data.getFolderId);
       }
-    },
-    openNewFolderModel() {
+    }
+    const openNewFolderModel = () => {
       // 显示新建文件夹模态窗
-      this.isShowRightMenu = false;
-      this.isShowNewFolderModel = true;
-    },
-    openNewFileModel() {
+      data.isShowRightMenu = false;
+      data.isShowNewFolderModel = true;
+    }
+    const openNewFileModel = () => {
       //显示新建文件模态窗
-      this.isShowNewFileModel = true;
-    },
-    showdelDialog() {
-      this.isShowRightMenu = false;
-      if (this.rightMenuItem.type == "file") {
+      data.isShowNewFileModel = true;
+    }
+    const showdelDialog = () => {
+      data.isShowRightMenu = false;
+      if (data.rightMenuItem.type == "file") {
         //删除文件
         this.$dialogMessge({
           title: "确定删除",
           text: `确定删除该文件嘛?`,
-          onOk: () => this.delFileOrFolder(),
+          onOk: () => delFileOrFolder(),
           onCancel: () => {},
         });
       } else {
@@ -435,36 +391,36 @@ export default {
         this.$dialogMessge({
           title: "确定删除",
           text: "确定删除该文件夹嘛?文件夹内的文件将全部删除!!!",
-          onOk: () => this.delFileOrFolder(),
+          onOk: () => delFileOrFolder(),
           onCancel: () => {},
         });
       }
-    },
-    delFileOrFolder() {
+    }
+    const delFileOrFolder = () => {
       //删除文件或文件夹
-      this.$http
-        .post(`${this.$store.state.serve.serveUrl}drive/delUserFileOrFolder`, {
-          id: this.rightMenuItem.id,
-          type: this.rightMenuItem.type,
+      proxy.$http
+        .post(`${store.serve.serveUrl}drive/delUserFileOrFolder`, {
+          id: data.rightMenuItem.id,
+          type: data.rightMenuItem.type,
         })
         .then((res) => {
           if (res.data.code == 200) {
             //刷新
-            this.getUserFileAndFolder(this.getFolderId);
+            getUserFileAndFolder(data.getFolderId);
           }
-          this.$tipMessge(res.data.message);
+          globalProperties.$tipMessge.show(res.data.message);
         })
         .catch((err) => {
-          this.$tipMessge(err.data.message);
+          globalProperties.$tipMessge.show(err.data.message);
         });
-    },
-    ImageToblobUrl(i) {
+    }
+    const ImageToblobUrl = (i) => {
       //获取图片数据并返回Blob地址
-      this.$http
+      proxy.$http
         .post(
-          `${this.$store.state.serve.serveUrl}drive/getUserFileForFileId`,
+          `${store.serve.serveUrl}drive/getUserFileForFileId`,
           {
-            id: this.fileData[i].id,
+            id: data.fileData[i].id,
           },
           {
             responseType: "blob",
@@ -472,19 +428,19 @@ export default {
         )
         .then((res) => {
           let bloburl = window.URL.createObjectURL(res.data);
-          this.$set(this.fileData[i], "blob", bloburl);
+          this.$set(data.fileData[i], "blob", bloburl);
         })
         .catch((err) => {
-          this.$tipMessge(err.data.message);
+          globalProperties.$tipMessge.show(err.data.message);
         });
-    },
-    VideoImageToblobUrl(i) {
+    }
+    const VideoImageToblobUrl = (i) => {
       //获取视频预览图数据并返回Blob地址
-      this.$http
+      proxy.$http
         .post(
-          `${this.$store.state.serve.serveUrl}video/getVideoSceenshots`,
+          `${store.serve.serveUrl}video/getVideoSceenshots`,
           {
-            id: this.fileData[i].id,
+            id: data.fileData[i].id,
           },
           {
             responseType: "blob",
@@ -493,18 +449,18 @@ export default {
         .then((res) => {
           if (res.data != null) {
             let bloburl = window.URL.createObjectURL(res.data);
-            this.$set(this.fileData[i], "blob", bloburl);
+            this.$set(data.fileData[i], "blob", bloburl);
           }
         })
         .catch((err) => {
-          this.$tipMessge(err.data.message);
+          globalProperties.$tipMessge.show(err.data.message);
         });
-    },
-    destroyBlobUrl() {
+    }
+    const destroyBlobUrl = () => {
       //销毁blob地址
       // window.URL.revokeObjectURL(blob);
-    },
-    checkType(item) {
+    }
+    const checkType = (item) => {
       let typeStr = {
         type: "",
         iconStr: "icon-unknown",
@@ -768,6 +724,85 @@ export default {
         }
       }
       return typeStr;
+    }
+
+    const getFileData = () => {
+      const colNum = Number.parseInt(Math.abs(data.width / 190));
+      let arr = [];
+      const rowNum = Number.parseInt(Math.abs((data.fileData.length / colNum)));
+      const rowNumReal =( (data.fileData.length / colNum) > rowNum) ? rowNum + 1 :rowNum;
+      for (let i = 0; i < rowNumReal; i++) {
+        arr.push([])
+        for (let j = (i * colNum); j < ((i * colNum) + colNum); j++) {
+          arr[i].push(data.fileData[j])
+        }
+      }
+      arr[arr.length - 1] = arr[arr.length - 1].filter(item => item!= void 0)
+      return arr.map((item, i) => {
+        return {
+          key: i,
+          data: item
+        }
+      });
+    }
+    const getFolderId = () => {
+      //获取路由中的参数文件夹id
+      console.log(proxy.$route.params)
+      return proxy.$route.params.folderId == undefined
+        ? "0"
+        : proxy.$route.params.folderId;
+    }
+
+
+
+
+    getUserFileAndFolder(getFolderId);
+
+    return {
+      ...toRefs(data),
+      store,
+      addUserFolder,
+      getUserFileAndFolder,
+      dragenter,
+      dragover,
+      dragleave,
+      drop,
+      driveBodyMouseup,
+      fileBoxMouseup,
+      openFileOrFolder,
+      oneFile,
+      getFileNameAndFext,
+      getFileFromEntryRecursively,
+      openNewFolderModel,
+      openNewFileModel,
+      showdelDialog,
+      delFileOrFolder,
+      ImageToblobUrl,
+      VideoImageToblobUrl,
+      destroyBlobUrl,
+      checkType,
+
+      getFileData,
+      getFolderId
+    }
+  },
+  watch: {
+    $route() {
+      //监听路由变化
+      // console.log(to,from);
+      this.getUserFileAndFolder(this.getFolderId);
+
+      //倒序删除导航
+      for (let i = this.currentFolder.length; i >= 0; i--) {
+        if (
+          this.getFolderId !=
+          this.currentFolder[this.currentFolder.length - 1].id
+        ) {
+          this.currentFolder.splice(i, 1);
+        } else {
+          break;
+        }
+      }
     },
   },
   mounted(){

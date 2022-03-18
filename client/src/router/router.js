@@ -42,7 +42,7 @@ const routes = [{
         title: '对象云盘'
     },
     children: [{
-        path: "/home/drive/:folderId",
+        path: "/home/drive/:folderId(.*)*",
         component: drive,
         name: "drive",
         meta: {

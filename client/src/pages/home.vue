@@ -17,23 +17,23 @@
         </div>
 
         <ul class="siderbarUl">
-          <li :class="{ liOn: $store.state.siderbarStr == 'drive' }" @click="openDrive">
+          <li :class="{ liOn: store.siderbarStr == 'drive' }" @click="openDrive">
             <i class="iconfont icon-drive"></i>
             <p>我的云盘</p>
           </li>
-          <li :class="{ liOn: $store.state.siderbarStr == 'driveResourcePool' }" @click="openDriveResourcePool">
+          <li :class="{ liOn:store.siderbarStr == 'driveResourcePool' }" @click="openDriveResourcePool">
             <i class="iconfont icon-cloud"></i>
             <p>资源池</p>
           </li>
-          <li :class="{ liOn: $store.state.siderbarStr == 'iconList' }" @click="openIconList">
+          <li :class="{ liOn: store.siderbarStr == 'iconList' }" @click="openIconList">
             <i class="iconfont icon-play-drag"></i>
             <p>图标库</p>
           </li>
-          <li :class="{ liOn: $store.state.siderbarStr == 'streamingVideo' }" @click="openStreamingVideo">
+          <li :class="{ liOn: store.siderbarStr == 'streamingVideo' }" @click="openStreamingVideo">
             <i class="iconfont icon-video-play"></i>
             <p>视频流DEMO</p>
           </li>
-          <li :class="{ liOn: $store.state.siderbarStr == 'interactiveEffect' }" @click="openInteractiveEffect">
+          <li :class="{ liOn: store.siderbarStr == 'interactiveEffect' }" @click="openInteractiveEffect">
             <i class="iconfont icon-list"></i>
             <p>交互效果DEMO</p>
           </li>
@@ -41,8 +41,8 @@
 
         <div class="headBox">
           <div class="headChildBox">
-            <img :src="$store.state.photo" />
-            <p>{{ $store.state.nickname }}</p>
+            <img :src="store.photo" />
+            <p>{{ store.nickname }}</p>
           </div>
         </div>
       </div>
@@ -59,6 +59,8 @@
 </template>
 
 <script>
+import {toRefs,getCurrentInstance} from "vue"
+import {useStore} from "@/store/index.ts"
 import uploadModal from "@/components/uploadModal.vue";
 import { sha256 } from "js-sha256";
 
@@ -66,66 +68,62 @@ export default {
   components: {
     uploadModal,
   },
-  data() {
-    return {
+
+  setup() {
+    const data = {
       uploadBufferPool: [], //上传缓冲池
       uploadSetTimeOut: null, //延迟倒计时
       uploadRemainingTask: 0, //剩余上传任务
-    };
-  },
-  watch: {
-    $route(toRouter) {
-      //设置最后路由
-      this.$store.state.siderbarStr = toRouter.name;
-      sessionStorage.setItem("siderbarStr", toRouter.name);
-
-      // 检查登录状态
-      this.judgmentIsLogin();
-    },
-    uploadBufferPool() {
-      //监听任务列表更新
-      this.distributionTask();
-    },
-  },
-  created() {
-    // 检查登录状态
-    this.judgmentIsLogin();
-    //拿取最后的路由名称
-    if (sessionStorage.getItem("siderbarStr") != null) {
-      this.$store.state.siderbarStr = sessionStorage.getItem("siderbarStr");
     }
-  },
-  mounted() {},
-  methods: {
-    judgmentIsLogin() {
+    const store = useStore();
+    const {appContext} = getCurrentInstance();
+    const globalProperties = appContext.config.globalProperties
+
+
+    const judgmentIsLogin = () => {
       //检查登录
 
-      if (!this.$store.state.isLogin) {
+      if (!store.isLogin) {
         sessionStorage.setItem("siderbarStr", "drive"); //重置最后路由
-        this.$router.replace({ name: "login" }); //没登录直接回到登录页
+        globalProperties.$router.replace({ name: "login" }); //没登录直接回到登录页
       }
-    },
-    openDrive() {
+    }
+
+    // 检查登录状态
+    judgmentIsLogin();
+    //拿取最后的路由名称
+    if (sessionStorage.getItem("siderbarStr") != null) {
+      store.siderbarStr = sessionStorage.getItem("siderbarStr");
+    }
+
+    
+
+    const openDrive = () => {
       //打开我的云盘
       this.$router.push({ name: "drive" });
-    },
-    openDriveResourcePool() {
+    }
+
+    const openDriveResourcePool = () => {
       // 打开资源池
       this.$router.push({ name: "driveResourcePool" });
-    },
-    openIconList() {
+    }
+
+    const openIconList = () => {
       //打开图标库
       this.$router.push({ name: "iconList" });
-    },
-    openStreamingVideo() {
+    }
+
+    const openStreamingVideo = () => {
       //打开视频流DEMO
       this.$router.push({ name: "streamingVideo" });
-    },
-    openInteractiveEffect() {
+    }
+
+    const openInteractiveEffect = () => {
       //打开交互效果DEMO
       this.$router.push({ name: "interactiveEffect" });
-    },
-    distributionTask() {
+    }
+
+    const distributionTask = () => {
       //分配任务
       for (let i = 0, len = this.uploadBufferPool.length; i < len; i++) {
         if (this.uploadBufferPool[i].uploadType == 0) {
@@ -134,8 +132,9 @@ export default {
           this.upLoadFun(this.uploadBufferPool[i]);
         }
       }
-    },
-    setTaskState(item, stateCode, ano) {
+    }
+
+    const setTaskState = (item, stateCode, ano) => {
       //设置任务状态
       //0等待中 1准备中 2上传中 3上传暂停 4上传完成 5秒传 6文件太小 7文件太大 8文件已存在 404上传错误
       this.$set(item, "uploadType", stateCode);
@@ -145,8 +144,9 @@ export default {
       } else if (ano == 1) {
         ++this.uploadRemainingTask;
       }
-    },
-    upLoadFun(item) {
+    }
+    
+    const upLoadFun = (item) => {
       if (item.file.size <= 0) {
         //文件太小,无法上传
         this.setTaskState(item, 6, 0);
@@ -161,8 +161,8 @@ export default {
         this.$set(item, "fileSha256", sha256Id);
         //检查文件
         this.$http
-          .post(`${this.$store.state.serve.serveUrl}upload/examineFile`, {
-            userid: this.$store.state.id,
+          .post(`${store.serve.serveUrl}upload/examineFile`, {
+            userid: store.id,
             folderid: item.folderId,
             sha256Id: sha256Id,
             filename: item.fname,
@@ -204,11 +204,11 @@ export default {
 
                     this.$http
                       .put(
-                        `${this.$store.state.serve.serveUrl}upload/uploadStreamFile`,
+                        `${store.serve.serveUrl}upload/uploadStreamFile`,
                         fileslice,
                         {
                           params: {
-                            userid: this.$store.state.id,
+                            userid: store.id,
                             folderid: item.folderId,
                             fileName: item.fname,
                             filePath: item.filePath,
@@ -249,9 +249,9 @@ export default {
 
                   this.$http
                     .post(
-                      `${this.$store.state.serve.serveUrl}upload/uploadSecondPass`,
+                      `${store.serve.serveUrl}upload/uploadSecondPass`,
                       {
-                        userid: this.$store.state.id,
+                        userid: store.id,
                         folderid: item.folderId,
                         fileName: item.fname,
                         filePath: item.filePath,
@@ -287,9 +287,9 @@ export default {
             console.log(err);
           });
       };
-    },
+    }
 
-    calculateSliceSize(size) {
+    const calculateSliceSize = (size) => {
       //计算分段
       let Msize = (parseInt((size / 1024 ** 2) * 100) / 100).toFixed(2);
       if (Msize < 10) {
@@ -299,6 +299,37 @@ export default {
       } else {
         return 10;
       }
+    }
+
+
+
+    return {
+      ...toRefs(data),
+      store,
+      judgmentIsLogin,
+      openDrive,
+      openDriveResourcePool,
+      openIconList,
+      openStreamingVideo,
+      openInteractiveEffect,
+      distributionTask,
+      setTaskState,
+      upLoadFun,
+      calculateSliceSize
+    }
+  },
+  watch: {
+    $route(toRouter) {
+      //设置最后路由
+      this.store.siderbarStr = toRouter.name;
+      sessionStorage.setItem("siderbarStr", toRouter.name);
+
+      // 检查登录状态
+      this.judgmentIsLogin();
+    },
+    uploadBufferPool() {
+      //监听任务列表更新
+      this.distributionTask();
     },
   },
 };
