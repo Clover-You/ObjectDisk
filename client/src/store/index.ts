@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 
 // useStore could be anything like useUser, useCart
 // the first argument is a unique id of the store across your application
+
 export const useStore = defineStore('main', {
     // other options...
     state: () => {
@@ -19,6 +20,11 @@ export const useStore = defineStore('main', {
                 serveUrl: 'http://127.0.0.1:3000/',
             }
         }
+    },
+    persist: {
+        enabled: true, // 开启缓存  默认会存储在本地localstorage
+        storage: sessionStorage, // 缓存使用方式
+        paths: [] // 需要缓存键 
     },
     getters: {},
     actions: {}

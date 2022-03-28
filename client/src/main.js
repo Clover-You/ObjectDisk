@@ -7,16 +7,13 @@
  */
 import './static/css/iconFont.css'
 import { createApp } from 'vue';
-// import store from './store'
-// import VueAxios from 'vue-axios'
-
 import App from './App.vue'
 import './assets/fonts/cnrIcon.css'
 import lPromptBox from './components/lpromptbox.vue'
 import router from "./router/router.js"
-// import VueRouter from "vue-router";
 import axios from './utils/axios'
 import { createPinia } from 'pinia'
+import piniaPluginPersist from 'pinia-plugin-persist'
 import tipMessge from '@/components/tipMessge.js'
 // import dialogMessge from '@/components/dialogMessge.js'
 import VueVirtualScroller from 'vue-virtual-scroller'
@@ -40,4 +37,4 @@ app.config.globalProperties.$tipMessge = tipMessge;
 
 // Vue.use(VueAxios, axios);
 
-app.use(router).use(createPinia()).use(VueVirtualScroller).use(tipMessge).mount('#app')
+app.use(router).use(createPinia().use(piniaPluginPersist)).use(VueVirtualScroller).use(tipMessge).mount('#app')

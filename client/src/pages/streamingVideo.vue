@@ -18,24 +18,29 @@
   </div>
 </template>
 <script>
+import { toRefs,getCurrentInstance } from "vue";
+import { useStore } from "@/store/index.ts";
 import lVideo from "@/components/lVideo";
 export default {
   components: {
     lVideo,
   },
-  data() {
-    return {
+  created() {
+    const data = {
       isShow: false,
       videoList: [],
       lsSrc: "",
-    };
-  },
-  created() {
-    if (!this.$store.state.isLogin) {
-      this.$router.replace({ name: "login" }); //没登录直接回到登录页
     }
 
-    this.videoList.push(
+    const store = useStore();
+    const { appContext } = getCurrentInstance();
+    const globalProperties = appContext.config.globalProperties;
+
+    if (!store.isLogin) {
+      globalProperties.$router.replace({ name: 'login' });//没登录直接回到登录页
+    }
+
+    data.videoList.push(
       "m2+c7R+kU2IF4Kn8v9c/kCJqZGx5f2Ioj3XOX6HxXjTg7X1gXnTXMz9C4lTvk7ql4m39H6UXqdcKF8SbUzI5VU0ronOI+aYmYMRglsAVGWawtXD41vrJEfonMiM3fdD9+ehR+LDcjfAuPYc/aoAbzJcxnBBkwD7YKyvPB+hrvDA="
     );
 
@@ -56,15 +61,22 @@ export default {
     // }).catch(err => {
     // this.$tipMessge(err.data.message)
     // })
-  },
-  methods: {
-    show() {
-      this.isShow = true;
-    },
-    destroyBlobUrl(blob) {
+
+    const show = () => {
+      data.isShow = true;
+    };
+
+    const destroyBlobUrl = (blob) => {
       //销毁blob地址
       window.URL.revokeObjectURL(blob);
-    },
+    };
+
+
+    return {
+      ...toRefs(data),
+      show,
+      destroyBlobUrl
+    }
   },
 };
 </script>

@@ -145,19 +145,25 @@ export default {
     const { proxy, appContext } = getCurrentInstance();
     const globalProperties = appContext.config.globalProperties;
 
+    
     if (!store.isLogin) {
       proxy.$router.replace({ name: "login" }); //没登录直接回到登录页
     }
 
+    console.log(store)
+
     const getFolderId = () => {
       //获取路由中的参数文件夹id
-      let folderid =
-        typeof proxy.$route.params.folderId == "string"
+      let folderid = proxy.$route.params.folderId;
+      if (folderid == undefined || folderid == "" || folderid == null) {
+        return "0";
+      }
+
+      folderid =
+        typeof folderid == "string"
           ? proxy.$route.params.folderId
           : proxy.$route.params.folderId[0];
-      return folderid == undefined || folderid == "" || folderid == null
-        ? "0"
-        : folderid;
+      return folderid;
     };
 
     const getUserFileAndFolder = (value) => {
@@ -786,7 +792,6 @@ export default {
     $route() {
       //监听路由变化
       // console.log(to,from);
-      console.log(this.getFolderId());
       this.getUserFileAndFolder(this.getFolderId());
       let currentFolderList = toRaw(this.currentFolder);
       //倒序删除导航

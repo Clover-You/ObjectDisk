@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import {reactive, toRefs, getCurrentInstance } from "vue";
+import { reactive, toRefs, getCurrentInstance } from "vue";
 import { useStore } from "@/store/index.ts";
 import uploadModal from "@/components/uploadModal.vue";
 import { sha256 } from "js-sha256";
@@ -76,29 +76,35 @@ export default {
       uploadRemainingTask: 0, //剩余上传任务
     });
     const store = useStore();
-    const {proxy } = getCurrentInstance();
+    const { proxy } = getCurrentInstance();
     // const globalProperties = appContext.config.globalProperties;
 
     const judgmentIsLogin = () => {
       //检查登录
-      if (!sessionStorage.isLogin) {
-        sessionStorage.setItem("siderbarStr", "drive"); //重置最后路由
+      if (!store.isLogin) {
+
+        store.siderbarStr = "drive"//重置最后路由
         proxy.$router.replace({ name: "login" }); //没登录直接回到登录页
-      } else {
-        //已登录
-        store.isLogin = sessionStorage.isLogin;
-        store.id = sessionStorage.id;
-        store.photo = sessionStorage.photo;
-        store.nickname = sessionStorage.nickname;
       }
+
+      // if (!sessionStorage.isLogin) {
+      //   sessionStorage.setItem("siderbarStr", "drive"); //重置最后路由
+      //   proxy.$router.replace({ name: "login" }); //没登录直接回到登录页
+      // } else {
+      //   //已登录
+      //   store.isLogin = sessionStorage.isLogin;
+      //   store.id = sessionStorage.id;
+      //   store.photo = sessionStorage.photo;
+      //   store.nickname = sessionStorage.nickname;
+      // }
     };
 
     // 检查登录状态
     judgmentIsLogin();
     //拿取最后的路由名称
-    if (sessionStorage.getItem("siderbarStr") != null) {
-      store.siderbarStr = sessionStorage.getItem("siderbarStr");
-    }
+    // if (sessionStorage.getItem("siderbarStr") != null) {
+    //   store.siderbarStr = sessionStorage.getItem("siderbarStr");
+    // }
 
     const openDrive = () => {
       //打开我的云盘
@@ -319,7 +325,8 @@ export default {
     $route(toRouter) {
       //设置最后路由
       this.store.siderbarStr = toRouter.name;
-      sessionStorage.setItem("siderbarStr", toRouter.name);
+      // sessionStorage.setItem("siderbarStr", toRouter.name);
+      this.store.siderbarStr = toRouter.name//重置最后路由
 
       // 检查登录状态
       this.judgmentIsLogin();

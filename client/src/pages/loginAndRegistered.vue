@@ -52,15 +52,16 @@
 </template>
 
 <script>
-import {toRefs,getCurrentInstance} from "vue"
+import {reactive,toRefs,getCurrentInstance} from "vue"
 import lVerificationCodeInput from "../components/lVerificationCodeInput";
+// import { storeToRefs } from "pinia";
 import {useStore} from "@/store/index.ts"
 export default {
   components: {
     lVerificationCodeInput,
   },
   setup() {
-    const data = {
+    const data = reactive({
       isRegistered: false, //是否是注册页面
       nickName: "",
       account: "",
@@ -68,7 +69,7 @@ export default {
       confirmPassword: "",
       registeredCode: "",
       rememberMe: false, //记住账号
-    }
+    })
 
     const {proxy,appContext} = getCurrentInstance();
 
@@ -87,7 +88,7 @@ export default {
       data.rememberMe = true;
     }
 
-    store.isLogin = sessionStorage.getItem("isLogin");
+    // store.isLogin = sessionStorage.getItem("isLogin");
     if (store.isLogin) {
       proxy.$router.replace({ name: "drive" }); //已登录直接进入云盘
     }
@@ -133,6 +134,7 @@ export default {
         globalProperties.$tipMessge.open("密码不能为空");
         return;
       }
+
       proxy.$http
         .post(`${store.serve.serveUrl}user/objectCloudDiskLogin`, {
           account: data.account,
@@ -148,10 +150,10 @@ export default {
               localStorage.removeItem("password");
             }
 
-            sessionStorage.setItem("isLogin", true);
-            sessionStorage.setItem("id", res.data.data.id);
-            sessionStorage.setItem("photo", res.data.data.photo);
-            sessionStorage.setItem("nickname", res.data.data.nickName);
+            // sessionStorage.setItem("isLogin", true);
+            // sessionStorage.setItem("id", res.data.data.id);
+            // sessionStorage.setItem("photo", res.data.data.photo);
+            // sessionStorage.setItem("nickname", res.data.data.nickName);
 
             store.isLogin = true;
             store.id = res.data.data.id;
