@@ -103,7 +103,7 @@ export default {
       resetInput();
       const container = document.querySelector(".container");
       container.classList.remove("sign-up-mode");
-      document.title = "登录对象内部云盘";
+      document.title = "登录对象云盘";
     }
     const switchRgistered = () => {
       //切换到注册
@@ -111,7 +111,7 @@ export default {
       resetInput();
       const container = document.querySelector(".container");
       container.classList.add("sign-up-mode");
-      document.title = "注册对象内部云盘";
+      document.title = "注册对象云盘";
     }
     const keydown = (e) => {
       if (e.keyCode == 13) {

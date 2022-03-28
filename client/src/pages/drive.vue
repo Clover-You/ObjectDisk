@@ -116,7 +116,7 @@
 </template>
 
 <script>
-import {reactive,toRefs,getCurrentInstance} from "vue"
+import {reactive,toRefs,toRaw,getCurrentInstance} from "vue"
 import {useStore} from "@/store/index.ts"
 import newFile from "@/components/newFile";
 import newFolder from "@/components/newFolder";
@@ -157,7 +157,6 @@ export default {
 
     const getFolderId = () => {
       //获取路由中的参数文件夹id
-      console.log(proxy.$route.params)
       let folderid = proxy.$route.params.folderId;
       return folderid == undefined || folderid == ""
         ? "0"
@@ -795,14 +794,16 @@ export default {
       //监听路由变化
       // console.log(to,from);
       this.getUserFileAndFolder(this.getFolderId());
-
+      let currentFolderList = toRaw(this.currentFolder);
       //倒序删除导航
-      for (let i = this.currentFolder.length; i >  0; i--) {
+      for (let i = currentFolderList.length; i >  0; i--) {
+        // console.log(currentFolderList[currentFolderList.length - 1]);
+        // console.log(this.getFolderId());
         if (
           this.getFolderId() !=
-          this.currentFolder[this.currentFolder.length - 1].id
+          currentFolderList[currentFolderList.length - 1].id
         ) {
-          this.currentFolder.splice(i, 1);
+          currentFolderList.splice(i-1, 1);
         } else {
           break;
         }
