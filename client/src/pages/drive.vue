@@ -146,7 +146,7 @@ export default {
     const globalProperties = appContext.config.globalProperties;
 
     if (!store.isLogin) {
-      globalProperties.$router.replace({ name: "login" }); //没登录直接回到登录页
+      proxy.$router.replace({ name: "login" }); //没登录直接回到登录页
     }
 
     const getFolderId = () => {

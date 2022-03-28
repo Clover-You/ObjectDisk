@@ -76,14 +76,14 @@ export default {
       uploadRemainingTask: 0, //剩余上传任务
     });
     const store = useStore();
-    const {proxy, appContext } = getCurrentInstance();
-    const globalProperties = appContext.config.globalProperties;
+    const {proxy } = getCurrentInstance();
+    // const globalProperties = appContext.config.globalProperties;
 
     const judgmentIsLogin = () => {
       //检查登录
       if (!sessionStorage.isLogin) {
         sessionStorage.setItem("siderbarStr", "drive"); //重置最后路由
-        globalProperties.$router.replace({ name: "login" }); //没登录直接回到登录页
+        proxy.$router.replace({ name: "login" }); //没登录直接回到登录页
       } else {
         //已登录
         store.isLogin = sessionStorage.isLogin;
