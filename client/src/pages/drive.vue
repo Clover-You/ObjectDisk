@@ -36,28 +36,27 @@
 
       <div class="file-container" v-if="fileData.length!=0">
 
-        <RecycleScroller :items="getFileData()" class="scroller" :item-size="15" key-field="key" v-slot="data">
+        <DynamicScroller :items="getFileData()" class="scroller" :min-item-size="1" key-field="key" v-slot="data">
 
-          <div style="display: flex">
-
-            <div v-for="(item) in data.item.data" :key="item.id" class="fileBox" @dblclick="openFileOrFolder(item)" @mouseup.stop="fileBoxMouseup($event,item)" @contextmenu.prevent="">
-              <div class="fileContentBox">
-                <div class="fileContentImg">
-                  <img class="imagePreview" src="../static/img/folder.png" draggable="false" v-if="item.type == 'folder'" />
-                  <div class="imgBox" v-if="item.type == 'file' && item.blob != null">
-                    <img class="imagePreview" ref="img" :src="item.blob" draggable="false" @load="destroyBlobUrl(item.blob)">
-                    <i class="iconfont icon-or-play videoImg" v-if="checkType(item).type == 'video'"></i>
-                  </div>
-                  <i class="iconfont iconPreview" :class="checkType(item).iconStr" v-if="item.type == 'file' && item.blob == null"></i>
+          <div v-for="(item) in data.item.data" :key="item.id" class="fileBox" @dblclick="openFileOrFolder(item)" @mouseup.stop="fileBoxMouseup($event,item)" @contextmenu.prevent="">
+            <div class="fileContentBox">
+              <div class="fileContentImg">
+                <img class="imagePreview" src="../static/img/folder.png" draggable="false" v-if="item.type == 'folder'" />
+                <div class="imgBox" v-if="item.type == 'file' && item.blob != null">
+                  <img class="imagePreview" ref="img" :src="item.blob" draggable="false" @load="destroyBlobUrl(item.blob)">
+                  <i class="iconfont icon-or-play videoImg" v-if="checkType(item).type == 'video'"></i>
                 </div>
-                <div class="fileContentText">
-                  <p class="fileContentName">{{item.name}}{{item.suffix==null?'':`.${item.suffix}`}}</p>
-                  <p class="fileContentDate">{{item.updateTime.slice(0,item.updateTime.length-3)}}</p>
-                </div>
+                <i class="iconfont iconPreview" :class="checkType(item).iconStr" v-if="item.type == 'file' && item.blob == null"></i>
+              </div>
+              <div class="fileContentText">
+                <p class="fileContentName">{{item.name}}{{item.suffix==null?'':`.${item.suffix}`}}</p>
+                <p class="fileContentDate">{{item.updateTime.slice(0,item.updateTime.length-3)}}</p>
               </div>
             </div>
+
           </div>
-        </RecycleScroller>
+
+        </DynamicScroller>
       </div>
     </div>
 
@@ -145,12 +144,11 @@ export default {
     const { proxy, appContext } = getCurrentInstance();
     const globalProperties = appContext.config.globalProperties;
 
-    
     if (!store.isLogin) {
       proxy.$router.replace({ name: "login" }); //没登录直接回到登录页
     }
 
-    console.log(store)
+    console.log(store);
 
     const getFolderId = () => {
       //获取路由中的参数文件夹id
@@ -736,11 +734,15 @@ export default {
     };
 
     const getFileData = () => {
+      //根据屏幕宽度计算可以显示多少个为一行
       const colNum = Number.parseInt(Math.abs(data.width / 190));
       let arr = [];
+      //根据返回的数据可以显示几行
       const rowNum = Number.parseInt(Math.abs(data.fileData.length / colNum));
+      //根据计算检查是否满足一行，不够一行加一行
       const rowNumReal =
         data.fileData.length / colNum > rowNum ? rowNum + 1 : rowNum;
+
       for (let i = 0; i < rowNumReal; i++) {
         arr.push([]);
         for (let j = i * colNum; j < i * colNum + colNum; j++) {
@@ -810,6 +812,14 @@ export default {
   mounted() {
     this.width = this.$refs.recycleScroller.offsetWidth - 100;
     this.height = this.$refs.recycleScroller.offsetHeight;
+
+    //监听浏览器大小变化
+    window.onresize = () => {
+      return (() => {
+        this.width = this.$refs.recycleScroller.offsetWidth - 100;
+        this.height = this.$refs.recycleScroller.offsetHeight;
+      })();
+    };
   },
 };
 </script>
@@ -877,6 +887,7 @@ export default {
   flex: 1;
   display: flex;
   padding: 0 50px;
+  height: 100%;
   /* overflow: auto; */
 }
 
