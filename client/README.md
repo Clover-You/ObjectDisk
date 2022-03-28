@@ -7,6 +7,8 @@
 ![img](https://github.com/zeroojs/landing-ux/raw/main/doc/preview.jpg)
 登录与注册页面 https://github.com/zeroojs/landing-ux
 
+`⚠:图标使用了阿里云盘内测时的图标,作者懒得设计,如果商用务必自己设计一套Icon，造成侵权和作者无关`
+
 #### 软件架构
 软件架构说明
 

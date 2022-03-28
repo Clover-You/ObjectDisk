@@ -35,14 +35,17 @@
       </div>
 
       <div class="file-container" v-if="fileData.length!=0">
+
         <RecycleScroller
-          :items="getFileData"
+          :items="getFileData()"
           class="scroller"
           :item-size="15"
           key-field="key"
           v-slot="data"
         >
+
         <div style="display: flex">
+          
             <div v-for="(item) in data.item.data" :key="item.id" class="fileBox" @dblclick="openFileOrFolder(item)" @mouseup.stop="fileBoxMouseup($event,item)" @contextmenu.prevent="" >
               <div class="fileContentBox">
                 <div class="fileContentImg">
@@ -113,7 +116,7 @@
 </template>
 
 <script>
-import {toRefs,getCurrentInstance} from "vue"
+import {reactive,toRefs,getCurrentInstance} from "vue"
 import {useStore} from "@/store/index.ts"
 import newFile from "@/components/newFile";
 import newFolder from "@/components/newFolder";
@@ -128,7 +131,7 @@ export default {
   },
 
   setup() {
-    const data = {
+    const data = reactive({
       width: 0, // 宽
       height: 0, // 高
       isShowlVideo: false, //是否显示视频模态窗
@@ -142,7 +145,7 @@ export default {
       rightMenuItem: null, //右键对应的Item对象
       fileData: [], //用户数据
       currentFolder: [], //导航文件夹
-    }
+    })
 
     const store = useStore();
     const {proxy,appContext} = getCurrentInstance();
@@ -150,6 +153,15 @@ export default {
 
     if (!store.isLogin) {
       globalProperties.$router.replace({ name: "login" }); //没登录直接回到登录页
+    }
+
+    const getFolderId = () => {
+      //获取路由中的参数文件夹id
+      console.log(proxy.$route.params)
+      let folderid = proxy.$route.params.folderId;
+      return folderid == undefined || folderid == ""
+        ? "0"
+        : folderid;
     }
 
     const getUserFileAndFolder = (value) => {
@@ -162,7 +174,7 @@ export default {
         .then((res) => {
 
           if (res.data.code == 200) {
-            console.log(res.data.data);
+
             for (let i = 0; i < res.data.data.length; i++) {
               res.data.data[i].blob = null;
             }
@@ -187,8 +199,9 @@ export default {
             globalProperties.$tipMessge.show(res.data.message);
           }
         })
-        .catch((err) => {
-          globalProperties.$tipMessge.show(err.data.message);
+        .catch(() => {
+          
+          // globalProperties.$tipMessge.show(err.data.message);
         });
     }
 
@@ -197,12 +210,12 @@ export default {
       proxy.$http
         .post(`${store.serve.serveUrl}drive/addUserFolder`, {
           userid: store.id,
-          folderid: data.getFolderId,
+          folderid: getFolderId(),
           name: value,
         })
         .then((res) => {
           if (res.data.code == 200) {
-            getUserFileAndFolder(data.getFolderId);
+            getUserFileAndFolder(getFolderId());
           } else {
             globalProperties.$tipMessge.show(res.data.message);
           }
@@ -297,7 +310,7 @@ export default {
         fext: filenameAndfext.fext,
         filePath: path,
         fileSha256: "",
-        folderId: data.getFolderId,
+        folderId: getFolderId(),
         // currentChunkList: []
       };
       // console.log(fileInfoOBJ);
@@ -335,7 +348,7 @@ export default {
             fext: filenameAndfext.fext,
             filePath: path,
             fileSha256: "",
-            folderId: folderId == "0" ? data.getFolderId : folderId,
+            folderId: folderId == "0" ? getFolderId() : folderId,
             // currentChunkList: []
           };
           // console.log(fileInfoOBJ);
@@ -347,7 +360,7 @@ export default {
           `${store.serve.serveUrl}drive/addUserFolder`,
           {
             userid: store.id,
-            folderid: folderId == "0" ? data.getFolderId : folderId,
+            folderid: folderId == "0" ? getFolderId() : folderId,
             name: entry.name,
           }
         );
@@ -364,7 +377,7 @@ export default {
           // entries.forEach(entry => this.getFileFromEntryRecursively(entry));
         });
         //刷新
-        getUserFileAndFolder(data.getFolderId);
+        getUserFileAndFolder(getFolderId());
       }
     }
     const openNewFolderModel = () => {
@@ -406,7 +419,7 @@ export default {
         .then((res) => {
           if (res.data.code == 200) {
             //刷新
-            getUserFileAndFolder(data.getFolderId);
+            getUserFileAndFolder(getFolderId());
           }
           globalProperties.$tipMessge.show(res.data.message);
         })
@@ -745,18 +758,9 @@ export default {
         }
       });
     }
-    const getFolderId = () => {
-      //获取路由中的参数文件夹id
-      console.log(proxy.$route.params)
-      return proxy.$route.params.folderId == undefined
-        ? "0"
-        : proxy.$route.params.folderId;
-    }
 
 
-
-
-    getUserFileAndFolder(getFolderId);
+    getUserFileAndFolder(getFolderId());
 
     return {
       ...toRefs(data),
@@ -790,12 +794,12 @@ export default {
     $route() {
       //监听路由变化
       // console.log(to,from);
-      this.getUserFileAndFolder(this.getFolderId);
+      this.getUserFileAndFolder(this.getFolderId());
 
       //倒序删除导航
       for (let i = this.currentFolder.length; i >  0; i--) {
         if (
-          this.getFolderId !=
+          this.getFolderId() !=
           this.currentFolder[this.currentFolder.length - 1].id
         ) {
           this.currentFolder.splice(i, 1);

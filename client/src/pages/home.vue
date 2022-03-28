@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import { toRefs, getCurrentInstance } from "vue";
+import {reactive, toRefs, getCurrentInstance } from "vue";
 import { useStore } from "@/store/index.ts";
 import uploadModal from "@/components/uploadModal.vue";
 import { sha256 } from "js-sha256";
@@ -70,13 +70,13 @@ export default {
   },
 
   setup() {
-    const data = {
+    const data = reactive({
       uploadBufferPool: [], //上传缓冲池
       uploadSetTimeOut: null, //延迟倒计时
       uploadRemainingTask: 0, //剩余上传任务
-    };
+    });
     const store = useStore();
-    const { appContext } = getCurrentInstance();
+    const {proxy, appContext } = getCurrentInstance();
     const globalProperties = appContext.config.globalProperties;
 
     const judgmentIsLogin = () => {
@@ -102,27 +102,27 @@ export default {
 
     const openDrive = () => {
       //打开我的云盘
-      this.$router.push({ name: "drive" });
+      proxy.$router.push({ name: "drive" });
     };
 
     const openDriveResourcePool = () => {
       // 打开资源池
-      this.$router.push({ name: "driveResourcePool" });
+      proxy.$router.push({ name: "driveResourcePool" });
     };
 
     const openIconList = () => {
       //打开图标库
-      this.$router.push({ name: "iconList" });
+      proxy.$router.push({ name: "iconList" });
     };
 
     const openStreamingVideo = () => {
       //打开视频流DEMO
-      this.$router.push({ name: "streamingVideo" });
+      proxy.$router.push({ name: "streamingVideo" });
     };
 
     const openInteractiveEffect = () => {
       //打开交互效果DEMO
-      this.$router.push({ name: "interactiveEffect" });
+      proxy.$router.push({ name: "interactiveEffect" });
     };
 
     const distributionTask = () => {
@@ -235,7 +235,7 @@ export default {
                             item.uploadCurrentChunkNum >= item.currentChunkMax
                           ) {
                             this.$refs.childRouter.getUserFileAndFolder(
-                              this.$refs.childRouter.getFolderId
+                              this.$refs.childRouter.getFolderId()
                             );
                             //设置任务上传完成
                             this.setTaskState(item, 4, 0);
@@ -261,7 +261,7 @@ export default {
                     .then((SecondPass) => {
                       if (SecondPass.data.code == 200) {
                         this.$refs.childRouter.getUserFileAndFolder(
-                          this.$refs.childRouter.getFolderId
+                          this.$refs.childRouter.getFolderId()
                         );
                         //设置任务为秒传
                         this.setTaskState(item, 5, 0);
