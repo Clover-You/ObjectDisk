@@ -148,8 +148,6 @@ export default {
       proxy.$router.replace({ name: "login" }); //没登录直接回到登录页
     }
 
-    console.log(store);
-
     const getFolderId = () => {
       //获取路由中的参数文件夹id
       let folderid = proxy.$route.params.folderId;
