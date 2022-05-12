@@ -9,6 +9,7 @@ import DateUtils from 'src/utils/DateUtils';
 import MathTools from 'src/utils/MathTools';
 import { Repository } from 'typeorm';
 import conf from 'src/config/config';
+import {DataBaseConfig} from 'src/config/orm.config';
 import * as fs from 'fs';
 
 /*

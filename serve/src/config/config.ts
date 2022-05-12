@@ -46,14 +46,6 @@ export interface ConfType {
 const USER_HOME = process.env.HOME || process.env.USERPROFILE;
 
 const conf: ConfType = {
-  mysql: {
-    user: 'root',
-    password: '123',
-    database: 'objcloud',
-    host: '127.0.0.1',
-    port: 3306,
-  },
-  port: 3000,
   key: { 
     path: path.join(USER_HOME, '/.objectcloud/key/'),
   },

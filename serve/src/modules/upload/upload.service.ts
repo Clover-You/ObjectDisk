@@ -3,6 +3,7 @@ import { Request } from 'express';
 import { AjaxResult } from 'src/utils/ajax-result.classes';
 import { Injectable } from '@nestjs/common';
 import conf from 'src/config/config';
+import {DataBaseConfig} from 'src/config/orm.config';
 import * as fs from 'fs';
 import { UserFilesEntity } from 'src/entity/user_files.entity';
 import { FilesEntity } from 'src/entity/files.entity';

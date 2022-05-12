@@ -4,6 +4,7 @@ import { Injectable, StreamableFile } from '@nestjs/common';
 import { FilesEntity } from 'src/entity/files.entity';
 import { Repository } from 'typeorm';
 import { UserFilesEntity } from 'src/entity/user_files.entity';
+import {DataBaseConfig} from 'src/config/orm.config';
 import conf from 'src/config/config';
 // import * as ffmpeg from 'ffmpeg';
 import * as fs from 'fs';

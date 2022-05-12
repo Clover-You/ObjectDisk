@@ -22,7 +22,7 @@ const DataBaseConfig: TypeOrmModuleOptions = {
   host: 'localhost',
   port: 3306,
   username: 'root',
-  password: '1234',
+  password: '123',
   database: 'objcloud',
   // 不要打开这个设置
   synchronize: true,

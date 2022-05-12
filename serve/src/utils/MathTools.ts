@@ -7,6 +7,7 @@
  */
 import * as NodeRSA from 'node-rsa';
 import * as fs from 'fs';
+import {DataBaseConfig} from 'src/config/orm.config';
 import conf from 'src/config/config';
 
 export default class MathTools {
