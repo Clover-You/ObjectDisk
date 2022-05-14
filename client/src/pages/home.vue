@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, getCurrentInstance } from "vue";
+import { reactive, toRefs, getCurrentInstance, ref } from "vue";
 import { useStore } from "@/store/index.ts";
 import uploadModal from "@/components/uploadModal.vue";
 import { sha256 } from "js-sha256";
@@ -70,20 +70,41 @@ export default {
   },
 
   setup() {
-    const data = reactive({
-      uploadBufferPool: [], //上传缓冲池
-      uploadSetTimeOut: null, //延迟倒计时
-      uploadRemainingTask: 0, //剩余上传任务
-    });
+    const childRouter = ref(); //RefChilde 要和Son组件上的class名相同
+
     const store = useStore();
+
+    // console.log(store.drive.uploadBufferPool)
+    const data = reactive({
+      uploadBufferPool: store.drive.uploadBufferPool,
+      uploadRemainingTask: store.drive.uploadRemainingTask,
+    });
+
+    const distributionTask = () => {
+      //分配任务
+      for (let i = 0, len = store.drive.uploadBufferPool.length; i < len; i++) {
+        if (store.drive.uploadBufferPool[i].uploadType == 0) {
+          //有空闲线程先异步执行
+          setTaskState(store.drive.uploadBufferPool[i], 0, 1);
+          upLoadFun(store.drive.uploadBufferPool[i]);
+        }
+      }
+    };
+
+    store.$subscribe((m, s) => {
+      //监听文件变化
+      // uploadBufferPool = s.drive.uploadBufferPool;
+      distributionTask();
+      // console.log(s);
+    });
+
     const { proxy } = getCurrentInstance();
     // const globalProperties = appContext.config.globalProperties;
 
     const judgmentIsLogin = () => {
       //检查登录
       if (!store.isLogin) {
-
-        store.siderbarStr = "drive"//重置最后路由
+        store.siderbarStr = "drive"; //重置最后路由
         proxy.$router.replace({ name: "login" }); //没登录直接回到登录页
       }
 
@@ -131,44 +152,34 @@ export default {
       proxy.$router.push({ name: "interactiveEffect" });
     };
 
-    const distributionTask = () => {
-      //分配任务
-      for (let i = 0, len = this.uploadBufferPool.length; i < len; i++) {
-        if (this.uploadBufferPool[i].uploadType == 0) {
-          //有空闲线程先异步执行
-          this.setTaskState(this.uploadBufferPool[i], 0, 1);
-          this.upLoadFun(this.uploadBufferPool[i]);
-        }
-      }
-    };
-
     const setTaskState = (item, stateCode, ano) => {
       //设置任务状态
       //0等待中 1准备中 2上传中 3上传暂停 4上传完成 5秒传 6文件太小 7文件太大 8文件已存在 404上传错误
-      this.$set(item, "uploadType", stateCode);
+      item.uploadType = stateCode;
 
       if (ano == 0) {
-        --this.uploadRemainingTask;
+        --store.drive.uploadRemainingTask;
       } else if (ano == 1) {
-        ++this.uploadRemainingTask;
+        ++store.drive.uploadRemainingTask;
       }
     };
 
     const upLoadFun = (item) => {
       if (item.file.size <= 0) {
         //文件太小,无法上传
-        this.setTaskState(item, 6, 0);
+        setTaskState(item, 6, 0);
         return;
       }
-      this.setTaskState(item, 1, 3);
+      setTaskState(item, 1, 3);
       //拿到sha256
       let fr = new FileReader();
       fr.readAsArrayBuffer(item.file);
       fr.onload = (data) => {
         let sha256Id = sha256(data.target.result);
-        this.$set(item, "fileSha256", sha256Id);
+        item.fileSha256 = sha256Id;
+
         //检查文件
-        this.$http
+        proxy.$http
           .post(`${store.serve.serveUrl}upload/examineFile`, {
             userid: store.id,
             folderid: item.folderId,
@@ -185,17 +196,18 @@ export default {
               File.prototype.slice;
 
             // 指定文件分块大小 1024的2次方
-            let chunkSize = this.calculateSliceSize(item.file.size) * 1024 ** 2;
+            let chunkSize = calculateSliceSize(item.file.size) * 1024 ** 2;
             // 计算文件分块总数
             let chunks = Math.ceil(item.file.size / chunkSize);
             //设置总片段数量
-            this.$set(item, "currentChunkMax", chunks);
+            // this.$set(item, "currentChunkMax", chunks);
+            item.currentChunkMax = chunks;
 
             if (examineres.data.code == 200) {
               if (!examineres.data.data.userFileExist) {
                 if (!examineres.data.data.fileExist) {
                   //设置该任务的状态
-                  this.setTaskState(item, 2, 3);
+                  setTaskState(item, 2, 3);
                   for (let i = 0, len = chunks; i < len; i++) {
                     // 计算开始读取的位置
                     let start = i * chunkSize;
@@ -210,7 +222,7 @@ export default {
 
                     //片段流上传
 
-                    this.$http
+                    proxy.$http
                       .put(
                         `${store.serve.serveUrl}upload/uploadStreamFile`,
                         fileslice,
@@ -232,22 +244,23 @@ export default {
                       )
                       .then((res) => {
                         if (res.data.code == 200) {
-                          this.$set(
-                            item,
-                            "uploadCurrentChunkNum",
-                            item.uploadCurrentChunkNum + 1
-                          );
+                          item.uploadCurrentChunkNum =
+                            item.uploadCurrentChunkNum + 1;
                           if (
                             item.uploadCurrentChunkNum >= item.currentChunkMax
                           ) {
-                            this.$refs.childRouter.getUserFileAndFolder(
-                              this.$refs.childRouter.getFolderId()
-                            );
+                            // console.log(childRouter);
+                            // this.$refs.childRouter.getUserFileAndFolder(
+                            //   this.$refs.childRouter.getFolderId()
+                            // );
+
+                            console.log();
+
                             //设置任务上传完成
-                            this.setTaskState(item, 4, 0);
+                            setTaskState(item, 4, 0);
                           }
                         } else {
-                          this.setTaskState(item, 404, 0);
+                          setTaskState(item, 404, 0);
                           console.log("上传出错");
                         }
                       });
@@ -255,7 +268,7 @@ export default {
                 } else {
                   //秒传文件
 
-                  this.$http
+                  proxy.$http
                     .post(`${store.serve.serveUrl}upload/uploadSecondPass`, {
                       userid: store.id,
                       folderid: item.folderId,
@@ -266,9 +279,11 @@ export default {
                     })
                     .then((SecondPass) => {
                       if (SecondPass.data.code == 200) {
-                        this.$refs.childRouter.getUserFileAndFolder(
-                          this.$refs.childRouter.getFolderId()
-                        );
+                        // childRouter.value.getUserFileAndFolder(
+                        //   childRouter.value.getFolderId()
+                        // );
+                        console.log(childRouter);
+
                         //设置任务为秒传
                         this.setTaskState(item, 5, 0);
                       } else {
@@ -326,14 +341,10 @@ export default {
       //设置最后路由
       this.store.siderbarStr = toRouter.name;
       // sessionStorage.setItem("siderbarStr", toRouter.name);
-      this.store.siderbarStr = toRouter.name//重置最后路由
+      this.store.siderbarStr = toRouter.name; //重置最后路由
 
       // 检查登录状态
       this.judgmentIsLogin();
-    },
-    uploadBufferPool() {
-      //监听任务列表更新
-      this.distributionTask();
     },
   },
 };

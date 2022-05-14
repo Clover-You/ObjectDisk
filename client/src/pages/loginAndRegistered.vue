@@ -77,6 +77,19 @@ export default {
 
     const store = useStore();
 
+    const encryption = (str) => {
+      //加密
+      let num1 = window.btoa(str).replace(/=/g, "··");
+      let num2 = window.btoa(num1).replace(/=/g, "s+");
+      return num2;
+    }
+    const decrypt = (str) => {
+      //解密
+      let num1 = window.atob(str.replace(/s\+/g, "="));
+      let num2 = window.atob(num1.replace(/··/g, "="));
+      return num2;
+    }
+
     if (localStorage.getItem("account") != null) {
       data.account = decrypt(localStorage.getItem("account"));
     }
@@ -222,18 +235,7 @@ export default {
       data.confirmPassword = "";
       data.registeredCode = "";
     }
-    const encryption = (str) => {
-      //加密
-      let num1 = window.btoa(str).replace(/=/g, "··");
-      let num2 = window.btoa(num1).replace(/=/g, "s+");
-      return num2;
-    }
-    const decrypt = (str) => {
-      //解密
-      let num1 = window.atob(str.replace(/s\+/g, "="));
-      let num2 = window.atob(num1.replace(/··/g, "="));
-      return num2;
-    }
+  
 
     return {
       ...toRefs(data),

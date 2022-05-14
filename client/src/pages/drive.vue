@@ -15,10 +15,10 @@
 
     <div class="toolbar">
       <div class="toolbarLeft">
-        <p class="toolbarTitle" :class="{colorR:currentFolder.length >= 1}">{{currentFolder.length == 0?`我的云盘(${fileData.length})`:'我的云盘'}}</p>
-        <div v-for="(item,index) in currentFolder" :key="item.id" style="display:inline-flex" :class="{toolbarOn:index!=currentFolder.length-1}">
+        <p class="toolbarTitle" :class="{colorR:store.drive.navigation.length >= 1}">{{store.drive.navigation.length == 0?`我的云盘(${fileData.length})`:'我的云盘'}}</p>
+        <div v-for="(item,index) in store.drive.navigation" :key="item.id" style="display:inline-flex" :class="{toolbarOn:index!=store.drive.navigation.length-1}">
           <P class="toolbarArrow colorR">›</P>
-          <p class="toolbarTitle" :class="{colorR:index!=currentFolder.length-1}">{{item.text}}<span v-if="index==currentFolder.length-1">({{fileData.length}})</span></p>
+          <p class="toolbarTitle" :class="{colorR:index!=store.drive.navigation.length-1}">{{item.text}}<span v-if="index==store.drive.navigation.length-1">({{fileData.length}})</span></p>
         </div>
       </div>
       <div class="toolbarRight">
@@ -36,9 +36,9 @@
 
       <div class="file-container" v-if="fileData.length!=0">
 
-        <DynamicScroller :items="getFileData()" class="scroller" :min-item-size="1" key-field="key" v-slot="data">
+        <DynamicScroller :items="getFileData()" class="scroller" :min-item-size="1" key-field="key" v-slot="viewdata">
 
-          <div v-for="(item) in data.item.data" :key="item.id" class="fileBox" @dblclick="openFileOrFolder(item)" @mouseup.stop="fileBoxMouseup($event,item)" @contextmenu.prevent="">
+          <div v-for="(item) in viewdata.item.data" :key="item.id" class="fileBox" @dblclick="openFileOrFolder(item)" @mouseup.stop="fileBoxMouseup($event,item)" @contextmenu.prevent="">
             <div class="fileContentBox">
               <div class="fileContentImg">
                 <img class="imagePreview" src="../static/img/folder.png" draggable="false" v-if="item.type == 'folder'" />
@@ -124,7 +124,9 @@ export default {
   },
 
   setup() {
-    const data = reactive({
+    const store = useStore();
+
+    const viewdata = reactive({
       width: 0, // 宽
       height: 0, // 高
       isShowlVideo: false, //是否显示视频模态窗
@@ -137,10 +139,9 @@ export default {
       fileMenuPos: { x: 0, y: 0 }, //右键菜单选择显示位置
       rightMenuItem: null, //右键对应的Item对象
       fileData: [], //用户数据
-      currentFolder: [], //导航文件夹
+      // navigation: store.drive.navigation, //导航
     });
 
-    const store = useStore();
     const { proxy, appContext } = getCurrentInstance();
     const globalProperties = appContext.config.globalProperties;
 
@@ -149,8 +150,9 @@ export default {
     }
 
     const getFolderId = () => {
-      //获取路由中的参数文件夹id
-      let folderid = proxy.$route.params.folderId;
+      //获取路由的文件夹id
+      // let folderid = store.drive.currenFolderId;
+      let folderid = store.drive.currenFolderId =  proxy.$route.params.folderId;
       if (folderid == undefined || folderid == "" || folderid == null) {
         return "0";
       }
@@ -175,7 +177,7 @@ export default {
               res.data.data[i].blob = null;
             }
 
-            data.fileData = res.data.data;
+            viewdata.fileData = res.data.data;
 
             for (let i = 0; i < res.data.data.length; i++) {
               if (
@@ -192,7 +194,7 @@ export default {
               }
             }
           } else {
-            globalProperties.$tipMessge.show(res.data.message);
+            // globalProperties.$tipMessge.show(res.data.message);
           }
         })
         .catch(() => {
@@ -212,11 +214,11 @@ export default {
           if (res.data.code == 200) {
             getUserFileAndFolder(getFolderId());
           } else {
-            globalProperties.$tipMessge.show(res.data.message);
+            // globalProperties.$tipMessge.show(res.data.message);
           }
         })
         .catch((err) => {
-          globalProperties.$tipMessge.show(err.data.message);
+          // globalProperties.$tipMessge.show(err.data.message);
         });
     };
 
@@ -228,22 +230,22 @@ export default {
         if (item.kind === "file") {
           //是文件才触发显示效果
           e.dataTransfer.dropEffect = "copy";
-          data.isShowUpdateModel = true;
+          viewdata.isShowUpdateModel = true;
         }
       }
     };
     const dragover = (e) => {
       //拖拽持续移动
       e.dataTransfer.dropEffect = "copy";
-      data.isShowUpdateModel = true;
+      viewdata.isShowUpdateModel = true;
     };
     const dragleave = () => {
       //拖拽离开
-      data.isShowUpdateModel = false;
+      viewdata.isShowUpdateModel = false;
     };
     const drop = (e) => {
       //拖拽放入
-      data.isShowUpdateModel = false;
+      viewdata.isShowUpdateModel = false;
 
       // 修复拖拽获取不了文件的情况
       let items = [];
@@ -264,29 +266,37 @@ export default {
     };
     const driveBodyMouseup = () => {
       //父级点击
-      data.isShowRightMenu = false;
+      viewdata.isShowRightMenu = false;
     };
     const fileBoxMouseup = (e, item) => {
-      data.isShowRightMenu = false;
-      data.showRightMenuType = item === null ? "default" : item.type;
+      viewdata.isShowRightMenu = false;
+      viewdata.showRightMenuType = item === null ? "default" : item.type;
 
-      data.rightMenuItem = item;
-      //点击文件与文件夹
+      viewdata.rightMenuItem = item;
+      //右点击文件与文件夹
       if (e.button == 2) {
         //右键
-        this.$set(data.fileMenuPos, "x", e.x);
-        this.$set(data.fileMenuPos, "y", e.y);
-        data.isShowRightMenu = true;
+        viewdata.fileMenuPos.x = e.x;
+        viewdata.fileMenuPos.y = e.y;
+        // this.$set(, "x", e.x);
+        // this.$set(, "y", e.y);
+        viewdata.isShowRightMenu = true;
       }
     };
     const openFileOrFolder = (item) => {
       //打开文件或打开文件夹
       if (item.type == "folder") {
-        data.currentFolder.push({ text: item.name, id: item.id });
+        //给导航添加
+        store.drive.navigation.push({ text: item.name, id: item.id });
+        // viewdata.currentFolder.push({ text: item.name, id: item.id });
+
+        //将进入的文件夹的id赋值给全局变量
+        store.drive.currenFolderId = item.id;
+        //将路由跳转
         proxy.$router.push({ name: "drive", params: { folderId: item.id } });
       } else {
         //打开文件
-        globalProperties.$tipMessge.show("哦吼,文件预览还不能用");
+        // globalProperties.$tipMessge.show("哦吼,文件预览还不能用");
       }
     };
     const oneFile = async (file) => {
@@ -309,7 +319,8 @@ export default {
         // currentChunkList: []
       };
       // console.log(fileInfoOBJ);
-      this.$parent.uploadBufferPool.push(fileInfoOBJ); //将任务写入数据
+
+      store.drive.uploadBufferPool.push(fileInfoOBJ); //将任务写入数据
     };
     const getFileNameAndFext = (string) => {
       //获取文件名和后缀
@@ -347,7 +358,7 @@ export default {
             // currentChunkList: []
           };
           // console.log(fileInfoOBJ);
-          this.$parent.uploadBufferPool.push(fileInfoOBJ); //将任务写入数据
+          store.drive.uploadBufferPool.push(fileInfoOBJ); //将任务写入数据
         });
       } else {
         //检测到文件夹
@@ -374,16 +385,16 @@ export default {
     };
     const openNewFolderModel = () => {
       // 显示新建文件夹模态窗
-      data.isShowRightMenu = false;
-      data.isShowNewFolderModel = true;
+      viewdata.isShowRightMenu = false;
+      viewdata.isShowNewFolderModel = true;
     };
     const openNewFileModel = () => {
       //显示新建文件模态窗
-      data.isShowNewFileModel = true;
+      viewdata.isShowNewFileModel = true;
     };
     const showdelDialog = () => {
-      data.isShowRightMenu = false;
-      if (data.rightMenuItem.type == "file") {
+      viewdata.isShowRightMenu = false;
+      if (viewdata.rightMenuItem.type == "file") {
         //删除文件
         this.$dialogMessge({
           title: "确定删除",
@@ -405,18 +416,18 @@ export default {
       //删除文件或文件夹
       proxy.$http
         .post(`${store.serve.serveUrl}drive/delUserFileOrFolder`, {
-          id: data.rightMenuItem.id,
-          type: data.rightMenuItem.type,
+          id: viewdata.rightMenuItem.id,
+          type: viewdata.rightMenuItem.type,
         })
         .then((res) => {
           if (res.data.code == 200) {
             //刷新
             getUserFileAndFolder(getFolderId());
           }
-          globalProperties.$tipMessge.show(res.data.message);
+          // globalProperties.$tipMessge.show(res.data.message);
         })
         .catch((err) => {
-          globalProperties.$tipMessge.show(err.data.message);
+          // globalProperties.$tipMessge.show(err.data.message);
         });
     };
     const ImageToblobUrl = (i) => {
@@ -425,7 +436,7 @@ export default {
         .post(
           `${store.serve.serveUrl}drive/getUserFileForFileId`,
           {
-            id: data.fileData[i].id,
+            id: viewdata.fileData[i].id,
           },
           {
             responseType: "blob",
@@ -433,10 +444,10 @@ export default {
         )
         .then((res) => {
           let bloburl = window.URL.createObjectURL(res.data);
-          this.$set(data.fileData[i], "blob", bloburl);
+          this.$set(viewdata.fileData[i], "blob", bloburl);
         })
         .catch((err) => {
-          globalProperties.$tipMessge.show(err.data.message);
+          // globalProperties.$tipMessge.show(err.data.message);
         });
     };
     const VideoImageToblobUrl = (i) => {
@@ -445,7 +456,7 @@ export default {
         .post(
           `${store.serve.serveUrl}video/getVideoSceenshots`,
           {
-            id: data.fileData[i].id,
+            id: viewdata.fileData[i].id,
           },
           {
             responseType: "blob",
@@ -454,11 +465,11 @@ export default {
         .then((res) => {
           if (res.data != null) {
             let bloburl = window.URL.createObjectURL(res.data);
-            this.$set(data.fileData[i], "blob", bloburl);
+            this.$set(viewdata.fileData[i], "blob", bloburl);
           }
         })
         .catch((err) => {
-          globalProperties.$tipMessge.show(err.data.message);
+          // globalProperties.$tipMessge.show(err.data.message);
         });
     };
     const destroyBlobUrl = () => {
@@ -733,18 +744,20 @@ export default {
 
     const getFileData = () => {
       //根据屏幕宽度计算可以显示多少个为一行
-      const colNum = Number.parseInt(Math.abs(data.width / 190));
+      const colNum = Number.parseInt(Math.abs(viewdata.width / 190));
       let arr = [];
       //根据返回的数据可以显示几行
-      const rowNum = Number.parseInt(Math.abs(data.fileData.length / colNum));
+      const rowNum = Number.parseInt(
+        Math.abs(viewdata.fileData.length / colNum)
+      );
       //根据计算检查是否满足一行，不够一行加一行
       const rowNumReal =
-        data.fileData.length / colNum > rowNum ? rowNum + 1 : rowNum;
+        viewdata.fileData.length / colNum > rowNum ? rowNum + 1 : rowNum;
 
       for (let i = 0; i < rowNumReal; i++) {
         arr.push([]);
         for (let j = i * colNum; j < i * colNum + colNum; j++) {
-          arr[i].push(data.fileData[j]);
+          arr[i].push(viewdata.fileData[j]);
         }
       }
       arr[arr.length - 1] = arr[arr.length - 1].filter(
@@ -761,7 +774,7 @@ export default {
     getUserFileAndFolder(getFolderId());
 
     return {
-      ...toRefs(data),
+      ...toRefs(viewdata),
       store,
       addUserFolder,
       getUserFileAndFolder,
@@ -792,8 +805,11 @@ export default {
     $route() {
       //监听路由变化
       // console.log(to,from);
+      // console.log(this.store.drive.currenFolderId,this.getFolderId())
       this.getUserFileAndFolder(this.getFolderId());
-      let currentFolderList = toRaw(this.currentFolder);
+      let currentFolderList = toRaw(this.store.drive.navigation);
+      
+      
       //倒序删除导航
       for (let i = currentFolderList.length; i > 0; i--) {
         if (

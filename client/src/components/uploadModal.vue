@@ -79,8 +79,8 @@ export default {
         if (value == "video/mp4") {
           return "icon-video";
         }
-        if(value == "application/vnd.android.package-archive") {
-          return "icon-Android-hover"
+        if (value == "application/vnd.android.package-archive") {
+          return "icon-Android-hover";
         }
         // if (value == "application/octet-stream") {
         //   return ""
@@ -191,7 +191,7 @@ export default {
   width: 2rem !important;
   cursor: pointer;
   opacity: 0.8;
-  background-color: rgba(255,255,255,0.8) !important;
+  background-color: rgba(255, 255, 255, 0.8) !important;
   backdrop-filter: blur(10px);
 }
 
